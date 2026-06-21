@@ -1,0 +1,139 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleBody from "../../components/ArticleBody.astro";
+import ShareButton from "../../components/ShareButton.astro";
+import { SITE } from "../../config";
+import {
+  ELEMENTS,
+  CATEGORY_META,
+  categoryLabel,
+  adjacentElements,
+  type Element,
+} from "../../lib/elements";
+import { buildArticle, formatMass } from "../../lib/article";
+
+export function getStaticPaths() {
+  return ELEMENTS.map((element) => ({
+    params: { slug: element.slug },
+    props: { element },
+  }));
+}
+
+interface Props {
+  element: Element;
+}
+const { element } = Astro.props;
+const article = buildArticle(element);
+// Trailing slash to match Astro's directory-format canonical / og:url output.
+const canonical = new URL(`/element/${element.slug}/`, SITE.url).href;
+const accent = CATEGORY_META[element.category].cssVar;
+const { prev, next } = adjacentElements(element.number);
+
+// JSON-LD: a ChemicalSubstance for the element itself + a BreadcrumbList.
+const chemical = {
+  "@context": "https://schema.org",
+  "@type": "ChemicalSubstance",
+  name: element.name,
+  alternateName: element.symbol,
+  identifier: String(element.number),
+  description: article.summary,
+  url: canonical,
+  ...(element.discoveredBy && element.discoveredBy !== "Ancient"
+    ? { discoverer: { "@type": "Person", name: element.discoveredBy } }
+    : {}),
+};
+
+const breadcrumbs = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Elements",
+      item: new URL("/elements/", SITE.url).href,
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: element.name,
+      item: canonical,
+    },
+  ],
+};
+
+const metaDescription = article.summary.slice(0, 300);
+---
+
+<BaseLayout
+  title={`${element.name} (${element.symbol})`}
+  description={metaDescription}
+  jsonLd={[chemical, breadcrumbs]}
+>
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a> › <a href="/elements/">Elements</a> › {element.name}
+    </nav>
+
+    <div class="element-hero">
+      <div class="element-tile" style={`--tile-accent:var(${accent});`}>
+        <span class="num">{element.number}</span>
+        <span class="sym">{element.symbol}</span>
+        <span class="mass">{formatMass(element)}</span>
+      </div>
+      <div class="meta">
+        <h1>{element.name}</h1>
+        <p class="cat">
+          {categoryLabel(element.category)} · Group {
+            element.group ?? "—"
+          } · Period {element.period}
+        </p>
+      </div>
+    </div>
+
+    {/* Toolbar: Share + "Show more" affordance kept on the right via margin-left:auto. */}
+    <div class="toolbar">
+      <ShareButton element={element} />
+      <a class="icon-btn" href="/" style="margin-left:auto;">← Back to table</a>
+    </div>
+
+    <ArticleBody element={element} />
+
+    <nav class="prevnext" aria-label="Element navigation">
+      {
+        prev ? (
+          <a class="icon-btn" href={`/element/${prev.slug}/`}>
+            ← {prev.number} {prev.name}
+          </a>
+        ) : (
+          <span></span>
+        )
+      }
+      {
+        next ? (
+          <a class="icon-btn" href={`/element/${next.slug}/`}>
+            {next.number} {next.name} →
+          </a>
+        ) : (
+          <span></span>
+        )
+      }
+    </nav>
+  </div>
+
+  <div class="toast js-toast" role="status" aria-live="polite"></div>
+</BaseLayout>
+
+<script>
+  import { wireStandaloneShareButtons } from "../../scripts/table-ui";
+  const toast = document.querySelector<HTMLElement>(".js-toast");
+  let t: ReturnType<typeof setTimeout> | undefined;
+  wireStandaloneShareButtons((msg) => {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(t);
+    t = setTimeout(() => toast.classList.remove("show"), 2600);
+  });
+</script>

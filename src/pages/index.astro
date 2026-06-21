@@ -1,0 +1,103 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PeriodicTable from "../components/PeriodicTable.astro";
+import { SITE } from "../config";
+import { ELEMENTS, CATEGORY_META, type Category } from "../lib/elements";
+
+const cats = Object.entries(CATEGORY_META) as [
+  Category,
+  (typeof CATEGORY_META)[Category],
+][];
+
+// ItemList JSON-LD: the table links out to all 118 element pages.
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Chemical elements",
+  numberOfItems: ELEMENTS.length,
+  itemListElement: ELEMENTS.map((el) => ({
+    "@type": "ListItem",
+    position: el.number,
+    url: new URL(`/element/${el.slug}/`, SITE.url).href,
+    name: el.name,
+  })),
+};
+---
+
+<BaseLayout title={SITE.name} description={SITE.description} jsonLd={itemList}>
+  <div class="container">
+    <div class="hero-copy">
+      <h1>Interactive Periodic Table</h1>
+      <p>
+        Explore all 118 chemical elements. Click any element to read its article
+        in the panel — or open its own dedicated, fully indexable page. Every
+        element has structured data, electron configuration, discovery history,
+        and real-world uses.
+      </p>
+    </div>
+
+    <div class="search-box">
+      <label for="pt-search" class="visually-hidden">Filter elements</label>
+      <input
+        id="pt-search"
+        type="search"
+        placeholder="Filter by name, symbol, or number…"
+        autocomplete="off"
+      />
+    </div>
+
+    <PeriodicTable />
+
+    <div class="legend" aria-label="Category legend">
+      {
+        cats.map(([cat, meta]) => (
+          <span class="legend-item" data-category={cat}>
+            <span
+              class="legend-swatch"
+              style={`--swatch:var(${meta.cssVar});`}
+            />
+            {meta.label}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  {/* ---- More-info slide-in panel ---- */}
+  <div class="panel-backdrop js-backdrop"></div>
+  <aside
+    class="info-panel js-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="panel-title"
+    aria-hidden="true"
+  >
+    <div class="panel-head">
+      <div class="titles">
+        <h2 id="panel-title" class="js-panel-title">Element</h2>
+        <span class="sub js-panel-sub"></span>
+      </div>
+      {/* Controls live on the RIGHT of the header per spec: Share + "Show more" (full page) + Close. */}
+      <div class="panel-actions">
+        <button class="icon-btn js-panel-share" type="button" aria-label="Share this element">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share
+        </button>
+        <a class="icon-btn js-panel-more" href="#" aria-label="Open full element page">Show more →</a>
+        <button class="icon-btn js-panel-close" type="button" aria-label="Close panel">✕</button>
+      </div>
+    </div>
+    <div class="panel-body js-panel-body">
+      <p>Select an element to load its article.</p>
+    </div>
+  </aside>
+
+  <div class="toast js-toast" role="status" aria-live="polite"></div>
+</BaseLayout>
+
+<script>
+  import { initInteractiveTable } from "../scripts/table-ui";
+  initInteractiveTable();
+</script>

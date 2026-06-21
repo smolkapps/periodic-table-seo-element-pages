@@ -1,0 +1,43 @@
+---
+import type { Element } from "../lib/elements";
+import { buildArticle } from "../lib/article";
+
+interface Props {
+  element: Element;
+  /** Whether to render the facts table (shown on page; also in panel). */
+  showFacts?: boolean;
+}
+const { element, showFacts = true } = Astro.props;
+const article = buildArticle(element);
+---
+
+<div class="article">
+  <p class="summary">{article.summary}</p>
+
+  {
+    article.sections.map((section) => (
+      <section>
+        <h3>{section.heading}</h3>
+        <p>{section.body}</p>
+      </section>
+    ))
+  }
+
+  {
+    showFacts && (
+      <table class="facts">
+        <caption class="visually-hidden">
+          Key properties of {element.name}
+        </caption>
+        <tbody>
+          {article.facts.map((fact) => (
+            <tr>
+              <th scope="row">{fact.label}</th>
+              <td>{fact.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }
+</div>

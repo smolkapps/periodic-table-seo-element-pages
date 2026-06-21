@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE } from "../../config";
+import { elementsByCategory, CATEGORY_META } from "../../lib/elements";
+import { formatMass } from "../../lib/article";
+
+const grouped = elementsByCategory();
+
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "All chemical elements, by category",
+  itemListElement: [...grouped.values()].flat().map((el) => ({
+    "@type": "ListItem",
+    position: el.number,
+    url: new URL(`/element/${el.slug}/`, SITE.url).href,
+    name: el.name,
+  })),
+};
+---
+
+<BaseLayout
+  title="All Elements"
+  description="A complete, browsable index of all 118 chemical elements grouped by category — alkali metals, noble gases, transition metals, lanthanides, actinides, and more. Each links to its own dedicated page."
+  jsonLd={itemList}
+>
+  <div class="container">
+    <div class="hero-copy">
+      <h1>All 118 Elements</h1>
+      <p>
+        Every element grouped by category. Each name links to a dedicated,
+        fully indexable page with its article, properties, and structured data.
+      </p>
+    </div>
+
+    {
+      [...grouped.entries()].map(([cat, els]) =>
+        els.length === 0 ? null : (
+          <section style="margin-block:2rem;">
+            <h2 style={`border-left:4px solid var(${CATEGORY_META[cat].cssVar});padding-left:.6rem;`}>
+              {CATEGORY_META[cat].label}
+              <span style="color:var(--ink-faint);font-weight:400;font-size:.9rem;">
+                {" "}
+                ({els.length})
+              </span>
+            </h2>
+            <ul style="list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem 1rem;padding:0;margin-top:.75rem;">
+              {els.map((el) => (
+                <li>
+                  <a href={`/element/${el.slug}/`}>
+                    <strong>{el.symbol}</strong> {el.name}{" "}
+                    <span style="color:var(--ink-faint);">
+                      {el.number} · {formatMass(el)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ),
+      )
+    }
+  </div>
+</BaseLayout>

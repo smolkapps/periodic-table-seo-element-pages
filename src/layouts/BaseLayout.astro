@@ -1,0 +1,111 @@
+---
+import "../styles/global.css";
+import { SITE } from "../config";
+import JsonLd from "../components/JsonLd.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Per-page JSON-LD object(s). */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Override the canonical path (defaults to the current path). */
+  canonicalPath?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  jsonLd,
+  canonicalPath,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, SITE.url).href;
+const ogImage = new URL("/og-default.svg", SITE.url).href;
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+---
+
+<!doctype html>
+<html lang={SITE.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="author" content={SITE.author} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={`${SITE.name} — ${title}`} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${SITE.name} — ${title}`} />
+
+    <!-- Icons + manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Feed + sitemap -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.name}
+      href="/rss.xml"
+    />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {jsonLd && <JsonLd data={jsonLd} />}
+
+    {
+      SITE.analyticsId && (
+        <script
+          is:inline
+          defer
+          data-domain={SITE.url}
+          src="https://plausible.io/js/script.js"
+        />
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href="/">{SITE.name}</a>
+        <nav aria-label="Primary">
+          <a href="/elements/">All elements</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Built by <a href={SITE.authorUrl}>{SITE.author}</a>. Data from public
+          domain references (IUPAC standard atomic weights, NIST). Open source
+          under the MIT license.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

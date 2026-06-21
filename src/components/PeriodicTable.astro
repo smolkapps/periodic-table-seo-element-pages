@@ -1,0 +1,40 @@
+---
+import { buildGrid, CATEGORY_META, type Element } from "../lib/elements";
+
+const grid = buildGrid();
+
+// Build a CSS custom property string per cell for its grid coords + accent.
+function cellStyle(el: Element): string {
+  const accent = CATEGORY_META[el.category].cssVar;
+  return `--x:${el.xpos};--y:${el.ypos};--cell-accent:var(${accent});`;
+}
+---
+
+<div class="pt-scroll">
+  <div class="periodic-table" role="grid" aria-label="Periodic table of the elements">
+    {
+      grid.map(({ element }) => (
+        <button
+          type="button"
+          class="pt-cell js-cell"
+          style={cellStyle(element)}
+          data-slug={element.slug}
+          data-symbol={element.symbol}
+          data-number={element.number}
+          data-name={element.name}
+          data-search={`${element.name} ${element.symbol} ${element.number}`.toLowerCase()}
+          aria-label={`${element.name}, symbol ${element.symbol}, atomic number ${element.number}. Open details.`}
+        >
+          <span class="num">{element.number}</span>
+          <span class="sym">{element.symbol}</span>
+          <span class="nm">{element.name}</span>
+        </button>
+      ))
+    }
+
+    {/* Detached f-block leader placeholders in the main body. */}
+    <div class="pt-placeholder" style="--x:3;--y:6;" aria-hidden="true">57–71</div>
+    <div class="pt-placeholder" style="--x:3;--y:7;" aria-hidden="true">89–103</div>
+    <div class="fblock-spacer" style="grid-row:8;" aria-hidden="true"></div>
+  </div>
+</div>

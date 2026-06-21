@@ -1,0 +1,29 @@
+{
+  "name": "periodic-table-seo-element-pages",
+  "version": "1.0.0",
+  "description": "An interactive periodic table with a dedicated, fully indexable static page per element, embedded element articles, share buttons, and complete SEO (per-element JSON-LD, sitemap, RSS).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Michael Smolkin <michael@smolkin.org>",
+  "scripts": {
+    "icons": "node scripts/gen-icons.mjs",
+    "dev": "astro dev",
+    "build": "npm run icons && astro build",
+    "verify": "node scripts/verify-build.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.1.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "sharp": "^0.33.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

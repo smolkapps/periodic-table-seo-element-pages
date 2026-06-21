@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Element not found"
+  description="That page does not exist. Return to the periodic table."
+  noindex={true}
+>
+  <div class="container" style="padding-block:4rem;text-align:center;">
+    <h1 style="font-size:var(--step-3);">404 — Off the table</h1>
+    <p style="color:var(--ink-soft);max-width:48ch;margin:1rem auto;">
+      That element or page doesn't exist. Maybe it hasn't been synthesized yet.
+    </p>
+    <p style="margin-top:1.5rem;">
+      <a class="icon-btn" href="/">← Back to the periodic table</a>
+      <a class="icon-btn" href="/elements/">Browse all elements</a>
+    </p>
+  </div>
+</BaseLayout>
