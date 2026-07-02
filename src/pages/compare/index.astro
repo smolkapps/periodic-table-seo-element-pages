@@ -1,0 +1,108 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { CATEGORY_META } from "../../lib/elements";
+import {
+  buildComparison,
+  resolveComparisonSlugs,
+  DEFAULT_COMPARE_SLUGS,
+  COMPARE_OPTIONS,
+  MAX_COMPARE,
+} from "../../lib/compare";
+
+// Server-render the default trio so the page ships real, indexable content and
+// works with no JavaScript. The client script re-renders on interaction.
+const defaults = resolveComparisonSlugs([...DEFAULT_COMPARE_SLUGS]);
+const comparison = buildComparison(defaults);
+
+const pickers = Array.from({ length: MAX_COMPARE }, (_, i) => ({
+  index: i,
+  selected: defaults[i]?.slug ?? "",
+}));
+
+const defaultNames = defaults.map((e) => e.name).join(", ");
+---
+
+<BaseLayout
+  title="Compare elements"
+  description={`Compare chemical elements side by side — atomic mass, category, group, period, electron configuration, and discovery. Choose any two or three of the 118 elements. Defaults to ${defaultNames}.`}
+>
+  <div class="container">
+    <div class="hero-copy">
+      <h1>Compare elements</h1>
+      <p>
+        Put any two or three elements side by side and see how their core
+        properties line up — atomic mass, category, group and period, electron
+        configuration, and when each was discovered. The greatest value in each
+        numeric row is highlighted.
+      </p>
+    </div>
+
+    <form class="cmp-pickers" aria-label="Choose elements to compare">
+      {
+        pickers.map((p) => (
+          <label class="cmp-picker">
+            <span class="cmp-picker-label">
+              Element {p.index + 1}
+              {p.index >= 2 ? " (optional)" : ""}
+            </span>
+            <select class="js-compare-select" name={`el${p.index + 1}`}>
+              {p.index >= 2 && <option value="">None</option>}
+              {COMPARE_OPTIONS.map((el) => (
+                <option value={el.slug} selected={el.slug === p.selected}>
+                  {el.number} · {el.symbol} — {el.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))
+      }
+    </form>
+
+    <div class="js-compare-result cmp-result">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <td></td>
+            {
+              comparison.elements.map((el) => (
+                <th scope="col">
+                  <a href={`/element/${el.slug}/`}>
+                    <span
+                      class="cmp-sym"
+                      style={`--cmp-accent:var(${CATEGORY_META[el.category].cssVar});`}
+                    >
+                      {el.symbol}
+                    </span>{" "}
+                    {el.name}
+                  </a>
+                </th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            comparison.rows.map((row) => (
+              <tr>
+                <th scope="row">{row.label}</th>
+                {row.values.map((v, i) => (
+                  <td class={row.maxIndex === i ? "cmp-max" : undefined}>{v}</td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="cmp-foot">
+      <a class="icon-btn" href="/">← Back to the table</a>
+      <a class="icon-btn" href="/elements/">Browse all elements</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initCompare } from "../../scripts/compare-ui";
+  initCompare();
+</script>
