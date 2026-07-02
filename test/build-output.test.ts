@@ -101,4 +101,27 @@ d("static build output", () => {
   it("emits a custom 404 page", () => {
     expect(existsSync(join(DIST, "404.html"))).toBe(true);
   });
+
+  it("emits a static compare page with the default comparison prerendered", () => {
+    const comparePath = join(DIST, "compare", "index.html");
+    expect(existsSync(comparePath)).toBe(true);
+    const html = readFileSync(comparePath, "utf8");
+    // The default trio (iron, gold, oxygen) is rendered server-side, so crawlers
+    // and no-JS visitors see a real comparison table, not an empty shell.
+    for (const slug of ["iron", "gold", "oxygen"]) {
+      expect(html.includes(`/element/${slug}/`), `compare missing ${slug}`).toBe(
+        true,
+      );
+    }
+    // Property rows and a numeric highlight cell are present in the static HTML.
+    expect(html).toContain("Electron configuration");
+    expect(html).toContain("cmp-max");
+    // All 118 elements are pickable in the selects.
+    for (const el of ELEMENTS) {
+      expect(
+        html.includes(`value="${el.slug}"`),
+        `compare picker missing ${el.slug}`,
+      ).toBe(true);
+    }
+  });
 });

@@ -23,6 +23,12 @@ engines see complete content with zero JavaScript.
   is the single source of truth, so the panel never drifts from the indexable
   content. Panel controls (Share, **Show more →**, Close) sit on the **right** of
   the header.
+- **Compare view** (`/compare/`): put any two or three elements side by side and
+  see their core properties aligned — atomic mass, category, group/period,
+  electron configuration, and discovery — with the greatest value in each numeric
+  row highlighted. The default trio is prerendered into static HTML (so crawlers
+  and no-JS visitors see a real table); the picker then re-renders from the same
+  pure logic and keeps a shareable `?ids=iron,gold,oxygen` URL in sync.
 - **Per-element pages** (`/element/<slug>/`): hero tile, full article (overview,
   atomic structure, discovery + neighbours), a properties table, prev/next
   navigation, and a **Share** button.
@@ -40,6 +46,7 @@ engines see complete content with zero JavaScript.
 | Element dataset (118 elements, accurate core facts + grid positions) | `src/data/elements.ts` | `test/elements.test.ts` |
 | Core logic (lookup, category/group/period, grid, share-data, slugs) | `src/lib/elements.ts` | `test/elements.test.ts` |
 | Article generation (deterministic prose + facts per element) | `src/lib/article.ts` | `test/article.test.ts` |
+| Element comparison (side-by-side rows, numeric-max highlight, slug resolution) | `src/lib/compare.ts` | `test/compare.test.ts` |
 | Share logic (Web Share / clipboard / unavailable) | `src/lib/share.ts` | `test/share.test.ts` |
 | Static build output (per-element pages, SEO, sitemap, RSS) | `dist/` | `test/build-output.test.ts` |
 | UI (Astro pages/components + the one client script) | `src/pages`, `src/components`, `src/scripts` | build + manual |
