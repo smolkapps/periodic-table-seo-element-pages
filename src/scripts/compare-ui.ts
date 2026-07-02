@@ -11,6 +11,7 @@
 import {
   buildComparison,
   resolveComparisonSlugs,
+  MIN_COMPARE,
   type Comparison,
 } from "../lib/compare";
 import { CATEGORY_META, type Element } from "../lib/elements";
@@ -49,6 +50,42 @@ function renderComparison(cmp: Comparison): string {
   return `<table class="cmp-table"><thead><tr><td></td>${heads}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
+/**
+ * Decide how to seed the pickers for each slot from a deep-linked selection.
+ *
+ * Mandatory slots (index < MIN_COMPARE) must always hold a real element slug —
+ * their `<select>` has no empty "None" option, so writing "" would leave the
+ * control at selectedIndex = -1. Optional slots beyond the resolved selection
+ * are cleared to "" (they DO have a "None" option). Returns one value per slot,
+ * or `null` when the selection is too short to apply — in which case the caller
+ * keeps the server-rendered defaults rather than degrading below the no-JS view.
+ */
+export function selectionValues(
+  selection: Element[],
+  slotCount: number,
+): string[] | null {
+  if (selection.length < MIN_COMPARE) return null;
+  return Array.from({ length: slotCount }, (_, i) =>
+    i < selection.length ? selection[i]!.slug : "",
+  );
+}
+
+/**
+ * Build the message shown when the current picks don't yield a comparison.
+ * Distinguishes "not enough picked" from "picked the same element twice", which
+ * the naive "pick at least two" wording gets wrong.
+ */
+export function hintForSelection(
+  chosenSlugs: string[],
+  resolved: Element[],
+): string {
+  if (resolved.length >= MIN_COMPARE) return "";
+  const distinct = new Set(chosenSlugs.map((s) => s.toLowerCase())).size;
+  return chosenSlugs.length >= MIN_COMPARE && distinct < MIN_COMPARE
+    ? "Pick two different elements to compare."
+    : "Pick at least two elements to compare.";
+}
+
 export function initCompare(): void {
   const selects = Array.from(
     document.querySelectorAll<HTMLSelectElement>(".js-compare-select"),
@@ -57,9 +94,8 @@ export function initCompare(): void {
   if (selects.length === 0 || !result) return;
   const target = result;
 
-  function currentElements(): Element[] {
-    const slugs = selects.map((s) => s.value).filter((v) => v.length > 0);
-    return resolveComparisonSlugs(slugs);
+  function chosenSlugs(): string[] {
+    return selects.map((s) => s.value).filter((v) => v.length > 0);
   }
 
   function syncUrl(els: Element[]): void {
@@ -70,10 +106,10 @@ export function initCompare(): void {
   }
 
   function update(): void {
-    const els = currentElements();
-    if (els.length < 2) {
-      target.innerHTML =
-        '<p class="cmp-hint">Pick at least two elements to compare.</p>';
+    const chosen = chosenSlugs();
+    const els = resolveComparisonSlugs(chosen);
+    if (els.length < MIN_COMPARE) {
+      target.innerHTML = `<p class="cmp-hint">${hintForSelection(chosen, els)}</p>`;
       return;
     }
     target.innerHTML = renderComparison(buildComparison(els));
@@ -85,13 +121,17 @@ export function initCompare(): void {
   const idsParam = params.get("ids");
   if (idsParam) {
     const initial = resolveComparisonSlugs(idsParam.split(","));
-    initial.forEach((el, i) => {
-      if (selects[i]) selects[i]!.value = el.slug;
-    });
-    // Clear any remaining pickers so they read as "None".
-    for (let i = initial.length; i < selects.length; i++) {
-      selects[i]!.value = "";
+    const values = selectionValues(initial, selects.length);
+    if (values) {
+      // A valid deep link: seed every picker from it.
+      values.forEach((v, i) => {
+        if (selects[i]) selects[i]!.value = v;
+      });
     }
+    // Whether or not the deep link was applied, re-render from the current
+    // selects. A too-short/invalid ?ids leaves the server defaults untouched,
+    // so the page never degrades below the no-JS comparison, and the URL is
+    // canonicalised to whatever is actually shown.
     update();
   }
 

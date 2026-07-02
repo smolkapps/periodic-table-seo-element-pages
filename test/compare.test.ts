@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getElementByNumber } from "../src/lib/elements";
+import { highlightFor } from "../src/lib/article";
 import {
   buildComparison,
   resolveComparisonSlugs,
@@ -84,6 +85,36 @@ describe("buildComparison", () => {
     for (const row of cmp.rows) {
       expect(row.maxIndex).toBeNull();
     }
+  });
+
+  it("shows the curated highlight (not discovery info) in the Notability row", () => {
+    const cmp = buildComparison([iron, gold, oxygen]);
+    const notability = cmp.rows.find((r) => r.label === "Notability")!;
+    const discovered = cmp.rows.find((r) => r.label === "Discovered")!;
+
+    for (let i = 0; i < cmp.elements.length; i++) {
+      const el = cmp.elements[i]!;
+      const hl = highlightFor(el);
+      // Notability is the sentence-cased curated highlight …
+      expect(notability.values[i]).toBe(
+        hl[0]!.toUpperCase() + hl.slice(1) + ".",
+      );
+      // … and must NOT duplicate the discovery year shown one row above.
+      expect(notability.values[i]).not.toBe(discovered.values[i]);
+      expect(notability.values[i]).not.toContain("discovered in");
+      expect(notability.values[i]).not.toContain("known since antiquity");
+    }
+    // Concretely: iron's notability is its use ("steel"), not "1774"/"Antiquity".
+    expect(notability.values[0]).toContain("steel");
+    expect(notability.maxIndex).toBeNull();
+  });
+
+  it("keeps Group and Period consistent: neither is a highlighted numeric row", () => {
+    const cmp = buildComparison([iron, gold, oxygen]);
+    const group = cmp.rows.find((r) => r.label === "Group")!;
+    const period = cmp.rows.find((r) => r.label === "Period")!;
+    expect(group.maxIndex).toBeNull();
+    expect(period.maxIndex).toBeNull();
   });
 });
 

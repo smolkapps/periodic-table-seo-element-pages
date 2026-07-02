@@ -608,8 +608,13 @@ p {
   font-weight: 700;
 }
 .cmp-hint,
+.cmp-note,
 .cmp-foot {
   margin-block: var(--space-m);
+}
+.cmp-note {
+  color: var(--ink-soft);
+  font-size: 0.95em;
 }
 .cmp-foot {
   display: flex;
