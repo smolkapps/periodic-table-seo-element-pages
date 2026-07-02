@@ -58,7 +58,15 @@ const defaultNames = defaults.map((e) => e.name).join(", ");
       }
     </form>
 
-    <div class="js-compare-result cmp-result">
+    <noscript>
+      <p class="cmp-note">
+        Choosing your own elements requires JavaScript. The comparison below
+        shows the default selection ({defaultNames}); enable JavaScript to swap
+        in any of the 118 elements and get a shareable link.
+      </p>
+    </noscript>
+
+    <div class="js-compare-result cmp-result" aria-live="polite">
       <table class="cmp-table">
         <thead>
           <tr>

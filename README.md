@@ -49,11 +49,13 @@ engines see complete content with zero JavaScript.
 | Element comparison (side-by-side rows, numeric-max highlight, slug resolution) | `src/lib/compare.ts` | `test/compare.test.ts` |
 | Share logic (Web Share / clipboard / unavailable) | `src/lib/share.ts` | `test/share.test.ts` |
 | Static build output (per-element pages, SEO, sitemap, RSS) | `dist/` | `test/build-output.test.ts` |
-| UI (Astro pages/components + the one client script) | `src/pages`, `src/components`, `src/scripts` | build + manual |
+| UI (Astro pages/components + the client scripts) | `src/pages`, `src/components`, `src/scripts` | build + `test/compare-ui.test.ts` (jsdom) + manual |
 
-The interactive table's only client JavaScript is `src/scripts/table-ui.ts`
-(filter, panel, fetch-and-embed article, share). Everything else ships as static
-HTML.
+There are two small client scripts, and everything else ships as static HTML:
+`src/scripts/table-ui.ts` (filter, panel, fetch-and-embed article, share) powers
+the interactive table, and `src/scripts/compare-ui.ts` progressively enhances the
+`/compare/` page (re-render the table from the picks and keep the shareable
+`?ids=` URL in sync). Both only enhance content that already renders without JS.
 
 ## Develop
 

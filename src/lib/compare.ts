@@ -13,7 +13,7 @@ import {
   categoryLabel,
   getElementBySlug,
 } from "./elements";
-import { formatMass, discoveryPhrase } from "./article";
+import { formatMass, highlightFor } from "./article";
 
 /** How many elements can be compared at once (min 2 for a meaningful diff). */
 export const MIN_COMPARE = 2;
@@ -57,8 +57,11 @@ const ROW_SPECS: RowSpec[] = [
   { label: "Symbol", value: (e) => e.symbol, numeric: null },
   { label: "Atomic mass", value: (e) => formatMass(e), numeric: (e) => e.atomicMass },
   { label: "Category", value: (e) => categoryLabel(e.category), numeric: null },
+  // Group and Period are positional coordinates in the table, not "greater is
+  // better" quantities, so neither is highlighted. Keeping them consistent
+  // avoids implying that a higher period/group is somehow the "winning" value.
   { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "—"), numeric: null },
-  { label: "Period", value: (e) => String(e.period), numeric: (e) => e.period },
+  { label: "Period", value: (e) => String(e.period), numeric: null },
   { label: "Phase at STP", value: (e) => capitalize(e.phase), numeric: null },
   { label: "Electron configuration", value: (e) => e.electronConfig, numeric: null },
   {
@@ -67,7 +70,9 @@ const ROW_SPECS: RowSpec[] = [
       e.discoveredYear !== null ? String(e.discoveredYear) : "Antiquity",
     numeric: (e) => e.discoveredYear ?? -Infinity,
   },
-  { label: "Notability", value: (e) => sentenceCase(discoveryPhrase(e)), numeric: null },
+  // The curated highlight (uses/notability) — deliberately distinct from the
+  // "Discovered" row above, which carries the discovery year/discoverer.
+  { label: "Notability", value: (e) => sentenceCase(highlightFor(e)), numeric: null },
 ];
 
 function capitalize(s: string): string {
