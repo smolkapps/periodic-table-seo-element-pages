@@ -28,7 +28,8 @@
   --cat-actinide: #e599f7;
 
   /* Type scale (fluid) */
-  --font-ui: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  --font-ui:
+    "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
   --font-serif: Georgia, "Times New Roman", Cambria, serif;
   --font-mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
   --step--1: clamp(0.8rem, 0.75rem + 0.2vw, 0.9rem);
@@ -207,9 +208,19 @@ p {
     border-color 0.08s ease;
   border-left: 4px solid var(--cell-accent, var(--rule));
 }
-.pt-cell:hover,
+/* Desktop hover only — iOS keeps :hover "stuck" on the last-tapped cell,
+   which left it offset by 2px (translateY) after a tap. */
+@media (hover: hover) {
+  .pt-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 40%);
+    border-color: var(--cell-accent, var(--accent));
+    z-index: 2;
+  }
+}
+/* Keyboard focus: highlight without the translate, so the programmatic
+   refocus when the panel closes (table-ui.ts) doesn't leave the cell shifted. */
 .pt-cell:focus-visible {
-  transform: translateY(-2px);
   box-shadow: 0 6px 16px rgb(0 0 0 / 40%);
   border-color: var(--cell-accent, var(--accent));
   z-index: 2;
