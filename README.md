@@ -17,7 +17,10 @@ engines see complete content with zero JavaScript.
   full, correctly sized cell — including the lanthanide/actinide rows and the
   group-2/group-3 gap (the original app rendered Oganesson and Actinium tiny
   because the spacers collapsed their cells; here each cell has an explicit grid
-  coordinate, so that can't happen).
+  coordinate, so that can't happen). The grid is fully keyboard-navigable
+  (roving tabindex: one tab stop, arrow keys / Home / End move between cells),
+  and the live filter matches name, symbol, number, or category, with a match
+  count and an explicit "no matches" empty state.
 - **More-info panel**: clicking an element opens a slide-in panel that embeds
   *that element's article*, loaded from its own static page. The dedicated page
   is the single source of truth, so the panel never drifts from the indexable
@@ -35,9 +38,13 @@ engines see complete content with zero JavaScript.
 - **Share button**: uses the Web Share API where available, falls back to
   copying the canonical link to the clipboard, with a toast either way.
 - **Full SEO**: per-page canonical URLs, Open Graph + Twitter cards, per-page
-  JSON-LD (`ItemList` on indexes, `ChemicalSubstance` + `BreadcrumbList` on
-  element pages), a generated sitemap, an RSS feed of all elements, and
-  `robots.txt`.
+  JSON-LD (`WebSite` + `ItemList` on indexes, `ChemicalSubstance` +
+  `BreadcrumbList` on element pages), a generated sitemap, an RSS feed of all
+  elements, and `robots.txt`.
+- **Per-element social cards**: every element page ships its own prerendered
+  1200×630 PNG Open Graph image (`/og/<slug>.png`) — the element's tile in its
+  category colour with its key facts — rasterized at build time with sharp
+  (social crawlers don't render SVG `og:image`s, so these are real PNGs).
 
 ## Architecture
 
@@ -48,6 +55,8 @@ engines see complete content with zero JavaScript.
 | Article generation (deterministic prose + facts per element) | `src/lib/article.ts` | `test/article.test.ts` |
 | Element comparison (side-by-side rows, numeric-max highlight, slug resolution) | `src/lib/compare.ts` | `test/compare.test.ts` |
 | Share logic (Web Share / clipboard / unavailable) | `src/lib/share.ts` | `test/share.test.ts` |
+| Keyboard grid navigation (roving tabindex, arrow-key movement) | `src/lib/grid-nav.ts` | `test/grid-nav.test.ts` |
+| OG social-card template (SVG rasterized to per-element PNGs) | `src/lib/og-card.ts` | `test/og-card.test.ts` |
 | Static build output (per-element pages, SEO, sitemap, RSS) | `dist/` | `test/build-output.test.ts` |
 | UI (Astro pages/components + the client scripts) | `src/pages`, `src/components`, `src/scripts` | build + `test/compare-ui.test.ts` (jsdom) + manual |
 

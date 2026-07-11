@@ -28,7 +28,7 @@ const errors = [];
 // 1. Required finishing assets.
 const required = [
   "favicon.svg",
-  "og-default.svg",
+  "og-default.png",
   "site.webmanifest",
   "apple-touch-icon.png",
   "icon-192.png",
@@ -81,6 +81,8 @@ addAllFiles(DIST);
 // 3. Check internal links + image alts.
 const hrefRe = /(?:href|src)="([^"]+)"/g;
 const imgRe = /<img\b[^>]*>/g;
+const ogImageRe =
+  /(?:property="og:image"|name="twitter:image") content="([^"]+)"/g;
 
 let linkCount = 0;
 for (const file of htmlFiles) {
@@ -119,6 +121,27 @@ for (const file of htmlFiles) {
   while ((im = imgRe.exec(html))) {
     if (!/\balt=/.test(im[0])) {
       errors.push(`<img> without alt in ${where}: ${im[0].slice(0, 80)}`);
+    }
+  }
+
+  // Social-card images: every og:image / twitter:image URL must resolve to an
+  // emitted file (crawlers fetch these; a 404 means broken link previews).
+  let og;
+  while ((og = ogImageRe.exec(html))) {
+    let path;
+    try {
+      path = new URL(og[1]).pathname;
+    } catch {
+      errors.push(`Unparseable og:image URL in ${where}: ${og[1]}`);
+      continue;
+    }
+    if (!resolvable.has(path)) {
+      errors.push(`og:image points at a missing file in ${where}: ${path}`);
+    }
+    if (path.endsWith(".svg")) {
+      errors.push(
+        `og:image is an SVG in ${where} (social crawlers reject SVG): ${path}`,
+      );
     }
   }
 }

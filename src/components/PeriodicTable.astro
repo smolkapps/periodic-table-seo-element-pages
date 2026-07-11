@@ -11,7 +11,9 @@ function cellStyle(el: Element): string {
 ---
 
 <div class="pt-scroll">
-  <div class="periodic-table" role="grid" aria-label="Periodic table of the elements">
+  {/* role="group" (not ARIA grid): these are simple buttons laid out with CSS
+      grid; table-ui.ts adds roving-tabindex arrow-key navigation on top. */}
+  <div class="periodic-table js-periodic-table" role="group" aria-label="Periodic table of the elements">
     {
       grid.map(({ element }) => (
         <button
@@ -22,7 +24,9 @@ function cellStyle(el: Element): string {
           data-symbol={element.symbol}
           data-number={element.number}
           data-name={element.name}
-          data-search={`${element.name} ${element.symbol} ${element.number}`.toLowerCase()}
+          data-x={element.xpos}
+          data-y={element.ypos}
+          data-search={`${element.name} ${element.symbol} ${element.number} ${CATEGORY_META[element.category].label}`.toLowerCase()}
           aria-label={`${element.name}, symbol ${element.symbol}, atomic number ${element.number}. Open details.`}
         >
           <span class="num">{element.number}</span>

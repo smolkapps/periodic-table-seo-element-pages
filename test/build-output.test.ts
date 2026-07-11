@@ -69,6 +69,38 @@ d("static build output", () => {
     expect(html).toContain('name="twitter:card"');
   });
 
+  it("every element page has its own PNG social card, emitted and referenced", () => {
+    for (const el of ELEMENTS) {
+      expect(
+        existsSync(join(DIST, "og", `${el.slug}.png`)),
+        `missing og card for ${el.slug}`,
+      ).toBe(true);
+    }
+    const html = readFileSync(pagePath("iron"), "utf8");
+    expect(html).toContain(
+      'property="og:image" content="https://elements.smolkin.org/og/iron.png"',
+    );
+    expect(html).toContain('property="og:image:width" content="1200"');
+    expect(html).toContain('property="og:image:height" content="630"');
+  });
+
+  it("social-card images are PNG everywhere (crawlers reject SVG og:images)", () => {
+    const home = readFileSync(join(DIST, "index.html"), "utf8");
+    expect(home).toContain(
+      'property="og:image" content="https://elements.smolkin.org/og-default.png"',
+    );
+    expect(home).not.toContain('property="og:image" content="https://elements.smolkin.org/og-default.svg"');
+    expect(existsSync(join(DIST, "og-default.png"))).toBe(true);
+  });
+
+  it("home page uses the full marketing title and WebSite JSON-LD", () => {
+    const home = readFileSync(join(DIST, "index.html"), "utf8");
+    expect(home).toContain(
+      "<title>Interactive Periodic Table — Every Element, Its Own Page</title>",
+    );
+    expect(home).toContain('"@type":"WebSite"');
+  });
+
   it("home page links to every element page (internal linking for SEO)", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     for (const el of ELEMENTS) {
@@ -83,6 +115,17 @@ d("static build output", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain('class="pt-cell js-cell"');
     expect(home).toContain('data-slug="hydrogen"');
+    // Grid coordinates for the arrow-key navigation.
+    expect(home).toContain('data-x="1"');
+    expect(home).toContain('data-y="1"');
+  });
+
+  it("element pages deep-link into the compare view with their neighbours", () => {
+    const fe = readFileSync(pagePath("iron"), "utf8");
+    expect(fe).toContain("/compare/?ids=manganese,iron,cobalt");
+    // Endpoints only have one neighbour.
+    const h = readFileSync(pagePath("hydrogen"), "utf8");
+    expect(h).toContain("/compare/?ids=hydrogen,helium");
   });
 
   it("emits sitemap and robots.txt", () => {

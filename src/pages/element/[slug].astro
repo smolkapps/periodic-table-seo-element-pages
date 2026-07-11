@@ -64,12 +64,21 @@ const breadcrumbs = {
 };
 
 const metaDescription = article.summary.slice(0, 300);
+
+// Deep link into /compare/ preloaded with this element and its neighbours,
+// so "how does it stack up?" is one click from every article.
+const compareIds = [prev, element, next]
+  .filter(Boolean)
+  .map((e) => e!.slug)
+  .join(",");
 ---
 
 <BaseLayout
   title={`${element.name} (${element.symbol})`}
   description={metaDescription}
   jsonLd={[chemical, breadcrumbs]}
+  ogImagePath={`/og/${element.slug}.png`}
+  ogImageAlt={`${element.name} (${element.symbol}), element ${element.number} — periodic table tile with key facts`}
 >
   <div class="container">
     <nav class="crumbs" aria-label="Breadcrumb">
@@ -95,6 +104,9 @@ const metaDescription = article.summary.slice(0, 300);
     {/* Toolbar: Share + "Show more" affordance kept on the right via margin-left:auto. */}
     <div class="toolbar">
       <ShareButton element={element} />
+      <a class="icon-btn" href={`/compare/?ids=${compareIds}`}>
+        Compare with neighbours
+      </a>
       <a class="icon-btn" href="/" style="margin-left:auto;">← Back to table</a>
     </div>
 
