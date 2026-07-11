@@ -47,6 +47,9 @@
 
   --radius: 8px;
   --maxw: 72rem;
+
+  /* Native form controls, scrollbars, etc. render dark to match the theme. */
+  color-scheme: dark;
 }
 
 /* Reset-ish */
@@ -144,6 +147,11 @@ p {
   justify-content: space-between;
   gap: var(--space-m);
   padding-block: var(--space-s);
+  flex-wrap: wrap;
+}
+.site-header nav {
+  display: flex;
+  gap: var(--space-m);
   flex-wrap: wrap;
 }
 .brand {
@@ -529,7 +537,22 @@ p {
   color: var(--ink);
   font: inherit;
 }
+.search-status {
+  min-height: 1.4em;
+  margin-top: var(--space-xs);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.search-status:empty {
+  margin-top: 0;
+}
 .pt-cell[hidden] {
+  display: none;
+}
+/* While a filter is active, hide the decorative f-block placeholders so the
+   remaining matches read as a clean result set. */
+.periodic-table.filtering .pt-placeholder,
+.periodic-table.filtering .fblock-spacer {
   display: none;
 }
 .visually-hidden {

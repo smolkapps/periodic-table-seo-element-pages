@@ -1,4 +1,6 @@
 {
+  "id": "/",
+  "scope": "/",
   "name": "Interactive Periodic Table",
   "short_name": "Elements",
   "description": "An interactive periodic table with a dedicated page for every element.",
@@ -6,6 +8,8 @@
   "display": "standalone",
   "background_color": "#0e1116",
   "theme_color": "#0e1116",
+  "lang": "en",
+  "categories": ["education", "reference"],
   "icons": [
     { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },

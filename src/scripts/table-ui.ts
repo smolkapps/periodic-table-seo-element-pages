@@ -2,20 +2,30 @@
  * Client-side glue for the interactive periodic table on the home page.
  *
  * Behaviour:
- *  - Filter cells live by name/symbol/number.
+ *  - Filter cells live by name/symbol/number/category, with a match count and
+ *    an explicit "no matches" empty state (Escape clears the filter).
+ *  - Roving-tabindex keyboard navigation: the table is one tab stop; arrow
+ *    keys / Home / End move between element cells (logic in ../lib/grid-nav.ts).
  *  - Click a cell -> open the slide-in "more info" panel and embed THAT
  *    element's article by fetching its own static page (/element/<slug>) and
  *    lifting its <article> markup. The dedicated page is the single source of
  *    truth, so the panel never drifts from the indexable content.
  *  - Panel header controls (right-aligned): Share (Web Share API + clipboard
  *    fallback) and "Show more →" (link to the full element page).
- *  - Escape / backdrop / close button dismiss the panel; focus is restored.
+ *  - The panel is a modal dialog: `inert` while closed, focus is trapped while
+ *    open, and Escape / backdrop / close button dismiss it and restore focus.
  *
- * All element-specific logic that can be pure lives in ../lib/share.ts, which is
- * unit-tested. This file is the thin DOM layer.
+ * All element-specific logic that can be pure lives in ../lib/share.ts and
+ * ../lib/grid-nav.ts, which are unit-tested. This file is the thin DOM layer.
  */
 
 import { shareOrCopy, shareFeedback, type SharePayload } from "../lib/share";
+import {
+  isNavKey,
+  nextCellIndex,
+  firstVisibleIndex,
+  type NavCell,
+} from "../lib/grid-nav";
 
 interface PanelState {
   slug: string;
@@ -28,6 +38,8 @@ const articleCache = new Map<string, string>();
 
 export function initInteractiveTable(): void {
   const search = document.querySelector<HTMLInputElement>("#pt-search");
+  const searchStatus = document.querySelector<HTMLElement>(".js-search-status");
+  const table = document.querySelector<HTMLElement>(".js-periodic-table");
   const cells = Array.from(
     document.querySelectorAll<HTMLButtonElement>(".js-cell"),
   );
@@ -46,12 +58,80 @@ export function initInteractiveTable(): void {
   let lastFocused: HTMLElement | null = null;
   let current: PanelState | null = null;
 
+  // ---- Roving-tabindex keyboard navigation over the grid ----
+  const navCells = (): NavCell[] =>
+    cells.map((c) => ({
+      x: Number(c.dataset.x),
+      y: Number(c.dataset.y),
+      hidden: c.hidden,
+    }));
+
+  function setTabStop(index: number): void {
+    cells.forEach((c, i) => {
+      c.tabIndex = i === index ? 0 : -1;
+    });
+  }
+
+  if (cells.length > 0) setTabStop(0);
+
+  table?.addEventListener("keydown", (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains("js-cell") || !isNavKey(e.key)) return;
+    const from = cells.indexOf(target as HTMLButtonElement);
+    const to = nextCellIndex(navCells(), from, e.key);
+    if (to === null) {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+    setTabStop(to);
+    cells[to]?.focus();
+  });
+
+  // Clicking (or programmatically focusing) a cell makes it the tab stop, so
+  // tabbing away and back returns to where the user left off.
+  table?.addEventListener("focusin", (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains("js-cell")) return;
+    const i = cells.indexOf(target as HTMLButtonElement);
+    if (i !== -1) setTabStop(i);
+  });
+
   // ---- Live filter ----
-  search?.addEventListener("input", () => {
+  function applyFilter(): void {
+    if (!search) return;
     const q = search.value.trim().toLowerCase();
+    let shown = 0;
     for (const cell of cells) {
       const hay = cell.dataset.search ?? "";
       cell.hidden = q.length > 0 && !hay.includes(q);
+      if (!cell.hidden) shown++;
+    }
+    // Hide the decorative f-block placeholders while a filter is active — a
+    // handful of matches next to dashed "57–71" boxes reads as clutter.
+    table?.classList.toggle("filtering", q.length > 0);
+    if (searchStatus) {
+      searchStatus.textContent =
+        q.length === 0
+          ? ""
+          : shown === 0
+            ? `No elements match “${search.value.trim()}”. Press Escape to clear.`
+            : `${shown} of ${cells.length} elements shown`;
+    }
+    // Keep the tab stop on a visible cell so keyboard users can reach results.
+    const stop = cells.findIndex((c) => c.tabIndex === 0);
+    if (stop === -1 || cells[stop]!.hidden) {
+      const first = firstVisibleIndex(navCells());
+      if (first !== null) setTabStop(first);
+    }
+  }
+
+  search?.addEventListener("input", applyFilter);
+  search?.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && search.value !== "") {
+      e.preventDefault();
+      search.value = "";
+      applyFilter();
     }
   });
 
@@ -75,7 +155,7 @@ export function initInteractiveTable(): void {
 
     backdrop!.classList.add("open");
     panel!.classList.add("open");
-    panel!.setAttribute("aria-hidden", "false");
+    panel!.inert = false;
     document.body.style.overflow = "hidden";
     panelClose?.focus();
 
@@ -85,11 +165,31 @@ export function initInteractiveTable(): void {
   function closePanel(): void {
     backdrop!.classList.remove("open");
     panel!.classList.remove("open");
-    panel!.setAttribute("aria-hidden", "true");
+    panel!.inert = true;
     document.body.style.overflow = "";
     current = null;
     lastFocused?.focus();
   }
+
+  // Trap Tab inside the open dialog (aria-modal promises this).
+  panel.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const focusables = Array.from(
+      panel!.querySelectorAll<HTMLElement>(
+        'button, a[href], [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((el) => el.offsetParent !== null);
+    if (focusables.length === 0) return;
+    const first = focusables[0]!;
+    const last = focusables[focusables.length - 1]!;
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 
   // ---- Embed the element's article by fetching its dedicated page ----
   async function loadArticle(slug: string): Promise<void> {

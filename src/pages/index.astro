@@ -9,7 +9,17 @@ const cats = Object.entries(CATEGORY_META) as [
   (typeof CATEGORY_META)[Category],
 ][];
 
-// ItemList JSON-LD: the table links out to all 118 element pages.
+// WebSite JSON-LD identifies the site itself; ItemList links out to all 118
+// element pages.
+const webSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  alternateName: SITE.title,
+  description: SITE.description,
+  url: SITE.url + "/",
+};
+
 const itemList = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -24,7 +34,11 @@ const itemList = {
 };
 ---
 
-<BaseLayout title={SITE.name} description={SITE.description} jsonLd={itemList}>
+<BaseLayout
+  title={SITE.name}
+  description={SITE.description}
+  jsonLd={[webSite, itemList]}
+>
   <div class="container">
     <div class="hero-copy">
       <h1>Interactive Periodic Table</h1>
@@ -41,9 +55,11 @@ const itemList = {
       <input
         id="pt-search"
         type="search"
-        placeholder="Filter by name, symbol, or number…"
+        placeholder="Filter by name, symbol, number, or category…"
         autocomplete="off"
       />
+      {/* Filter feedback: match count while filtering, empty state on zero. */}
+      <p class="search-status js-search-status" role="status" aria-live="polite"></p>
     </div>
 
     <PeriodicTable />
@@ -65,12 +81,14 @@ const itemList = {
 
   {/* ---- More-info slide-in panel ---- */}
   <div class="panel-backdrop js-backdrop"></div>
+  {/* `inert` keeps the off-screen panel's controls out of the tab order and
+      the accessibility tree until it opens (table-ui.ts toggles it). */}
   <aside
     class="info-panel js-panel"
     role="dialog"
     aria-modal="true"
     aria-labelledby="panel-title"
-    aria-hidden="true"
+    inert
   >
     <div class="panel-head">
       <div class="titles">

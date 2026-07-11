@@ -134,20 +134,26 @@ export interface CategoryMeta {
   label: string;
   /** CSS custom-property name used for the category's accent colour. */
   cssVar: string;
+  /**
+   * The accent colour itself, for contexts that can't read CSS variables
+   * (build-time OG images). Keep in sync with the --cat-* tokens in
+   * styles/global.css.
+   */
+  hex: string;
 }
 
 /** Display metadata for each category (label + the CSS variable that colours it). */
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
-  "alkali metal": { label: "Alkali metal", cssVar: "--cat-alkali" },
-  "alkaline earth metal": { label: "Alkaline earth metal", cssVar: "--cat-alkaline" },
-  "transition metal": { label: "Transition metal", cssVar: "--cat-transition" },
-  "post-transition metal": { label: "Post-transition metal", cssVar: "--cat-post-transition" },
-  metalloid: { label: "Metalloid", cssVar: "--cat-metalloid" },
-  nonmetal: { label: "Reactive nonmetal", cssVar: "--cat-nonmetal" },
-  halogen: { label: "Halogen", cssVar: "--cat-halogen" },
-  "noble gas": { label: "Noble gas", cssVar: "--cat-noble" },
-  lanthanide: { label: "Lanthanide", cssVar: "--cat-lanthanide" },
-  actinide: { label: "Actinide", cssVar: "--cat-actinide" },
+  "alkali metal": { label: "Alkali metal", cssVar: "--cat-alkali", hex: "#ff6b6b" },
+  "alkaline earth metal": { label: "Alkaline earth metal", cssVar: "--cat-alkaline", hex: "#ffa94d" },
+  "transition metal": { label: "Transition metal", cssVar: "--cat-transition", hex: "#ffd43b" },
+  "post-transition metal": { label: "Post-transition metal", cssVar: "--cat-post-transition", hex: "#69db7c" },
+  metalloid: { label: "Metalloid", cssVar: "--cat-metalloid", hex: "#38d9a9" },
+  nonmetal: { label: "Reactive nonmetal", cssVar: "--cat-nonmetal", hex: "#4dabf7" },
+  halogen: { label: "Halogen", cssVar: "--cat-halogen", hex: "#748ffc" },
+  "noble gas": { label: "Noble gas", cssVar: "--cat-noble", hex: "#da77f2" },
+  lanthanide: { label: "Lanthanide", cssVar: "--cat-lanthanide", hex: "#f783ac" },
+  actinide: { label: "Actinide", cssVar: "--cat-actinide", hex: "#e599f7" },
 };
 
 /** The display label for a category, e.g. "Noble gas". */
