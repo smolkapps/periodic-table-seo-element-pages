@@ -1,7 +1,7 @@
 ---
 import type { Element } from "../lib/elements";
 import { buildShareData } from "../lib/elements";
-import { SITE } from "../config";
+import { absUrl } from "../config";
 
 interface Props {
   element: Element;
@@ -9,7 +9,10 @@ interface Props {
   label?: string;
 }
 const { element, label = "Share" } = Astro.props;
-const share = buildShareData(element, SITE.url);
+// Pass the origin WITH the deployment base so the shared/copied link resolves
+// to the canonical subpath (/apps/periodic-table/element/<slug>/), not the
+// origin root. absUrl() ends with "/"; buildShareData trims it before appending.
+const share = buildShareData(element, absUrl());
 ---
 
 <button

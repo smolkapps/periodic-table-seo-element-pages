@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { SITE } from "../config";
+import { SITE, absUrl } from "../config";
 import JsonLd from "../components/JsonLd.astro";
 
 interface Props {
@@ -27,10 +27,17 @@ const {
   noindex = false,
 } = Astro.props;
 
-const canonical = new URL(canonicalPath ?? Astro.url.pathname, SITE.url).href;
+// canonicalPath (when passed) is site-root-relative WITHOUT the base, so it
+// goes through absUrl() to gain `<origin><base>`. Astro.url.pathname already
+// INCLUDES the base (e.g. /apps/periodic-table/element/iron/), so it is
+// resolved against the bare origin directly — running it through absUrl()
+// would double the base.
+const canonical = canonicalPath
+  ? absUrl(canonicalPath)
+  : new URL(Astro.url.pathname, SITE.url).href;
 // Social crawlers (Facebook, X, Slack, iMessage) don't render SVG og:images,
-// so cards are always prerendered 1200×630 PNGs.
-const ogImage = new URL(ogImagePath, SITE.url).href;
+// so cards are always prerendered 1200×630 PNGs. ogImagePath is base-less.
+const ogImage = absUrl(ogImagePath);
 const ogAlt = ogImageAlt ?? `${SITE.name} — ${title}`;
 // Pages titled with the site name itself (the home page) get the full
 // marketing title; everything else gets a "Page — Site" pattern.

@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleBody from "../../components/ArticleBody.astro";
 import ShareButton from "../../components/ShareButton.astro";
-import { SITE } from "../../config";
+import { absUrl } from "../../config";
 import {
   ELEMENTS,
   CATEGORY_META,
@@ -25,7 +25,9 @@ interface Props {
 const { element } = Astro.props;
 const article = buildArticle(element);
 // Trailing slash to match Astro's directory-format canonical / og:url output.
-const canonical = new URL(`/element/${element.slug}/`, SITE.url).href;
+// absUrl() keeps the deployment base (/apps/periodic-table/) so this agrees
+// with the <link rel="canonical"> BaseLayout derives from Astro.url.pathname.
+const canonical = absUrl(`element/${element.slug}/`);
 const accent = CATEGORY_META[element.category].cssVar;
 const { prev, next } = adjacentElements(element.number);
 
@@ -47,12 +49,12 @@ const breadcrumbs = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" },
+    { "@type": "ListItem", position: 1, name: "Home", item: absUrl() },
     {
       "@type": "ListItem",
       position: 2,
       name: "Elements",
-      item: new URL("/elements/", SITE.url).href,
+      item: absUrl("elements/"),
     },
     {
       "@type": "ListItem",

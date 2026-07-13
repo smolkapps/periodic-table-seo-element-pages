@@ -5,7 +5,14 @@ import sitemap from "@astrojs/sitemap";
 // crawlers see full content without needing prerender.io. This is the core of
 // the SEO enhancement (replaces the old client-rendered Tomcat-served app).
 export default defineConfig({
-  site: "https://elements.smolkin.org",
+  // Deployed under a subpath of the main site, not a dedicated subdomain:
+  //   https://www.smolkin.org/apps/periodic-table/
+  // `site` is the ORIGIN only; `base` is the subpath. Astro prefixes every
+  // internal link/asset with `base`, and absolute in-head/JSON-LD URLs are
+  // composed as `<site><base><path>` via `absUrl()` in src/config.ts. Keep
+  // `site` bare `smolkin.org` (no `www`) to match the deployed canonical host.
+  site: "https://smolkin.org",
+  base: "/apps/periodic-table/",
   // Directory format + always-trailing-slash keeps canonical, og:url, JSON-LD
   // URLs, and the on-disk path all consistent (/element/iron/).
   trailingSlash: "always",

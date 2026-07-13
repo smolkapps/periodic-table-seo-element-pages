@@ -46,12 +46,14 @@ d("static build output", () => {
   it("each element page has a self-referential canonical link (trailing-slash consistent)", () => {
     const fe = getElementByNumber(26)!;
     const html = readFileSync(pagePath(fe.slug), "utf8");
+    // Deployed under the /apps/periodic-table/ subpath: canonical/og:url MUST
+    // carry the base, not resolve to the origin root.
     expect(html).toContain(
-      '<link rel="canonical" href="https://elements.smolkin.org/element/iron/"',
+      '<link rel="canonical" href="https://smolkin.org/apps/periodic-table/element/iron/"',
     );
     // og:url must agree with the canonical exactly.
     expect(html).toContain(
-      'property="og:url" content="https://elements.smolkin.org/element/iron/"',
+      'property="og:url" content="https://smolkin.org/apps/periodic-table/element/iron/"',
     );
   });
 
@@ -78,7 +80,7 @@ d("static build output", () => {
     }
     const html = readFileSync(pagePath("iron"), "utf8");
     expect(html).toContain(
-      'property="og:image" content="https://elements.smolkin.org/og/iron.png"',
+      'property="og:image" content="https://smolkin.org/apps/periodic-table/og/iron.png"',
     );
     expect(html).toContain('property="og:image:width" content="1200"');
     expect(html).toContain('property="og:image:height" content="630"');
@@ -87,9 +89,9 @@ d("static build output", () => {
   it("social-card images are PNG everywhere (crawlers reject SVG og:images)", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain(
-      'property="og:image" content="https://elements.smolkin.org/og-default.png"',
+      'property="og:image" content="https://smolkin.org/apps/periodic-table/og-default.png"',
     );
-    expect(home).not.toContain('property="og:image" content="https://elements.smolkin.org/og-default.svg"');
+    expect(home).not.toContain('property="og:image" content="https://smolkin.org/apps/periodic-table/og-default.svg"');
     expect(existsSync(join(DIST, "og-default.png"))).toBe(true);
   });
 

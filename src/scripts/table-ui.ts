@@ -241,7 +241,13 @@ export function initInteractiveTable(): void {
     const payload: SharePayload = {
       title: `${current.name} (${current.symbol}) — Periodic Table`,
       text: `${current.name}: element ${current.number} on the periodic table.`,
-      url: new URL(`/element/${current.slug}/`, window.location.origin).href,
+      // import.meta.env.BASE_URL (= the Astro `base`, e.g. /apps/periodic-table/)
+      // is inlined at build time; include it so the shared link keeps the
+      // deployment subpath instead of resolving to the origin root.
+      url: new URL(
+        `${import.meta.env.BASE_URL}element/${current.slug}/`,
+        window.location.origin,
+      ).href,
     };
     const outcome = await shareOrCopy(navigator, payload);
     showToast(shareFeedback(outcome));

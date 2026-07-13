@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PeriodicTable from "../components/PeriodicTable.astro";
-import { SITE } from "../config";
+import { SITE, absUrl } from "../config";
 import { ELEMENTS, CATEGORY_META, type Category } from "../lib/elements";
 
 const cats = Object.entries(CATEGORY_META) as [
@@ -17,7 +17,7 @@ const webSite = {
   name: SITE.name,
   alternateName: SITE.title,
   description: SITE.description,
-  url: SITE.url + "/",
+  url: absUrl(),
 };
 
 const itemList = {
@@ -28,7 +28,7 @@ const itemList = {
   itemListElement: ELEMENTS.map((el) => ({
     "@type": "ListItem",
     position: el.number,
-    url: new URL(`/element/${el.slug}/`, SITE.url).href,
+    url: absUrl(`element/${el.slug}/`),
     name: el.name,
   })),
 };

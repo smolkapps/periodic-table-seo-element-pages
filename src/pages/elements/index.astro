@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { SITE } from "../../config";
+import { absUrl } from "../../config";
 import { elementsByCategory, CATEGORY_META } from "../../lib/elements";
 import { formatMass } from "../../lib/article";
 
@@ -13,7 +13,7 @@ const itemList = {
   itemListElement: [...grouped.values()].flat().map((el) => ({
     "@type": "ListItem",
     position: el.number,
-    url: new URL(`/element/${el.slug}/`, SITE.url).href,
+    url: absUrl(`element/${el.slug}/`),
     name: el.name,
   })),
 };
