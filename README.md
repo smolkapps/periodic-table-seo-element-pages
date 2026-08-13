@@ -17,7 +17,9 @@ engines see complete content with zero JavaScript.
   full, correctly sized cell — including the lanthanide/actinide rows and the
   group-2/group-3 gap (the original app rendered Oganesson and Actinium tiny
   because the spacers collapsed their cells; here each cell has an explicit grid
-  coordinate, so that can't happen).
+  coordinate, so that can't happen). Each cell is also a normal link to its
+  element page, so the full collection remains crawlable and usable without
+  JavaScript; an ordinary click is progressively enhanced into the info panel.
 - **More-info panel**: clicking an element opens a slide-in panel that embeds
   *that element's article*, loaded from its own static page. The dedicated page
   is the single source of truth, so the panel never drifts from the indexable

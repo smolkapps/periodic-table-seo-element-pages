@@ -3,7 +3,9 @@
  *
  * Behaviour:
  *  - Filter cells live by name/symbol/number.
- *  - Click a cell -> open the slide-in "more info" panel and embed THAT
+ *  - Each cell is a real link, so crawlers and no-JS visitors can reach every
+ *    element page. An unmodified click progressively enhances that link by
+ *    opening the slide-in "more info" panel and embedding THAT
  *    element's article by fetching its own static page (/element/<slug>) and
  *    lifting its <article> markup. The dedicated page is the single source of
  *    truth, so the panel never drifts from the indexable content.
@@ -29,7 +31,7 @@ const articleCache = new Map<string, string>();
 export function initInteractiveTable(): void {
   const search = document.querySelector<HTMLInputElement>("#pt-search");
   const cells = Array.from(
-    document.querySelectorAll<HTMLButtonElement>(".js-cell"),
+    document.querySelectorAll<HTMLAnchorElement>(".js-cell"),
   );
   const backdrop = document.querySelector<HTMLElement>(".js-backdrop");
   const panel = document.querySelector<HTMLElement>(".js-panel");
@@ -122,7 +124,19 @@ export function initInteractiveTable(): void {
 
   // ---- Wire cells ----
   for (const cell of cells) {
-    cell.addEventListener("click", () => {
+    cell.addEventListener("click", (event) => {
+      // Preserve normal link behaviour for new-tab/window gestures. Without
+      // JavaScript, every cell still navigates directly to its element page.
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+      event.preventDefault();
       openPanel(
         {
           slug: cell.dataset.slug ?? "",

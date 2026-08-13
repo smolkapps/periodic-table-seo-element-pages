@@ -14,8 +14,8 @@ function cellStyle(el: Element): string {
   <div class="periodic-table" role="grid" aria-label="Periodic table of the elements">
     {
       grid.map(({ element }) => (
-        <button
-          type="button"
+        <a
+          href={`/element/${element.slug}/`}
           class="pt-cell js-cell"
           style={cellStyle(element)}
           data-slug={element.slug}
@@ -28,7 +28,7 @@ function cellStyle(el: Element): string {
           <span class="num">{element.number}</span>
           <span class="sym">{element.symbol}</span>
           <span class="nm">{element.name}</span>
-        </button>
+        </a>
       ))
     }
 
