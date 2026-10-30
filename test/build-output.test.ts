@@ -46,14 +46,14 @@ d("static build output", () => {
   it("each element page has a self-referential canonical link (trailing-slash consistent)", () => {
     const fe = getElementByNumber(26)!;
     const html = readFileSync(pagePath(fe.slug), "utf8");
-    // Deployed under the /apps/periodic-table/ subpath: canonical/og:url MUST
-    // carry the base, not resolve to the origin root.
+    // The dedicated-domain release must keep canonical and social URLs on
+    // the same origin so aliases cannot split search signals.
     expect(html).toContain(
-      '<link rel="canonical" href="https://smolkin.org/apps/periodic-table/element/iron/"',
+      '<link rel="canonical" href="https://elementalearn.com/element/iron/"',
     );
     // og:url must agree with the canonical exactly.
     expect(html).toContain(
-      'property="og:url" content="https://smolkin.org/apps/periodic-table/element/iron/"',
+      'property="og:url" content="https://elementalearn.com/element/iron/"',
     );
   });
 
@@ -80,7 +80,7 @@ d("static build output", () => {
     }
     const html = readFileSync(pagePath("iron"), "utf8");
     expect(html).toContain(
-      'property="og:image" content="https://smolkin.org/apps/periodic-table/og/iron.png"',
+      'property="og:image" content="https://elementalearn.com/og/iron.png"',
     );
     expect(html).toContain('property="og:image:width" content="1200"');
     expect(html).toContain('property="og:image:height" content="630"');
@@ -89,16 +89,16 @@ d("static build output", () => {
   it("social-card images are PNG everywhere (crawlers reject SVG og:images)", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain(
-      'property="og:image" content="https://smolkin.org/apps/periodic-table/og-default.png"',
+      'property="og:image" content="https://elementalearn.com/og-default.png"',
     );
-    expect(home).not.toContain('property="og:image" content="https://smolkin.org/apps/periodic-table/og-default.svg"');
+    expect(home).not.toContain('property="og:image" content="https://elementalearn.com/og-default.svg"');
     expect(existsSync(join(DIST, "og-default.png"))).toBe(true);
   });
 
   it("home page uses the full marketing title and WebSite JSON-LD", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain(
-      "<title>Interactive Periodic Table — Every Element, Its Own Page</title>",
+      "<title>Elementa — Interactive Periodic Table</title>",
     );
     expect(home).toContain('"@type":"WebSite"');
   });
@@ -107,10 +107,17 @@ d("static build output", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     for (const el of ELEMENTS) {
       expect(
-        home.includes(`/element/${el.slug}`),
+        home.includes(`href="/element/${el.slug}/"`),
         `home missing link to ${el.slug}`,
       ).toBe(true);
     }
+  });
+
+  it("home page includes the existing usage beacon once and a meaningful element-open event", () => {
+    const home = readFileSync(join(DIST, "index.html"), "utf8");
+    expect(home.match(/src="https:\/\/umami\.smolkin\.org\/script\.js"/g)).toHaveLength(1);
+    // The tracker must not take over link navigation after the drawer opens.
+    expect(home).not.toContain('data-umami-event="element-open"');
   });
 
   it("home page ships the interactive table cells with data attributes", () => {

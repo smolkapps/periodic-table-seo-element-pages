@@ -22,6 +22,8 @@ const targets = [
 for (const { name, size } of targets) {
   await sharp(svg, { density: 384 })
     .resize(size, size, { fit: "contain", background: "#0e1116" })
+    .flatten({ background: "#0e1116" })
+    .removeAlpha()
     .png()
     .toFile(join(PUBLIC, name));
   console.log(`wrote public/${name} (${size}x${size})`);

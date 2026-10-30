@@ -79,7 +79,7 @@ const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`
 
     <!-- Icons + manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Feed + sitemap -->
@@ -98,8 +98,8 @@ const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`
         <script
           is:inline
           defer
-          data-domain={SITE.url}
-          src="https://plausible.io/js/script.js"
+          data-website-id={SITE.analyticsId}
+          src="https://umami.smolkin.org/script.js"
         />
       )
     }
@@ -123,8 +123,10 @@ const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`
     <footer class="site-footer">
       <div class="container">
         <p>
-          Built by <a href={SITE.authorUrl}>{SITE.author}</a>. Data from public
-          domain references (IUPAC standard atomic weights, NIST). Open source
+          © 2025 Smolk Apps. Built by <a href={SITE.authorUrl}>{SITE.author}</a>.
+          Reference sources: <a href="https://iupac.org/what-we-do/periodic-table-of-elements/">IUPAC</a>
+          and <a href="https://www.nist.gov/pml/atomic-spectra-database">NIST</a>.
+          <a href="https://github.com/smolkapps/periodic-table-seo-element-pages">Source code</a>
           under the MIT license.
         </p>
       </div>

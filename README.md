@@ -1,4 +1,6 @@
-# Periodic Table — SEO element pages
+# Elementa
+
+Live: [elementalearn.com](https://elementalearn.com/)
 
 An interactive periodic table of all 118 elements, where **every element gets
 its own dedicated, fully indexable static page** — plus the element's article is

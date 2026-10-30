@@ -27,6 +27,12 @@ import {
   type NavCell,
 } from "../lib/grid-nav";
 
+declare global {
+  interface Window {
+    umami?: { track: (event: string, data: Record<string, string>) => void };
+  }
+}
+
 interface PanelState {
   slug: string;
   symbol: string;
@@ -41,7 +47,7 @@ export function initInteractiveTable(): void {
   const searchStatus = document.querySelector<HTMLElement>(".js-search-status");
   const table = document.querySelector<HTMLElement>(".js-periodic-table");
   const cells = Array.from(
-    document.querySelectorAll<HTMLButtonElement>(".js-cell"),
+    document.querySelectorAll<HTMLAnchorElement>(".js-cell"),
   );
   const backdrop = document.querySelector<HTMLElement>(".js-backdrop");
   const panel = document.querySelector<HTMLElement>(".js-panel");
@@ -77,7 +83,7 @@ export function initInteractiveTable(): void {
   table?.addEventListener("keydown", (e) => {
     const target = e.target as HTMLElement;
     if (!target.classList.contains("js-cell") || !isNavKey(e.key)) return;
-    const from = cells.indexOf(target as HTMLButtonElement);
+    const from = cells.indexOf(target as HTMLAnchorElement);
     const to = nextCellIndex(navCells(), from, e.key);
     if (to === null) {
       e.preventDefault();
@@ -93,7 +99,7 @@ export function initInteractiveTable(): void {
   table?.addEventListener("focusin", (e) => {
     const target = e.target as HTMLElement;
     if (!target.classList.contains("js-cell")) return;
-    const i = cells.indexOf(target as HTMLButtonElement);
+    const i = cells.indexOf(target as HTMLAnchorElement);
     if (i !== -1) setTabStop(i);
   });
 
@@ -148,6 +154,9 @@ export function initInteractiveTable(): void {
   // ---- Panel open/close ----
   function openPanel(state: PanelState, trigger: HTMLElement): void {
     current = state;
+    // Automatic event attributes on links navigate after tracking, overriding
+    // the drawer's progressive enhancement. Record the activation directly.
+    window.umami?.track("element-open", { element: state.slug });
     lastFocused = trigger;
     if (panelTitle) panelTitle.textContent = `${state.name} (${state.symbol})`;
     if (panelSub) panelSub.textContent = `Element ${state.number}`;
@@ -222,7 +231,10 @@ export function initInteractiveTable(): void {
 
   // ---- Wire cells ----
   for (const cell of cells) {
-    cell.addEventListener("click", () => {
+    cell.addEventListener("click", (event) => {
+      // Keep real links available to crawlers, no-JS users and new-tab gestures.
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
       openPanel(
         {
           slug: cell.dataset.slug ?? "",
@@ -239,7 +251,7 @@ export function initInteractiveTable(): void {
   panelShare?.addEventListener("click", async () => {
     if (!current) return;
     const payload: SharePayload = {
-      title: `${current.name} (${current.symbol}) — Periodic Table`,
+      title: `${current.name} (${current.symbol}) — Elementa`,
       text: `${current.name}: element ${current.number} on the periodic table.`,
       // import.meta.env.BASE_URL (= the Astro `base`, e.g. /apps/periodic-table/)
       // is inlined at build time; include it so the shared link keeps the

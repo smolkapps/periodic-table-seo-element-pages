@@ -3,19 +3,16 @@
  * deploy; everything else reads from here.
  */
 export const SITE = {
-  // Origin only (no path). The deployment base path (`/apps/periodic-table/`)
-  // lives in `astro.config.mjs` (`base`) and is applied via `absUrl()` below,
-  // so canonical/og/JSON-LD URLs come out as `<origin><base><path>`.
-  url: "https://smolkin.org",
-  name: "Periodic Table",
-  shortName: "Elements",
-  title: "Interactive Periodic Table — Every Element, Its Own Page",
+  url: "https://elementalearn.com",
+  name: "Elementa",
+  shortName: "Elementa",
+  title: "Elementa — Interactive Periodic Table",
   description:
-    "An interactive periodic table of the 118 elements. Click any element for an embedded article, or open its own dedicated, fully indexable page with structured data, electron configuration, discovery, and uses.",
+    "Explore all 118 chemical elements. Find atomic properties, electron configurations and discovery history, then compare elements side by side.",
   author: "Michael Smolkin",
   authorUrl: "https://www.smolkin.org",
   /** Leave blank to omit the analytics beacon. */
-  analyticsId: "",
+  analyticsId: "0ee0e19b-b29b-4c98-b3f6-a92a43b4ba5a",
   themeColor: "#0e1116",
   locale: "en",
 } as const;

@@ -11,13 +11,13 @@ function cellStyle(el: Element): string {
 ---
 
 <div class="pt-scroll">
-  {/* role="group" (not ARIA grid): these are simple buttons laid out with CSS
+  {/* role="group" (not ARIA grid): these are element links laid out with CSS
       grid; table-ui.ts adds roving-tabindex arrow-key navigation on top. */}
   <div class="periodic-table js-periodic-table" role="group" aria-label="Periodic table of the elements">
     {
       grid.map(({ element }) => (
-        <button
-          type="button"
+        <a
+          href={`/element/${element.slug}/`}
           class="pt-cell js-cell"
           style={cellStyle(element)}
           data-slug={element.slug}
@@ -32,7 +32,7 @@ function cellStyle(el: Element): string {
           <span class="num">{element.number}</span>
           <span class="sym">{element.symbol}</span>
           <span class="nm">{element.name}</span>
-        </button>
+        </a>
       ))
     }
 
