@@ -1,0 +1,47 @@
+{
+  "captured_at_utc": "2026-11-01T22:45:27.728835+00:00",
+  "application_source": "647c475dd526710085e04af981c6791d4f91826a; documentation receipt mainf0a7f88",
+  "capture_method": "Actual deployed elementalearn.com UI through in-app browser CDP1270x760; clicked existing Subshell Orbitals/Worksheet controls, no DOM/content edits or fabricated UI",
+  "gallery_order": [
+    "oxygen-orbitals.png",
+    "worksheet.png"
+  ],
+  "operator_fixture": "Visible1/118mastered and Saved(1) are prior owner QA on this browser, not customer traction or a fabricated product result. Gallery excludes the personal note lower on the page.",
+  "logo_source": "companion/public/icons/icon-512.png",
+  "logo_note": "Existing512px PNG provided unchanged;240px is recommended, not asserted as an exact file size.",
+  "files": [
+    {
+      "file": "oxygen-orbitals.png",
+      "width": 1270,
+      "height": 760,
+      "png_color_type": 2,
+      "sha256": "cd7edbfe3cad3b6d44c94751d5cd8b947980e2636856d1eb7ee866a9149c422a",
+      "use": "genuine live UI gallery"
+    },
+    {
+      "file": "homepage-reference-only.png",
+      "width": 1270,
+      "height": 760,
+      "png_color_type": 2,
+      "sha256": "42f1f4e25ece04dc465fcee926791bc68df68d2a03a83f23ad99a7143da6565a",
+      "use": "reference only; contains third-party video section; exclude from Product Hunt gallery"
+    },
+    {
+      "file": "elementa-logo.png",
+      "width": 512,
+      "height": 512,
+      "png_color_type": 6,
+      "sha256": "79bd1465b082ffaac444e826386ab648034b34836bb34e27ea632a51f9c7b12c",
+      "use": "logo"
+    },
+    {
+      "file": "worksheet.png",
+      "width": 1270,
+      "height": 760,
+      "png_color_type": 2,
+      "sha256": "ee981c414cf15cdf2833a591a5bef53a0320814bc60148d63fa3a7e7762b61c9",
+      "use": "genuine live UI gallery"
+    }
+  ],
+  "review": "Inspected actual fullsize captures. Diagram/worksheet text readable with normal viewport crop; no claimed full-page worksheet image. Homepage reference excluded to avoid presenting Google DeepMind demo as our product demo."
+}

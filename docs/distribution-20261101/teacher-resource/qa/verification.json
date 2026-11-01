@@ -1,0 +1,146 @@
+{
+  "checked_at_utc": "2026-11-01T22:46:11.330861+00:00",
+  "scope": "Local preparation only; not published, sold, submitted or classroom-tested.",
+  "artifacts": {
+    "oxygen-and-sulfur-worksheet.pdf": {
+      "bytes": 7066,
+      "sha256": "035432c047939ddb02d07d81897c32d7ff6ba8814ddcccad32bcbf875e2575d2"
+    },
+    "oxygen-and-sulfur-worksheet.html": {
+      "bytes": 9290,
+      "sha256": "3aa5d2601d91cde5566ee20742f33dc253c80569fc96449e5e06bbb673680fb7"
+    },
+    "build_resource.py": {
+      "bytes": 15747,
+      "sha256": "63c8b57b7604a50f5d441301945c31f2af5ded8bae1ca9d358e6eed3b440fa56"
+    }
+  },
+  "pdf_pages": [
+    {
+      "number": 1,
+      "dimensions_pt": [
+        612,
+        792
+      ],
+      "text_bounds_pt": [
+        42.0,
+        39.863000000000056,
+        570.0,
+        772.656
+      ],
+      "characters": 1781
+    },
+    {
+      "number": 2,
+      "dimensions_pt": [
+        612,
+        792
+      ],
+      "text_bounds_pt": [
+        42.0,
+        39.863000000000056,
+        570.0000089999999,
+        772.656
+      ],
+      "characters": 2138
+    }
+  ],
+  "pdf_external_links": [
+    "https://periodic-table.rsc.org/element/8/oxygen",
+    "https://periodic-table.rsc.org/element/16/sulfur"
+  ],
+  "html_print": {
+    "pages": 2,
+    "dimensions_pt": [
+      612,
+      792
+    ],
+    "questions": 8,
+    "answerKeyEntries": 8,
+    "responseOverflows": 0,
+    "footerOverlaps": 0,
+    "scripts": 0,
+    "externalAssets": 0,
+    "browserErrors": []
+  },
+  "render_dimensions_px": {
+    "html-page-1.png": [
+      935,
+      1210
+    ],
+    "html-page-2.png": [
+      935,
+      1210
+    ],
+    "page-1.png": [
+      1224,
+      1584
+    ],
+    "page-2.png": [
+      1224,
+      1584
+    ],
+    "thumb-1.png": [
+      279,
+      360
+    ],
+    "thumb-2.png": [
+      279,
+      360
+    ]
+  },
+  "visual_review": {
+    "full_size_pdf_pages": "Both reviewed at 144 dpi; no clipping or overlap. Superscripts, table rules, footers and answer spaces inspected.",
+    "pdf_thumbnails": "Both reviewed at 360-pixel longest edge; hierarchy and page separation clear.",
+    "html_print_pages": "Both reviewed at 110 dpi after correcting answer-line overflow; no clipping or overlap."
+  },
+  "facts_reviewed": {
+    "oxygen": {
+      "Z": 8,
+      "neutral_protons": 8,
+      "neutral_electrons": 8,
+      "configuration": "[He] 2s2 2p4",
+      "electron_sum": "2+2+4=8",
+      "shells": [
+        2,
+        6
+      ],
+      "period": 2,
+      "group": 16,
+      "outer_shell_electrons": 6
+    },
+    "sulfur": {
+      "Z": 16,
+      "neutral_protons": 16,
+      "neutral_electrons": 16,
+      "configuration": "[Ne] 3s2 3p4",
+      "electron_sum": "10+2+4=16",
+      "shells": [
+        2,
+        8,
+        6
+      ],
+      "period": 3,
+      "group": 16,
+      "outer_shell_electrons": 6
+    }
+  },
+  "primary_references": [
+    {
+      "title": "Royal Society of Chemistry: Oxygen",
+      "url": "https://periodic-table.rsc.org/element/8/oxygen",
+      "checked_date": "2026-11-01"
+    },
+    {
+      "title": "Royal Society of Chemistry: Sulfur",
+      "url": "https://periodic-table.rsc.org/element/16/sulfur",
+      "checked_date": "2026-11-01"
+    }
+  ],
+  "limitations": [
+    "Printable PDF is not tagged and is not a fillable form. No accessibility certification is claimed.",
+    "Grade 9-12 is editorial positioning, not demonstrated curricular alignment.",
+    "No classroom-use or learning-outcome evidence is claimed."
+  ],
+  "authority": "No account creation, term acceptance, payment, external message, submission, public publishing or commit."
+}

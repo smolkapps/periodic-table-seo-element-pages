@@ -1,0 +1,146 @@
+{
+  "checked_at_utc": "2026-11-01T22:35:52.391178+00:00",
+  "method": "Public GET with ordinary browser User-Agent; actual HTML title/canonical, status, and ASCII X URL-weighted length checks",
+  "links": [
+    {
+      "day": 1,
+      "url": "https://elementalearn.com/element/hydrogen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day01_hydrogen",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/hydrogen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day01_hydrogen",
+      "canonical": "https://elementalearn.com/element/hydrogen/",
+      "title": "Hydrogen (H) \u2014 Elementa",
+      "x_weighted_length": 219,
+      "source": "https://periodic-table.rsc.org/element/1/hydrogen"
+    },
+    {
+      "day": 2,
+      "url": "https://elementalearn.com/element/helium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day02_helium",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/helium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day02_helium",
+      "canonical": "https://elementalearn.com/element/helium/",
+      "title": "Helium (He) \u2014 Elementa",
+      "x_weighted_length": 225,
+      "source": "https://periodic-table.rsc.org/element/2/helium"
+    },
+    {
+      "day": 3,
+      "url": "https://elementalearn.com/element/lithium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day03_lithium",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/lithium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day03_lithium",
+      "canonical": "https://elementalearn.com/element/lithium/",
+      "title": "Lithium (Li) \u2014 Elementa",
+      "x_weighted_length": 227,
+      "source": "https://periodic-table.rsc.org/element/3/lithium"
+    },
+    {
+      "day": 4,
+      "url": "https://elementalearn.com/element/carbon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day04_carbon",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/carbon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day04_carbon",
+      "canonical": "https://elementalearn.com/element/carbon/",
+      "title": "Carbon (C) \u2014 Elementa",
+      "x_weighted_length": 218,
+      "source": "https://periodic-table.rsc.org/element/6/carbon"
+    },
+    {
+      "day": 5,
+      "url": "https://elementalearn.com/element/nitrogen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day05_nitrogen",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/nitrogen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day05_nitrogen",
+      "canonical": "https://elementalearn.com/element/nitrogen/",
+      "title": "Nitrogen (N) \u2014 Elementa",
+      "x_weighted_length": 218,
+      "source": "https://periodic-table.rsc.org/element/7/nitrogen"
+    },
+    {
+      "day": 6,
+      "url": "https://elementalearn.com/element/oxygen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day06_oxygen",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/oxygen/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day06_oxygen",
+      "canonical": "https://elementalearn.com/element/oxygen/",
+      "title": "Oxygen (O) \u2014 Elementa",
+      "x_weighted_length": 221,
+      "source": "https://periodic-table.rsc.org/element/8/oxygen"
+    },
+    {
+      "day": 7,
+      "url": "https://elementalearn.com/element/neon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day07_neon",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/neon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day07_neon",
+      "canonical": "https://elementalearn.com/element/neon/",
+      "title": "Neon (Ne) \u2014 Elementa",
+      "x_weighted_length": 211,
+      "source": "https://periodic-table.rsc.org/element/10/neon"
+    },
+    {
+      "day": 8,
+      "url": "https://elementalearn.com/element/sodium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day08_sodium",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/sodium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day08_sodium",
+      "canonical": "https://elementalearn.com/element/sodium/",
+      "title": "Sodium (Na) \u2014 Elementa",
+      "x_weighted_length": 227,
+      "source": "https://periodic-table.rsc.org/element/11/sodium"
+    },
+    {
+      "day": 9,
+      "url": "https://elementalearn.com/element/magnesium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day09_magnesium",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/magnesium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day09_magnesium",
+      "canonical": "https://elementalearn.com/element/magnesium/",
+      "title": "Magnesium (Mg) \u2014 Elementa",
+      "x_weighted_length": 220,
+      "source": "https://periodic-table.rsc.org/element/12/magnesium"
+    },
+    {
+      "day": 10,
+      "url": "https://elementalearn.com/element/aluminium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day10_aluminium",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/aluminium/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day10_aluminium",
+      "canonical": "https://elementalearn.com/element/aluminium/",
+      "title": "Aluminium (Al) \u2014 Elementa",
+      "x_weighted_length": 220,
+      "source": "https://periodic-table.rsc.org/element/13/aluminium"
+    },
+    {
+      "day": 11,
+      "url": "https://elementalearn.com/element/silicon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day11_silicon",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/silicon/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day11_silicon",
+      "canonical": "https://elementalearn.com/element/silicon/",
+      "title": "Silicon (Si) \u2014 Elementa",
+      "x_weighted_length": 240,
+      "source": "https://periodic-table.rsc.org/element/14/silicon"
+    },
+    {
+      "day": 12,
+      "url": "https://elementalearn.com/element/phosphorus/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day12_phosphorus",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/phosphorus/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day12_phosphorus",
+      "canonical": "https://elementalearn.com/element/phosphorus/",
+      "title": "Phosphorus (P) \u2014 Elementa",
+      "x_weighted_length": 228,
+      "source": "https://periodic-table.rsc.org/element/15/phosphorus"
+    },
+    {
+      "day": 13,
+      "url": "https://elementalearn.com/element/sulfur/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day13_sulfur",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/sulfur/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day13_sulfur",
+      "canonical": "https://elementalearn.com/element/sulfur/",
+      "title": "Sulfur (S) \u2014 Elementa",
+      "x_weighted_length": 218,
+      "source": "https://periodic-table.rsc.org/element/16/sulfur"
+    },
+    {
+      "day": 14,
+      "url": "https://elementalearn.com/element/iron/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day14_iron",
+      "http_status": 200,
+      "final_url": "https://elementalearn.com/element/iron/?utm_source=x&utm_medium=social&utm_campaign=element_of_day&utm_content=day14_iron",
+      "canonical": "https://elementalearn.com/element/iron/",
+      "title": "Iron (Fe) \u2014 Elementa",
+      "x_weighted_length": 219,
+      "source": "https://periodic-table.rsc.org/element/26/iron"
+    }
+  ]
+}

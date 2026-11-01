@@ -1,0 +1,14 @@
+{
+  "name": {
+    "length": 8,
+    "limit": 40
+  },
+  "tagline": {
+    "length": 55,
+    "limit": 60
+  },
+  "description": {
+    "length": 296,
+    "limit": 500
+  }
+}

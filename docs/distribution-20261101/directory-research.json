@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "researched_at": "2026-11-01T22:35:53.032597+00:00",
+  "method": "Official current public pages; web reader and ordinary HTTP GET; no sign-in",
+  "scope": "research and drafts only",
+  "actions_performed": {
+    "accounts_created": 0,
+    "logins": 0,
+    "forms_submitted": 0,
+    "emails_sent": 0,
+    "terms_accepted": 0,
+    "payments": 0,
+    "publications": 0
+  },
+  "claim_limits": [
+    "No curricular alignment, learning outcomes, accessibility certification or privacy-compliance claims",
+    "Tutor and long quizzes/difficulty excluded",
+    "Developer affiliation explicit",
+    "Optional AI labels off; mandatory venue disclosure flagged"
+  ],
+  "venues": [
+    {
+      "venue": "Common Sense Education",
+      "status": "paused_no_active_review_intake",
+      "recommendation": "park",
+      "route": "https://www.commonsense.org/education/reviews/FAQ",
+      "public_form_observation": "FAQ200; former edtech-reviews404; no active review form",
+      "cost": "not applicable to paused intake; separate privacy-evaluation fees unverified",
+      "account_gate": "not inspected; no signup",
+      "eligibility": "new reviews, updates and curated additions paused",
+      "fields_observed": [],
+      "suggested_metadata": {
+        "grades": "9-12, proposed only",
+        "subject": "Chemistry, proposed only"
+      },
+      "terms_gates": [
+        "Any later submission terms require review; no acceptance made"
+      ],
+      "sources": [
+        "https://www.commonsense.org/education/reviews/FAQ",
+        "https://www.commonsense.org/education/terms-of-use"
+      ]
+    },
+    {
+      "venue": "Teachers Pay Teachers",
+      "status": "marketplace_not_directory",
+      "recommendation": "no promotional listing; conditional genuine resource only",
+      "route": "https://www.teacherspayteachers.com/become-a-seller",
+      "account_gate": "Buyer then Seller; existing status unverified",
+      "fees": {
+        "new_basic_usd": 29,
+        "basic_frequency": "one-time nonrefundable; existing sellers waived",
+        "exclusive_usd_per_year": 59.95
+      },
+      "eligibility": "Original, complete downloadable teaching resource; not an advertising-only link sheet",
+      "policy_gates": [
+        "Most store items paid",
+        "No traffic-funneling purpose",
+        "No extra signup/payment to access full resource",
+        "Rights and seller terms"
+      ],
+      "fields_documented_or_prospective": [
+        "title",
+        "file",
+        "description",
+        "preview",
+        "grade",
+        "subject",
+        "resource type",
+        "price"
+      ],
+      "authenticated_upload_form_inspected": false,
+      "suggested_metadata": {
+        "grades": [
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "subject": "Chemistry",
+        "types": [
+          "Worksheets",
+          "Activities"
+        ],
+        "format": "PDF"
+      },
+      "draft": {
+        "status": "conditional; PDF not produced",
+        "title": "Oxygen and Sulfur: Periodic Table Comparison Worksheet",
+        "description": "A printable comparison activity for introductory chemistry, with student questions, teacher directions and an answer key. Students compare oxygen and sulfur, read their ground-state electron configurations, and explain how their occupied shells differ. The PDF should contain the full activity; an optional extension uses the free Elementa website without signup. Created by Michael Smolkin, Elementa's developer."
+      },
+      "sources": [
+        "https://www.teacherspayteachers.com/become-a-seller",
+        "https://help.teacherspayteachers.com/hc/en-us/articles/360041266191-How-do-I-sign-up-as-a-Seller",
+        "https://help.teacherspayteachers.com/hc/en-us/articles/360042626591-What-are-TPT-s-Seller-Guidelines",
+        "https://help.teacherspayteachers.com/hc/en-us/articles/360046747572-TPT-Content-Guidelines",
+        "https://www.teacherspayteachers.com/Terms-of-Service",
+        "https://www.teacherspayteachers.com/manuals/checklist.pdf"
+      ],
+      "upload_field_evidence_limit": "Authenticated upload screen not opened; public checklist indexed but fresh PDF fetch unavailable. Prospective fields are not claimed as exact current controls."
+    },
+    {
+      "venue": "ChemEd X",
+      "status": "editorial_not_directory",
+      "recommendation": "suitability inquiry for Article; avoid creator-authored Pick",
+      "route": "https://www.chemedx.org/contribute",
+      "inquiry_form": "https://www.chemedx.org/contact",
+      "public_inquiry_fields_required": [
+        "name",
+        "email",
+        "subject",
+        "message"
+      ],
+      "contribution_account_gate": "free member account, complete public author profile, manuscript template",
+      "publication_fee": "none stated on inspected pages; not a confirmed zero-fee guarantee",
+      "eligibility_gates": [
+        "Picks: independent instructor experience",
+        "Activities: classroom-use expectation",
+        "AI disclosure required",
+        "Published manuscript reuse permission"
+      ],
+      "registration_fields_required_html": [
+        "first name",
+        "last name",
+        "email",
+        "summary bio"
+      ],
+      "other_profile_fields_observed": [
+        "affiliation",
+        "role",
+        "professional URL",
+        "headshot",
+        "tagline"
+      ],
+      "manuscript_form_inspected": false,
+      "suggested_metadata": {
+        "type": "Article proposal",
+        "level": "introductory high school/college",
+        "subject": "atomic structure; periodic table"
+      },
+      "draft": {
+        "subject": "Article suitability: comparing shell models and configurations with Elementa",
+        "message": "I'm Michael Smolkin, the developer of Elementa, a free chemistry study website. I'm writing in that role, not as an independent reviewer of the product.\n\nWould a practical Article about comparing simplified shell models with ground-state electron configurations fit ChemEd X? The proposed walkthrough would use oxygen and sulfur to connect their configurations, occupied shells and positions in the periodic table, explain the limits of the diagrams, and include a short example worksheet with an answer key. Elementa provides 118 reference pages, comparisons and short quizzes without signup. I would cite the underlying chemistry references and identify the website as my own work.\n\nI don't have classroom-trial or learning-outcome evidence to report. Please advise whether this approach fits an Article or whether an independent instructor's evaluation would be more useful.",
+        "ai_acknowledgment_starting_note": "OpenAI Codex assisted with the initial editorial pitch and submission-requirements research."
+      },
+      "sources": [
+        "https://www.chemedx.org/contribute",
+        "https://www.chemedx.org/contribution-guidelines",
+        "https://www.chemedx.org/contact",
+        "https://www.chemedx.org/user/register"
+      ]
+    },
+    {
+      "venue": "Product Hunt",
+      "status": "eligible_product_candidate_account_gated",
+      "recommendation": "prepare personal-maker draft; parent checks duplicate and account access",
+      "route": "https://www.producthunt.com/posts/new",
+      "signed_out_observation": "redirects to /login?origin=/posts/new",
+      "ordinary_listing_cost_usd": 0,
+      "account_gate": "personal account and posting access; new accounts one-week wait or documented newsletter route",
+      "required_documented_fields": [
+        "product URL",
+        "name",
+        "tagline",
+        "description",
+        "logo",
+        "one gallery image",
+        "up to three launch tags",
+        "maker/hunter role"
+      ],
+      "limits": {
+        "name_chars": 40,
+        "tagline_chars": 60,
+        "description_chars": 500
+      },
+      "suggested_metadata": {
+        "pricing": "Free",
+        "role": "I made this",
+        "tag": "Education"
+      },
+      "draft": {
+        "name": "Elementa",
+        "url": "https://elementalearn.com/",
+        "tagline": "Explore 118 elements, compare properties, and practice",
+        "description": "A free chemistry study website with 118 element pages, comparisons, simplified shell/orbital views, short quizzes, and printable worksheets with answer keys. No signup; notes and progress stay in your browser.",
+        "maker_comment": "I'm Michael Smolkin, the developer of Elementa. It brings element reference pages, comparisons and short practice sessions into one browser-based tool.\n\nYou can look up an element, inspect its simplified shell/orbital view, compare it with another element, then try a quiz or print a worksheet with an answer key. Quizzes currently have up to five questions; single-element practice uses four distinct concepts. Notes and progress stay in the browser, with export/import for backups.\n\nIt's free and doesn't require signup. I'd like feedback from people studying or teaching introductory chemistry: which explanation or question would you change after trying it?"
+      },
+      "authenticated_form_inspected": false,
+      "terms_gates": [
+        "personal account terms",
+        "rights to media",
+        "no vote requests or paid hunters",
+        "final publication approval"
+      ],
+      "sources": [
+        "https://help.producthunt.com/en/articles/17834537-4-build-your-product-page",
+        "https://help.producthunt.com/en/articles/479557-how-to-post-a-product",
+        "https://help.producthunt.com/en/articles/481909-how-can-i-get-access-to-post",
+        "https://www.producthunt.com/launch/how-product-hunt-works",
+        "https://www.producthunt.com/topics/education",
+        "https://www.producthunt.com/legal"
+      ]
+    }
+  ],
+  "validation": {
+    "product_hunt_tagline_characters": 54,
+    "product_hunt_description_characters": 209
+  },
+  "root_execution": {
+    "date": "2026-11-01",
+    "chemedx": "private creator-disclosed Article suitability inquiry received; editorial-team notification confirmed, not manuscript/publication",
+    "chemedx_contact_submit_attempts": 2,
+    "chemedx_contact_successes": 1,
+    "gsc": "verified existing business Google session; newdomain verification proposal ready, no TXT or verifiedownership yet, actiontimeapprovalpending",
+    "product_hunt": "existingbusinessGoogle basicprofile/emailconsentstep reached; no OAuthgrant/newaccountterms/publication, approvalpending",
+    "teacher_resource": "actual2pagePDF+editableHTML+answerkey prepared/rendered; notTPTupload",
+    "public_social_posts": 0,
+    "paid_spend": 0
+  }
+}
