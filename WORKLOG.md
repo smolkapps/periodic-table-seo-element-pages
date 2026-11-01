@@ -148,3 +148,8 @@ Requested outcome: homepage video plays on its first activation, and the separat
 - Completed independent141root+32companion tests (0fail/0skip), lint/typecheck/build and123HTML/2775link gates. Deployed reviewed Main, backup /var/backups/elementa-20261101T050411Z/html. Independent review confirmed all118single-element pools stay scoped, then caught the remaining comparison mass-unit label. Corrected it with an explanatory bracket legend and behavior assertion; exact edits were applied/checkpointed in Base44 Main and pulled into Tutor.
 - Actual public browser: Oxygen worksheet4questions/allanswersO; Cu/Ag5questions/allanswersCuorAg; fresh single-Sodium deck4questions, real4/4session saved and mastery retained after reload. Mouse click selects shell, keyboardSpace selects another, phone-sized selection nooverflow. These are ownerQAfixtures, not demand or physical-device evidence.
 - Final native sync reports0pending Main messages, no Main code changes, clear conflicts, idle/no blocker. Actual Base44 InvokeLLM corrected a wrong Oxygen-pairing answer with graduated Hund-rule hints and an orbital follow-up; saved chat count increased0→1. Final exported-source refresh/local check and save/reload still finishing.
+
+
+## Separate tutor source branch — November 1
+
+Preserved all completed public Main updates at647c475 and added reviewed Base44 tutor differences, server adapter and tests. Kept production auth-free entry with Tutor route. Live InvokeLLM hint observed in Base44; stable-origin Local Coach save/reload/restore passed. No tutor publication. See docs/tutor-branch-20261101/SOURCE.md for source hashes, preview-storage limitation and self-hosted provider requirements.

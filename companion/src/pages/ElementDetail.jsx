@@ -26,6 +26,7 @@ import {
   ExternalLink,
   FileText,
   Save,
+  Sparkles,
 } from "lucide-react";
 
 export default function ElementDetail() {
@@ -246,6 +247,13 @@ export default function ElementDetail() {
           >
             <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">Quiz on {element.name}</span>
+          </Link>
+          <Link
+            to={`/tutor?element=${element.slug}`}
+            className="px-3 py-1.5 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#ffd43b] text-xs font-medium text-[#ffd43b] flex items-center gap-1.5 no-underline"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Ask Tutor about {element.name}</span>
           </Link>
           <Link
             to="/"

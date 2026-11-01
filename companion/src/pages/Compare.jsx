@@ -132,14 +132,24 @@ export default function Compare() {
               <span className="truncate">{copiedUrl ? `Copied ${copiedUrl}` : "Copy Shareable URL"}</span>
             </button>
             {resolvedElements.length >= MIN_COMPARE && (
-              <Link
-                to={`/practice?ids=${resolvedElements.map((e) => e.slug).join(",")}`}
-                aria-label={`Start quiz comparing ${resolvedElements.map((e) => e.name).join(", ")}`}
-                className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs font-semibold flex items-center justify-center gap-1.5 no-underline"
-              >
-                <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
-                <span>Quiz This Comparison</span>
-              </Link>
+              <>
+                <Link
+                  to={`/tutor?ids=${resolvedElements.map((e) => e.slug).join(",")}`}
+                  aria-label={`Ask the tutor to compare ${resolvedElements.map((e) => e.name).join(", ")}`}
+                  className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#161b22] border border-[#ffd43b]/50 hover:border-[#ffd43b] text-xs font-semibold text-[#ffd43b] flex items-center justify-center gap-1.5 no-underline"
+                >
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span>Ask Tutor to Compare</span>
+                </Link>
+                <Link
+                  to={`/practice?ids=${resolvedElements.map((e) => e.slug).join(",")}`}
+                  aria-label={`Start quiz comparing ${resolvedElements.map((e) => e.name).join(", ")}`}
+                  className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs font-semibold flex items-center justify-center gap-1.5 no-underline"
+                >
+                  <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
+                  <span>Quiz This Comparison</span>
+                </Link>
+              </>
             )}
           </div>
         </div>

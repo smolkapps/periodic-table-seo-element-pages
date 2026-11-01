@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Atom, ArrowLeftRight, BrainCircuit, BookmarkCheck, Layers } from "lucide-react";
+import { Atom, ArrowLeftRight, BrainCircuit, BookmarkCheck, Layers, Sparkles } from "lucide-react";
 import { useStudyProgress } from "@/lib/studyStore";
 import StorageNotice from "@/components/StorageNotice";
 
@@ -26,7 +26,7 @@ export default function Navbar() {
             <div>
               <span className="font-bold text-base sm:text-lg tracking-tight text-white flex items-center gap-2">
                 Elementa
-                <span className="hidden md:inline-block text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#4f9dff]/15 text-[#7bb6ff] border border-[#4f9dff]/30">
+                <span className="hidden lg:inline-block text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#4f9dff]/15 text-[#7bb6ff] border border-[#4f9dff]/30">
                   {masteredCount}/118 Mastered
                 </span>
               </span>
@@ -43,7 +43,7 @@ export default function Navbar() {
 
         <nav
           aria-label="Primary"
-          className="grid grid-cols-5 sm:flex items-center gap-1 sm:gap-1.5 w-full sm:w-auto"
+          className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-1.5 w-full sm:w-auto"
         >
           <Link
             to="/"
@@ -88,6 +88,17 @@ export default function Navbar() {
           >
             <BrainCircuit className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span>Practice</span>
+          </Link>
+          <Link
+            to="/tutor"
+            className={`px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-1.5 no-underline transition-all whitespace-nowrap ${
+              isActive("/tutor")
+                ? "bg-[#4f9dff] text-[#07121f] font-semibold shadow-sm"
+                : "text-[#aeb8c4] hover:text-white hover:bg-[#1c232d]"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span>Tutor</span>
           </Link>
           <Link
             to="/saved"

@@ -12,6 +12,7 @@ import {
   Printer,
   ArrowRight,
   Award,
+  Sparkles,
 } from "lucide-react";
 
 export default function Practice() {
@@ -341,6 +342,26 @@ export default function Practice() {
                 <span>View Saved Progress & Mastery →</span>
               </Link>
             </div>
+
+            {completedSession.missedSlugs && completedSession.missedSlugs.length > 0 && (
+              <div className="pt-3 border-t border-[#242c38] space-y-2">
+                <p className="text-xs font-mono text-[#ffd43b]">
+                  Review missed elements with the Chemistry Tutor (diagnostic check &amp; graduated hints):
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {completedSession.missedSlugs.map((slug) => (
+                    <Link
+                      key={slug}
+                      to={`/tutor?element=${slug}&from=quiz`}
+                      className="px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#ffd43b]/40 hover:border-[#ffd43b] text-xs text-[#ffd43b] flex items-center gap-1.5 no-underline"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Tutor: {slug} →</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* Active Question Card */
@@ -405,12 +426,27 @@ export default function Practice() {
                   {currentQ.explanation}
                 </p>
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Link
                       to={`/element/${currentQ.target.slug}`}
                       className="text-xs text-[#7bb6ff] hover:underline"
                     >
                       Open {currentQ.target.name} article →
+                    </Link>
+                    <Link
+                      to={`/tutor?element=${currentQ.target.slug}&from=quiz&q=${encodeURIComponent(
+                        currentQ.prompt
+                      )}&chosen=${encodeURIComponent(
+                        currentQ.options.find((o) => o.slug === selectedOption)?.label || selectedOption || ""
+                      )}`}
+                      className="text-xs px-2.5 py-1 rounded bg-[#ffd43b]/15 border border-[#ffd43b]/40 text-[#ffd43b] hover:bg-[#ffd43b]/25 flex items-center gap-1 no-underline font-medium"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>
+                        {selectedOption === currentQ.correctSlug
+                          ? `Ask Tutor Deep Dive (${currentQ.target.symbol})`
+                          : `Ask Tutor Why (${currentQ.target.symbol})`}
+                      </span>
                     </Link>
                     <button
                       type="button"

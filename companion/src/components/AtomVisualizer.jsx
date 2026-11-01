@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CATEGORY_META, AUFBAU_NOTES, getShellRoleLabel, isValenceSubshell } from "@/data/elementsData";
 import { Atom, Info } from "lucide-react";
 
@@ -6,7 +6,7 @@ const SHELL_LABELS = ["K (n=1)", "L (n=2)", "M (n=3)", "N (n=4)", "O (n=5)", "P 
 const SHELL_MAX = [2, 8, 18, 32, 32, 18, 8];
 
 export default function AtomVisualizer({ element, compact = false, initialViewMode = "bohr" }) {
-  const [viewMode, setViewMode] = useState(initialViewMode); // 'bohr' | 'subshells'
+  const [viewMode, setViewMode] = useState(initialViewMode === "subshells" ? "subshells" : "bohr"); // 'bohr' | 'subshells'
   const [selectedShell, setSelectedShell] = useState(null);
   const [hoveredShell, setHoveredShell] = useState(null);
   const accent = CATEGORY_META[element.category]?.hex || "#4f9dff";
@@ -16,6 +16,12 @@ export default function AtomVisualizer({ element, compact = false, initialViewMo
   const activeHoveredShell =
     hoveredShell !== null && hoveredShell < element.shells.length ? hoveredShell : null;
   const highlightedShell = activeHoveredShell !== null ? activeHoveredShell : activeSelectedShell;
+
+  useEffect(() => {
+    if (initialViewMode === "bohr" || initialViewMode === "subshells") {
+      setViewMode(initialViewMode);
+    }
+  }, [initialViewMode]);
 
   return (
     <div className="rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3">

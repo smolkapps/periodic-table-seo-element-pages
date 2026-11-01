@@ -27,6 +27,7 @@ import {
   Flame,
   Info,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
 
 const TREND_MODES = [
@@ -671,6 +672,13 @@ export default function Home() {
                 >
                   <BrainCircuit className="w-3.5 h-3.5" />
                   <span>Quiz on {drawerElement.name}</span>
+                </Link>
+                <Link
+                  to={`/tutor?element=${drawerElement.slug}`}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#ffd43b] hover:border-[#ffd43b] flex items-center gap-1.5 no-underline"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Ask Tutor about {drawerElement.name}</span>
                 </Link>
               </div>
 

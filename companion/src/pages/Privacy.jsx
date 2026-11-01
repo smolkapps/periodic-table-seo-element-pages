@@ -8,17 +8,17 @@ const SECTIONS = [
     icon: HardDrive,
     title: "What Elementa stores on your device",
     body: [
-      "Your study deck (elements you saved), mastery marks, personal study notes, and quiz history are saved as four entries in this browser's local storage. They stay on this device and this browser only.",
-      "A new install or a cleared browser starts with genuinely empty progress: no sample quizzes, notes, or mastered elements are created for you.",
+      "Your study deck (elements you saved), mastery marks, personal study notes, quiz history, and any tutor chats you explicitly save ('Save Chat Locally') are stored in this browser's local storage. They stay on this device and this browser only.",
+      "A new install or a cleared browser starts with genuinely empty progress and zero saved tutor chats: no sample quizzes, notes, mastered elements, or fake conversations are created for you.",
     ],
   },
   {
     icon: ShieldCheck,
-    title: "What Elementa does not collect",
+    title: "Chemistry Tutor: Local Coach vs. Live AI Service",
     body: [
-      "Elementa has no accounts, no sign-up, no login, and no cloud profile. It does not send your study data to a server, and it does not read a shared learner record on any service.",
-      "There are no analytics, advertising, tracking pixels, or third-party scripts in the study experience. The app works offline once loaded.",
-      "Science reference links (IUPAC, NIST, PubChem, Royal Society of Chemistry) open in a new tab; those sites have their own privacy policies once you visit them.",
+      "The Chemistry Tutor offers two explicitly labeled modes. 'Guided Socratic Coach (Local Dataset — Not Live AI)' runs 100% inside your browser using deterministic rules and the bundled 118-element dataset, sending zero network requests.",
+      "When 'Live AI' is active and you submit a question, your typed question, recent turns from the current conversation, selected student level, and the selected element's canonical reference context are sent to Base44's built-in InvokeLLM integration (the working default in this app using Base44 integration credits) or, when self-hosted with an external provider, to the portable '/api/tutor' server adapter (Google Gemini, OpenAI, or Anthropic) solely to generate a reply. External provider API keys are never bundled into the browser.",
+      "Elementa has no user accounts, no cloud learner database, and no advertising or tracking pixels. Science reference links (IUPAC, NIST, PubChem, Royal Society of Chemistry) open in a new tab; those sites have their own privacy policies once you visit them.",
     ],
   },
   {

@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:standalone": "VITE_STANDALONE=true VITE_PACKAGED=true vite build",
     "build:packaged": "VITE_PACKAGED=true vite build",
+    "start:server": "node server/tutorServer.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "test": "node --test test/*.test.js",
     "lint": "eslint . --quiet",

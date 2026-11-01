@@ -362,6 +362,10 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
         type,
         props: { ...(props || {}), children: children.flat() },
       }),
+      // Effects run synchronously on each simulated render; AtomVisualizer's prop-sync effect is idempotent.
+      useEffect: (effect) => {
+        effect();
+      },
       useState: (initialValue) => {
         const idx = hookCursor++;
         if (!(idx in hookStates)) {
