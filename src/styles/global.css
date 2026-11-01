@@ -217,6 +217,10 @@ p {
     border-color 0.08s ease;
   border-left: 4px solid var(--cell-accent, var(--rule));
 }
+.pt-cell:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
 /* Desktop hover only — iOS keeps :hover "stuck" on the last-tapped cell,
    which left it offset by 2px (translateY) after a tap. */
 @media (hover: hover) {

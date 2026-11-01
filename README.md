@@ -29,7 +29,10 @@ engines see complete content with zero JavaScript.
   full, correctly sized cell — including the lanthanide/actinide rows and the
   group-2/group-3 gap (the original app rendered Oganesson and Actinium tiny
   because the spacers collapsed their cells; here each cell has an explicit grid
-  coordinate, so that can't happen). The grid is fully keyboard-navigable
+  coordinate, so that can't happen). Each cell is an ordinary link to its
+  element page, available to crawlers and no-JavaScript visitors; normal clicks
+  progressively open the info panel while new-tab gestures keep working.
+  The grid is fully keyboard-navigable
   (roving tabindex: one tab stop, arrow keys / Home / End move between cells),
   and the live filter matches name, symbol, number, or category, with a match
   count and an explicit "no matches" empty state.

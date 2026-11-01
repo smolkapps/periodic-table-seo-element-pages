@@ -103,12 +103,19 @@ d("static build output", () => {
     expect(home).toContain('"@type":"WebSite"');
   });
 
-  it("home page links to every element page (internal linking for SEO)", () => {
+  it("home page has an ordinary crawlable link to every element page", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
+    // Real anchors, rather than URLs in structured data, preserve the original
+    // no-JavaScript and crawler navigation requirement.
+    const anchorHrefs = new Set(
+      [...home.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>/g)].map(
+        (match) => match[1],
+      ),
+    );
     for (const el of ELEMENTS) {
       expect(
-        home.includes(`href="/element/${el.slug}/"`),
-        `home missing link to ${el.slug}`,
+        anchorHrefs.has(`/element/${el.slug}/`),
+        `home missing ordinary link to ${el.slug}`,
       ).toBe(true);
     }
   });
@@ -122,7 +129,9 @@ d("static build output", () => {
 
   it("home page ships the interactive table cells with data attributes", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
-    expect(home).toContain('class="pt-cell js-cell"');
+    expect(home).toMatch(
+      /<a\b[^>]*href="\/element\/hydrogen\/"[^>]*class="pt-cell js-cell"/,
+    );
     expect(home).toContain('data-slug="hydrogen"');
     // Grid coordinates for the arrow-key navigation.
     expect(home).toContain('data-x="1"');

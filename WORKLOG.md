@@ -129,3 +129,9 @@ Michael now explicitly requests all Base44 main features deployed on elementalea
 - User approved the launch copy, then delegated choice among three owned accounts. Checked their actual profiles/recent posts; selected GlobalAITeacher for interactive-learning positioning. Normal sign-in was completed by the user. Preserved the observed opening edit to “Elementa is live, btw:” with the rest unchanged.
 - Published once as@GlobalAITeacher: https://x.com/GlobalAITeacher/status/2116727564441911523 . X confirmed sent; opened permalink and verified author, full feature/privacy wording and branded preview. The t.co link resolvesHTTP200 to the exact canonical UTM URL. Both optional content-disclosure toggles were verified off. No duplicate/cross-post/paid promotion/API spend.
 - Frozen receipt/body hash/link headers/screenshot retained in ignored marketing evidence. Three alternate audience drafts remain unsent. Use the actual publication window for72hour/7day readouts; ownerQA/zero initial counters are not customer acquisition. No application source changed or deployment required.
+
+
+## Main reconciliation — October31
+
+- Reconciled the preserved August crawlable-cell commit with the completed domain/study release. Current keyboard navigation, filter feedback, analytics and sharing remain in place; restored the linked-cell hover invariant and strengthened build tests to inspect actual anchors.
+- The separate tutor stays outside the public app. Private historical Base44 audit records and exports remain in their original local packet, rather than being copied into this public source. No website deployment, store release or new social action is part of this source merge.
