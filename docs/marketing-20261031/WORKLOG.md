@@ -29,3 +29,8 @@ Use the existing owner route if it becomes available. After root verifies the pu
 - README now distinguishes the actual deployed companion, old 202 receipt, new failed verification request and the frozen pre-launch baseline. Three social drafts remain unsent. No shared-branch commit/push was performed while root’s PR is active.
 
 Remaining: root’s public journey acceptance and Google account/property workflow; investigate IndexNow’s verification before one justified later retry. Do not call indexing, traffic growth or marketing conversions complete from this receipt.
+
+
+## Root final acceptance
+
+The combined public journeys passed and the later Argon quality pass is deployed/merged in PR9. IndexNow verification was corrected at the exact public key-file boundary, then one justified resubmission accepted122URLs withHTTP200. Hub description and GitHub discovery metadata are live. Root owns the final source/catalog/operations receipts; earlier incomplete/checkpoint statements above are historical. No social post was sent: final approval is pending and current X session is a different account. Google ownership/indexed counts remain unverified. Three launch drafts and72hour/7day measurement plan remain actionable after correct-account approval/access.
