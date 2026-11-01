@@ -29,8 +29,8 @@ removes local progress. The server does not store a learner database.
 `vite.deploy.config.js` uses ordinary Vite/React with hash routing and excludes the
 Base44 editor injection. The root assembly script scopes installation, icons and
 offline assets to `/study/`. Unrouted authentication templates from the complete
-export remain in source, but are not imported by the public app. Their existing
-type diagnostics are tracked separately from passing learning-app tests/builds.
+export remain in source, but are not imported by the public app. The configured
+typecheck now passes, including those template pages and their imported UI types.
 
 ## Builder workflow
 

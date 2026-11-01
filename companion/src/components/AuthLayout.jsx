@@ -1,6 +1,15 @@
 import React from "react";
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
+/**
+ * @param {{
+ *   icon: React.ComponentType<{ className?: string, "aria-hidden"?: boolean | "true" | "false" }>,
+ *   title: React.ReactNode,
+ *   subtitle?: React.ReactNode,
+ *   footer?: React.ReactNode,
+ *   children?: React.ReactNode
+ * }} props
+ */
+export default function AuthLayout({ icon: Icon, title, subtitle = undefined, footer = undefined, children = undefined }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">

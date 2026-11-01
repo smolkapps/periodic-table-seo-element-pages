@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { ELEMENTS, CATEGORY_META, categoryLabel, getElementBySlug } from "@/data/elementsData";
@@ -102,15 +102,27 @@ export default function Practice() {
 
   const { savedSlugs, recordQuizResult, toggleSavedSlug } = useStudyProgress();
   const [quizMode, setQuizMode] = useState(initialFocus);
+  const [deckSnapshotSlugs, setDeckSnapshotSlugs] = useState(() => [...savedSlugs]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [completedSession, setCompletedSession] = useState(null);
   const [showWorksheet, setShowWorksheet] = useState(false);
 
+  const firstOptionRef = useRef(null);
+  const nextButtonRef = useRef(null);
+  const shouldFocusQuestionRef = useRef(false);
+
+  // Keep deckSnapshotSlugs synced whenever not actively mid-question in deck mode.
+  useEffect(() => {
+    if (quizMode !== "deck" || (deckSnapshotSlugs.length === 0 && savedSlugs.length > 0)) {
+      setDeckSnapshotSlugs([...savedSlugs]);
+    }
+  }, [savedSlugs, quizMode, deckSnapshotSlugs.length]);
+
   const deckElements = useMemo(
-    () => savedSlugs.map((s) => getElementBySlug(s)).filter(Boolean),
-    [savedSlugs]
+    () => deckSnapshotSlugs.map((s) => getElementBySlug(s)).filter(Boolean),
+    [deckSnapshotSlugs]
   );
 
   const isEmptyDeckMode = quizMode === "deck" && deckElements.length === 0;
@@ -144,6 +156,15 @@ export default function Practice() {
   const questions = useMemo(() => buildDeterministicQuiz(pool, 5, quizMode), [pool, quizMode]);
   const currentQ = questions[currentIdx];
 
+  useEffect(() => {
+    if (selectedOption !== null) {
+      nextButtonRef.current?.focus();
+    } else if (shouldFocusQuestionRef.current && currentQ && !showWorksheet && !completedSession) {
+      shouldFocusQuestionRef.current = false;
+      firstOptionRef.current?.focus();
+    }
+  }, [selectedOption, currentIdx, currentQ, showWorksheet, completedSession]);
+
   const handleSelectOption = (slug) => {
     if (selectedOption !== null) return;
     setSelectedOption(slug);
@@ -153,6 +174,7 @@ export default function Practice() {
 
   const handleNext = () => {
     if (currentIdx + 1 < questions.length) {
+      shouldFocusQuestionRef.current = true;
       setCurrentIdx((i) => i + 1);
       setSelectedOption(null);
     } else {
@@ -170,16 +192,20 @@ export default function Practice() {
         total: questions.length,
         perElementResults: answers,
       });
+      setDeckSnapshotSlugs((prev) => Array.from(new Set([...prev, ...(session.missedSlugs || [])])));
       setCompletedSession(session);
     }
   };
 
   const resetQuiz = (newMode = quizMode) => {
+    shouldFocusQuestionRef.current = true;
+    setDeckSnapshotSlugs([...savedSlugs]);
     setQuizMode(newMode);
     setCurrentIdx(0);
     setSelectedOption(null);
     setAnswers([]);
     setCompletedSession(null);
+    setShowWorksheet(false);
   };
 
   return (
@@ -200,7 +226,12 @@ export default function Practice() {
           </div>
           <button
             type="button"
-            onClick={() => setShowWorksheet((v) => !v)}
+            onClick={() => {
+              if (!showWorksheet && isEmptyDeckMode) {
+                setQuizMode("trends");
+              }
+              setShowWorksheet((v) => !v);
+            }}
             className="px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#ffd43b]/40 text-[#ffd43b] hover:bg-[#ffd43b]/10 text-xs font-semibold flex items-center gap-1.5 shrink-0"
           >
             <Printer className="w-4 h-4" />
@@ -334,6 +365,16 @@ export default function Practice() {
                 <RotateCcw className="w-4 h-4" />
                 <span>Practice Again</span>
               </button>
+              {quizMode !== "deck" && savedSlugs.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => resetQuiz("deck")}
+                  className="px-4 py-2.5 rounded-xl bg-[#1a2436] border border-[#4f9dff] hover:bg-[#4f9dff]/20 text-xs sm:text-sm font-semibold text-[#7bb6ff] flex items-center gap-2"
+                >
+                  <BookmarkCheck className="w-4 h-4" />
+                  <span>Practice My Study Deck ({savedSlugs.length})</span>
+                </button>
+              )}
               <Link
                 to="/saved"
                 className="px-4 py-2.5 rounded-xl bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs sm:text-sm font-semibold flex items-center gap-2 no-underline"
@@ -364,7 +405,7 @@ export default function Practice() {
             <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">{currentQ.prompt}</h2>
 
             <div className="grid grid-cols-1 gap-2.5">
-              {currentQ.options.map((opt) => {
+              {currentQ.options.map((opt, optIdx) => {
                 const isSelected = selectedOption === opt.slug;
                 const isCorrect = opt.slug === currentQ.correctSlug;
                 let btnStyle = "bg-[#1a212d] border-[#2a323d] text-[#e9edf2] hover:border-[#4f9dff]";
@@ -381,6 +422,7 @@ export default function Practice() {
                 return (
                   <button
                     key={opt.slug}
+                    ref={optIdx === 0 ? firstOptionRef : null}
                     type="button"
                     disabled={selectedOption !== null}
                     onClick={() => handleSelectOption(opt.slug)}
@@ -421,6 +463,7 @@ export default function Practice() {
                     </button>
                   </div>
                   <button
+                    ref={nextButtonRef}
                     type="button"
                     onClick={handleNext}
                     className="px-4 py-2 rounded-lg bg-[#4f9dff] text-[#07121f] font-semibold text-xs sm:text-sm flex items-center gap-1.5 hover:bg-[#7bb6ff]"

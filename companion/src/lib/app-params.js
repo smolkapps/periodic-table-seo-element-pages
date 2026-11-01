@@ -14,11 +14,12 @@ const getAppParams = () => {
 	if (isClearAccessTokenRequested()) {
 		clearStoredAccessToken();
 	}
+	const env = /** @type {{ env?: Record<string, string | undefined> }} */ (import.meta).env || {};
 	return {
-		appId: import.meta.env.VITE_BASE44_APP_ID,
+		appId: env.VITE_BASE44_APP_ID,
 		token: getAccessToken(),
-		functionsVersion: (!isNode && new URLSearchParams(window.location.search).get("functions_version")?.trim()) || import.meta.env.VITE_BASE44_FUNCTIONS_VERSION,
-		appBaseUrl: import.meta.env.VITE_BASE44_APP_BASE_URL,
+		functionsVersion: (!isNode && new URLSearchParams(window.location.search).get("functions_version")?.trim()) || env.VITE_BASE44_FUNCTIONS_VERSION,
+		appBaseUrl: env.VITE_BASE44_APP_BASE_URL,
 	}
 }
 
