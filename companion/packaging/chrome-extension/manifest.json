@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Elementa — Interactive Periodic Table",
+  "short_name": "Elementa",
+  "description": "Study all 118 chemical elements: atomic structure, periodic trends, comparisons and quizzes. Works offline; progress stays on your device.",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "Open Elementa",
+    "default_popup": "index.html",
+    "default_icon": {
+      "32": "icons/icon-32.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": [],
+  "host_permissions": [],
+  "offline_enabled": true,
+  "minimum_chrome_version": "110"
+}

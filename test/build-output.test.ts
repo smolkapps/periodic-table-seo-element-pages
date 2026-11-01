@@ -98,7 +98,7 @@ d("static build output", () => {
   it("home page uses the full marketing title and WebSite JSON-LD", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain(
-      "<title>Elementa — Interactive Periodic Table</title>",
+      "<title>Elementa — Periodic Table &amp; Chemistry Practice</title>",
     );
     expect(home).toContain('"@type":"WebSite"');
   });

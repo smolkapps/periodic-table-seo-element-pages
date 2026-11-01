@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Elementa">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="72%">
+      <stop offset="0%" stop-color="#182437"/>
+      <stop offset="100%" stop-color="#0b0e14"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g fill="none" stroke-width="17" stroke-linecap="round">
+    <ellipse cx="256" cy="256" rx="158" ry="66" stroke="#4f9dff" transform="rotate(0 256 256)"/>
+    <ellipse cx="256" cy="256" rx="158" ry="66" stroke="#69a6ff" transform="rotate(60 256 256)"/>
+    <ellipse cx="256" cy="256" rx="158" ry="66" stroke="#8fc2ff" transform="rotate(120 256 256)"/>
+  </g>
+  <circle cx="256" cy="256" r="30" fill="#e9edf2"/>
+  <circle cx="256" cy="256" r="14" fill="#4f9dff"/>
+</svg>

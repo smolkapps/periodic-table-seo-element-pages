@@ -2,6 +2,16 @@
 
 Live: [elementalearn.com](https://elementalearn.com/)
 
+The complete learning app is at [elementalearn.com/study/](https://elementalearn.com/study/):
+quizzes with answer explanations, electron-shell and subshell diagrams, trends,
+comparisons, printable worksheets, study notes, and portable device-local progress.
+Its exported React source is in `companion/`; the reference pages below remain
+static HTML. The separate tutor experiment is not part of this deployment.
+
+The public reference and study app run on our own hosting without a Base44 account,
+subscription, API key, hosted database, or runtime request. Base44 is a development
+tool. Exporting from it and committing here is explicit; GitHub sync is not connected.
+
 An interactive periodic table of all 118 elements, where **every element gets
 its own dedicated, fully indexable static page** — plus the element's article is
 embedded back into the main table's slide-in "more info" panel.
@@ -71,7 +81,8 @@ the interactive table, and `src/scripts/compare-ui.ts` progressively enhances th
 ## Develop
 
 ```bash
-npm install
+npm ci
+npm ci --prefix companion
 npm run dev        # local dev server
 ```
 
@@ -82,6 +93,8 @@ npm run check      # astro check (types + content)
 npm run build      # rasterizes icons, then prerenders dist/
 npm run verify     # post-build gate: dead-link + finishing-asset check
 npm test           # vitest: unit tests + dist/ integration tests
+npm test --prefix companion
+npm run lint --prefix companion
 npm run preview    # serve dist/ locally
 ```
 
@@ -90,6 +103,12 @@ npm run preview    # serve dist/ locally
 first to include them).
 
 ## Deploy
+
+`bash scripts/deploy-elementa.sh` runs the release checks, backs up the current
+domain, and updates its existing static Caddy document root through SSH. It keeps
+old hashed assets available for open tabs. The study app's offline cache and
+manifest are scoped to `/study/`; updating it does not remove other applications'
+caches. Verify the live learner journeys after deploying.
 
 `dist/` is a plain static bundle — deploy it to any static host (Cloudflare
 Pages, Netlify, GitHub Pages, S3, a Caddy box, …). Set the canonical domain in
