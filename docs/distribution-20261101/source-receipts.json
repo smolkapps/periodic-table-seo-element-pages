@@ -1,0 +1,491 @@
+{
+  "as_of": "2026-11-01",
+  "scope": "Reddit/HN official rules research; no account login/post/modmail",
+  "sources": [
+    {
+      "url": "https://www.reddit.com/r/chemistry/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.322455+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/chemistryteachers/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.322865+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/ChemicalEducation/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.322949+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/ScienceTeachers/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.323007+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/Teachers/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.406590+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/InternetIsBeautiful/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.408767+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://www.reddit.com/r/SideProject/about/rules.json?raw_json=1",
+      "checked_at_utc": "2026-11-01T22:30:05.413316+00:00",
+      "method": "unauthenticated HTTP GET",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "url": "https://old.reddit.com/r/chemistry/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:32.604873+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2Fchemistry%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/chemistryteachers/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:33.508987+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2Fchemistryteachers%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/ChemicalEducation/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:33.963624+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2FChemicalEducation%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/ScienceTeachers/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:34.131234+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2FScienceTeachers%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/Teachers/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:34.308546+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2FTeachers%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/SideProject/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:34.431285+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2FSideProject%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    },
+    {
+      "url": "https://old.reddit.com/r/InternetIsBeautiful/about/rules",
+      "checked_at_utc": "2026-11-01T22:30:34.562044+00:00",
+      "method": "fresh logged-out task-owned Camoufox",
+      "status": 200,
+      "final_url": "https://old.reddit.com/login/?reason=lor2&dest=https%3A%2F%2Fold.reddit.com%2Fr%2FInternetIsBeautiful%2Fabout%2Frules",
+      "text": "Skip to main content",
+      "access_note": "Rules not retrieved: redirected to login, where research stopped."
+    }
+  ],
+  "schema_version": 1,
+  "recorded_at_utc": "2026-11-01T22:51:35.688883+00:00",
+  "authority": {
+    "public_posts": 0,
+    "modmail_sent": 0,
+    "account_login": false,
+    "only_private_drafts": true
+  },
+  "limitations": [
+    "Reddit public rules JSON returned403.",
+    "Fresh logged-out Camoufox old-rules navigation redirected to login; no login attempted.",
+    "Official web-fetched pages include cached October content; these are not authenticated November1 composer readbacks.",
+    "Account-specific thresholds, hidden filters, prior submissions and required composer fields were not inspected."
+  ],
+  "verified_official_sources": [
+    {
+      "url": "https://old.reddit.com/r/SideProject/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Rendered2026-10-28T17:00:22UTC; fetchedNovember1",
+      "finding": "Sidebar explicitly invites project sharing/constructive feedback and requests Project name - Short description. No published posting day, numeric threshold or required flair retrieved."
+    },
+    {
+      "url": "https://www.reddit.com/r/SideProject/about/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawled4daysago",
+      "finding": "Public community; no rules block retrieved. Absence does not establish unrestricted posting."
+    },
+    {
+      "url": "https://old.reddit.com/r/SideProject/comments/1oaq2kx/share_your_notai_projects/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawled3weeksago; submittedOctober19,2025",
+      "finding": "Highlighted Not-AI project thread is old, not a new weekly promotion schedule; asks for projects not AI-related."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemistry/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek",
+      "finding": "Rule10 requires modmail before promoting apps/sites/tools, with moderator pinned approval comment. Rule9 weekly careers/research threads are not a promotional exception."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemistry/comments/1s8p705/a_quick_update_on_self_promotion_and_other/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "March31,2026 announcement; full text returned by searchNovember1",
+      "finding": "Moderation announcement discusses periodic-table-app flood and requires approval for promotion."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemistry/comments/1x9tst0/weekly_careerseducation_questions_thread/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek",
+      "finding": "AutoModerator thread is for education/career advice, not permission to promote a tool."
+    },
+    {
+      "url": "https://www.reddit.com/r/ChemistryTeachers/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Laterretrieval:crawledtoday",
+      "finding": "Actual public high-school chemistry-teacher community exists; no explicit promotion policy retrieved."
+    },
+    {
+      "url": "https://www.reddit.com/r/ChemistryTeachers/about/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawled7monthsago",
+      "finding": "Public status; no rules block retrieved. This old capture cannot establish current posting clearance."
+    },
+    {
+      "url": "https://www.reddit.com/r/ChemistryTeachers/new/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawled5daysago",
+      "finding": "Recent resource/developer posts show activity, not permission for this project."
+    },
+    {
+      "url": "https://www.reddit.com/r/ChemicalEducation/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 404,
+      "cache_or_publication_note": "FetchedNovember1",
+      "finding": "404, not a verified target."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemistryeducation/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 404,
+      "cache_or_publication_note": "FetchedNovember1",
+      "finding": "404 for alternative spelling."
+    },
+    {
+      "url": "https://www.reddit.com/r/ScienceTeachers/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek",
+      "finding": "Rule2 requires sourced relevant content tied to standards/pedagogy; Rule3 prohibits promotion for self gain; Rule4 warns about unpaid educational-product-development advice requests."
+    },
+    {
+      "url": "https://www.reddit.com/r/Teachers/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek",
+      "finding": "Rules2/3 reject link drops, promotion including free tools and disguised app-feedback research; surveys/market research banned. Rule7 prohibits AI posts."
+    },
+    {
+      "url": "https://old.reddit.com/r/InternetIsBeautiful/about/rules",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Rendered2026-10-28T03:11:42UTC; fetchedNovember1",
+      "finding": "Rule3 excludes webgames including quizzes. Uniqueness and AI-primary-content/functionality restrictions apply. Rule11 requires90% of recent participation unrelated to owned sites. No Saturday exception verified."
+    },
+    {
+      "url": "https://www.reddit.com/r/teachingresources/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawled3weeksago",
+      "finding": "Restricted. Creators welcome with disclosure; resources free at point of use. Post must include resource, subject, grade/age, access/cost, creator identity and link. No ads, surveys or market research. Grade9-12 flair observed, mandatory status unknown."
+    },
+    {
+      "url": "https://www.reddit.com/r/teachingresources/comments/1vyom26/welcome_to_rteachingresources_what_this_place_is/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek",
+      "finding": "Pinned moderator welcome says Restricted: anyone can read/comment; posting needs approved contributor via join request. Reader proposals for AI flair are not adopted moderator rules."
+    },
+    {
+      "url": "https://news.ycombinator.com/showhn.html",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledtoday",
+      "finding": "Personally made nontrivial usable project; make easy to try; maker available to discuss. Title beginsShowHN. No vote/comment solicitation; routine upgrades not enough. No posting day or numeric account minimum stated."
+    },
+    {
+      "url": "https://news.ycombinator.com/newsguidelines.html",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledtoday",
+      "finding": "Generated and AI-edited posts/comments and automated posting prohibited. No promotional account use, hype, delete/repost or solicited engagement."
+    },
+    {
+      "url": "https://news.ycombinator.com/item?id=22336638",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official community/HN page or primary community post result",
+      "status": 200,
+      "cache_or_publication_note": "Crawledtoday; moderatorupdateMarch28,2026",
+      "finding": "Human must write text themselves, with no LLM generation or editing of any part. Personal backstory/facts encouraged; major reposts rare, explain changes."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemhelp/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawled3weeksago; officialsidebarretrievedNovember1",
+      "finding": "Help forum rules require attempted work and guided answers. Rule9 explicitly excludes links to AI tutoring websites; Rule10 bars paid tutoring. No standalone developer-promotion window verified."
+    },
+    {
+      "url": "https://www.reddit.com/r/APchemistry/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 404,
+      "cache_or_publication_note": "RequestedNovember1",
+      "finding": "Requested URL returned404. No alias to APChem assumed."
+    },
+    {
+      "url": "https://www.reddit.com/r/APChem/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawledlastweek; officialsidebarretrievedNovember1",
+      "finding": "Rule3 requires companies posting their material to message moderators first and prohibits tutoring offers. Clear titles required. Chemistry Resource flair observed; no promotional day or numeric account minimum retrieved."
+    },
+    {
+      "url": "https://www.reddit.com/r/APStudents/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawled2weeksago; officialsidebarretrievedNovember1",
+      "finding": "Rule3 explicitly requires moderator approval even for free resources, bars tutoring solicitation and asking students to DM; surveys also require approval. Score/schedule megathreads are not resource-advertising exceptions. AP Chemistry affiliate points to actual APChem."
+    },
+    {
+      "url": "https://www.reddit.com/r/GCSE/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawled2weeksago; officialsidebarretrievedNovember1",
+      "finding": "Rule2 bans excessive self-promotion/spam; Rule5 bans tutoring advertising including free services; Rule6 bans selling products/services. Revision Resources flair exists. No blanket free-reference-project ban, fixed promotion day or mandatory prior permission found in retrieved rules; account/composer eligibility unknown."
+    },
+    {
+      "url": "https://www.reddit.com/r/alevel/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawled2weeksago; officialsidebarretrievedNovember1",
+      "finding": "Rule2 bans advertising exam-related materials/services/tutoring free or paid; Rule4 permits self-promotion only if pre-approved through modmail. Treat any exception as needing explicit coverage of this specific resource. Rule11 requires relevant AI-use disclosure/no passing generated content as own. No fixed promotion day, approved promo flair or numeric account minimum retrieved."
+    },
+    {
+      "url": "https://www.reddit.com/r/6thForm/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawled2weeksago; officialsidebarretrievedNovember1",
+      "finding": "Rule4 explicitly permits own free resources with Offering Help flair, excluding commercial resources, free catches/trials/referrals/rewards. Rule7 requires approval for AMAs. Rule8 requires a relevant pinned megathread when one exists. No fixed free-resource promotion day or numeric account threshold published."
+    },
+    {
+      "url": "https://www.reddit.com/r/6thForm/comments/1mg1ttk/the_aaaa_why_cant_i_see_my_post_explainerupdate/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawledtoday; older archived post still highlighted in official community feed",
+      "finding": "Moderator explains new/low-karma accounts may enter manual review, without numeric thresholds. Do not repost or send extra modmail to speed up the queue."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemhelp/comments/1w3gshj/start_of_term_checkin/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Crawledtoday; highlighted thread inspectedNovember1",
+      "finding": "Start-of-term check-in, not a verified developer-promotion megathread."
+    },
+    {
+      "url": "https://www.reddit.com/r/chemhelp/comments/1mwl8sx/new_ownership/",
+      "checked_on": "2026-11-01",
+      "retrieval": "web tool, official subreddit sidebar or highlighted moderator/community post",
+      "status": 200,
+      "cache_or_publication_note": "Laterretrievalcrawledtoday; community announcement inspectedNovember1",
+      "finding": "Ownership announcement retrieved; no creator-promotion exception established by inspected content."
+    }
+  ],
+  "destination_decisions": {
+    "r/SideProject": {
+      "decision": "content fits; draft ready for Michael review",
+      "placement": "standalone project post; Project name - Short description",
+      "day_or_megathread": "none required in retrieved sidebar",
+      "flair": "mandatoryflair not established",
+      "account": "not inspected; numeric age/karma requirements not published in accessible sources"
+    },
+    "r/TeachingResources": {
+      "decision": "content fits; hold for approved-contributor status",
+      "placement": "standalone resource post after join-request approval",
+      "day_or_megathread": "no fixed day or promotional thread verified",
+      "flair": "Grade 9-12 observed; required status unknown",
+      "account": "approved contributor required; not checked"
+    },
+    "r/chemistry": {
+      "decision": "modmail approval required, none sought",
+      "placement": "moderator-approved placement; not weekly-career-thread workaround",
+      "flair": "moderators decide if approved; no promotional flair verified"
+    },
+    "r/ChemistryTeachers": {
+      "decision": "active candidate; promotion rules unverified; conditional draft",
+      "placement": "unverified",
+      "flair": "unverified",
+      "account": "public status observed; composer/filters unverified"
+    },
+    "r/ScienceTeachers": {
+      "decision": "omit: developer promotion/product-feedback request conflicts with rules3/4"
+    },
+    "r/Teachers": {
+      "decision": "omit: promotion prohibited including free tools"
+    },
+    "r/InternetIsBeautiful": {
+      "decision": "omit: quiz exclusion and other fit risks",
+      "account": "90/10 history requirement published; account not inspected"
+    },
+    "r/ChemicalEducation": {
+      "decision": "omit:404; not verified destination"
+    },
+    "Show HN": {
+      "decision": "product fits; generated private draft not submission-ready",
+      "placement": "ShowHN story, usable productURL, personally written explanation/firstcomment",
+      "human_requirement": "Michael must write actual text himself; no automated posting",
+      "account": "not inspected; no numeric minimum stated in sources; prior submissions unverified"
+    },
+    "r/chemhelp": {
+      "decision": "hold standalone developer promotion; no verified launch route",
+      "rule_limits": "Rule9 excludes AI tutoring links; Rule10 paid tutoring prohibited; help format requires attempted work and guided answers",
+      "placement": "no promo day or exception megathread verified; highlighted check-in is not a promo window",
+      "flair": "General/High School observed for help topics, not promotional permission",
+      "account": "no numeric requirement retrieved; account not inspected",
+      "draft": "none; promotion route not established",
+      "future_change": "Recheck if tutor becomes public."
+    },
+    "r/APchemistry": {
+      "decision": "omit requestedURL404; separately verified APChem is not an assumed alias",
+      "draft": "none for404 route"
+    },
+    "r/APChem": {
+      "decision": "moderator permission required for developer-affiliated material",
+      "placement": "message moderators before post underRule3; tutoring offers barred",
+      "day_or_megathread": "no exclusive promotion day/exception thread verified",
+      "flair": "Chemistry Resource observed; permission/composer governs",
+      "account": "no numeric age/karma requirement retrieved; account not inspected",
+      "draft": "permission-conditional AP-atomic-structure resource draft"
+    },
+    "r/APStudents": {
+      "decision": "moderator approval explicitly required for free resource",
+      "placement": "community moderator-contact route before posting; no student-DM solicitation",
+      "day_or_megathread": "score/schedule threads are not promotional exceptions; no promo day verified",
+      "flair": "course flairs exist; exact chemistry composer label/required status unverified",
+      "account": "numeric age/karma requirement not retrieved; account not inspected",
+      "draft": "permission-conditional free chemistry resource"
+    },
+    "r/GCSE": {
+      "decision": "free reference/practice resource candidate; not tutoring/selling/excessive promotion",
+      "placement": "one contextual resource post, subject to actual account/composer and current topic threads",
+      "day_or_megathread": "no fixed promotion day or mandatory permission stated in retrieved rules",
+      "flair": "Revision Resources observed",
+      "account": "no numeric age/karma requirement retrieved; account not inspected",
+      "draft": "ready for review with current public capabilities",
+      "future_change": "Tutor or monetization changes require rechecking fit."
+    },
+    "r/alevel": {
+      "decision": "hold for explicit exception coveringRule2 andRule4; private generated copy not submission-ready",
+      "placement": "prior modmail approval for specific resource; no generic approval inferred",
+      "day_or_megathread": "no promo window verified; results use official megathread",
+      "flair": "no approved promo flair verified",
+      "account": "no numeric requirement retrieved; account not inspected",
+      "authorship": "Rule11 requires disclosure of relevant AI use and prohibits presenting generated content as own",
+      "draft": "private conditional working draft only"
+    },
+    "r/6thForm": {
+      "decision": "own free resources explicitly allowed underRule4",
+      "placement": "Offering Help resource post; use relevant pinned megathread if present; not AMA",
+      "day_or_megathread": "no fixed day; no current general chemistry-resource megathread verified",
+      "flair": "Offering Help specified inRule4",
+      "account": "new/low-karma accounts may require manual review; numeric thresholds unpublished; no repeated posting while held",
+      "draft": "ready for review under current free/no-account resource scope"
+    }
+  },
+  "requested_extension": [
+    "r/chemhelp",
+    "r/APchemistry",
+    "r/APChem",
+    "r/APStudents",
+    "r/GCSE",
+    "r/alevel",
+    "r/6thForm"
+  ],
+  "product_copy_checkpoint": {
+    "as_of": "2026-11-01",
+    "public_brand": "Elementa",
+    "proposed_brand_only": "ElementaLearn",
+    "public_quiz_max": 5,
+    "public_single_element_question_count": 4,
+    "public_tutor": false,
+    "private_preview_reported_by_parent": {
+      "question_lengths": [
+        5,
+        10,
+        20
+      ],
+      "difficulties": [
+        "Easy",
+        "Standard",
+        "Hard"
+      ],
+      "deployed_or_synced_to_public": false
+    },
+    "draft_policy": "Keep current drafts public-truthful; parked new-feature sentence conditional on verified public source/build/journey. No first-launch/year claim."
+  }
+}
