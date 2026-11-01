@@ -40,6 +40,16 @@ https://elementalearn.com/compare/?ids=oxygen,iron,gold&utm_source=teacher_share
 
 **Posting state:** All three are unsent drafts. Review community rules and relevance before any teacher/community placement. Don’t drop the same pitch across unrelated groups or send automated outreach.
 
+## Published availability post
+
+Published once from [@GlobalAITeacher](https://x.com/GlobalAITeacher/status/2116727564441911523) on October 31, 2026 at 11:02 PM Eastern, after explicit copy approval and delegated account choice:
+
+> Elementa is live, btw: explore all 118 elements, inspect electron shells and orbitals, compare properties, and test yourself with quick quizzes. Free, no account; study progress stays on your device.
+>
+> https://elementalearn.com/?utm_source=x&utm_medium=social&utm_campaign=elementa_launch
+
+The opening composer edit was preserved. The three alternate drafts above remain unsent. Author, public body, preview and full tagged destination are verified; no duplicate post, paid promotion or customer result is claimed.
+
 ## A bounded first distribution test
 
 Start with one approved post that reaches students revising introductory chemistry. Use the tagged study URL above. Read results after72hours and again after7days, with fixedUTC windows and ownerQA excluded where it can be identified.
