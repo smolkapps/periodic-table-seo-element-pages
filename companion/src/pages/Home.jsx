@@ -89,6 +89,33 @@ export default function Home() {
   const cellRefs = useRef([]);
   const searchInputRef = useRef(null);
   const tableScrollRef = useRef(null);
+  const drawerDialogRef = useRef(null);
+  const drawerCloseRef = useRef(null);
+  const drawerTriggerRef = useRef(null);
+
+  const openDrawer = (slug, triggerEl = null) => {
+    drawerTriggerRef.current =
+      triggerEl || (typeof document !== "undefined" ? document.activeElement : null);
+    setDrawerSlug(slug);
+  };
+
+  const closeDrawer = () => {
+    const previousSlug = drawerSlug;
+    setDrawerSlug(null);
+    requestAnimationFrame(() => {
+      const trigger = drawerTriggerRef.current;
+      if (trigger && typeof trigger.focus === "function" && trigger.isConnected) {
+        trigger.focus();
+        return;
+      }
+      if (previousSlug) {
+        const idx = ELEMENTS.findIndex((e) => e.slug === previousSlug);
+        if (idx !== -1 && cellRefs.current[idx]) {
+          cellRefs.current[idx].focus();
+        }
+      }
+    });
+  };
 
   const scrollTableToGroup = (position) => {
     const container = tableScrollRef.current;
@@ -152,13 +179,37 @@ export default function Home() {
   const drawerArticle = useMemo(() => (drawerElement ? buildArticle(drawerElement) : null), [drawerElement]);
 
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && drawerSlug) {
-        setDrawerSlug(null);
+    if (!drawerSlug) return;
+    const raf = requestAnimationFrame(() => {
+      drawerCloseRef.current?.focus();
+    });
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeDrawer();
+        return;
+      }
+      if (e.key === "Tab" && drawerDialogRef.current) {
+        const focusables = drawerDialogRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = /** @type {HTMLElement} */ (focusables[0]);
+        const last = /** @type {HTMLElement} */ (focusables[focusables.length - 1]);
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [drawerSlug]);
 
   const handleShareElement = async (element) => {
@@ -204,8 +255,8 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0">
               <button
                 type="button"
-                onClick={() => {
-                  setDrawerSlug("oxygen");
+                onClick={(e) => {
+                  openDrawer("oxygen", e.currentTarget);
                 }}
                 className="p-2.5 rounded-lg bg-[#1a2230] hover:bg-[#222c3d] border border-[#2c374b] text-left transition-all"
               >
@@ -429,7 +480,7 @@ export default function Home() {
                       return;
                     }
                     event.preventDefault();
-                    setDrawerSlug(element.slug);
+                    openDrawer(element.slug, event.currentTarget);
                   }}
                   aria-label={`${element.name}, symbol ${element.symbol}, atomic number ${element.number}. Open details.`}
                   style={{
@@ -525,9 +576,10 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setDrawerSlug(null)}
+            onClick={() => closeDrawer()}
           />
           <aside
+            ref={drawerDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="panel-title"
@@ -585,8 +637,9 @@ export default function Home() {
                   <span>Show more →</span>
                 </Link>
                 <button
+                  ref={drawerCloseRef}
                   type="button"
-                  onClick={() => setDrawerSlug(null)}
+                  onClick={() => closeDrawer()}
                   aria-label="Close panel"
                   className="p-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#aeb8c4] hover:text-white"
                 >

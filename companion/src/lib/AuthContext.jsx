@@ -4,17 +4,25 @@ import { appParams } from '@/lib/app-params';
 
 const AuthContext = createContext();
 
+const isCloudAuthEnabled =
+  /** @type {{ env?: Record<string, string | undefined> }} */ (import.meta).env?.VITE_ENABLE_CLOUD_AUTH === 'true';
+
+/**
+ * @param {{ children?: React.ReactNode }} props
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(isCloudAuthEnabled);
+  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(isCloudAuthEnabled);
   const [authError, setAuthError] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [authChecked, setAuthChecked] = useState(!isCloudAuthEnabled);
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
 
   useEffect(() => {
-    checkAppState();
+    if (isCloudAuthEnabled) {
+      checkAppState();
+    }
   }, []);
 
   const checkAppState = async () => {
@@ -132,9 +140,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated,
       isLoadingAuth,
       isLoadingPublicSettings,
       authError,

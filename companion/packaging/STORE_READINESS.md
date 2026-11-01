@@ -56,11 +56,7 @@ Files produced:
 - `packaging/chrome-extension/manifest.json` + `README.md`
 - `/privacy` and `/terms` routes with the device-local data explanation, © 2025 Smolk Apps
 
-`npm run typecheck` now reports **0 errors across all used Elementa study files** (`elementsData`, `TrendExplorerCard`, `AtomVisualizer`, `AllElements`, `Home`, `ElementDetail`, `Compare`, `Practice`, `SavedProgress`, `Privacy`, `Terms`, `Navbar`, `Footer`, `StorageNotice`, `progressStore`, `studyStore`). The **57 remaining errors** are confined to unused platform template files not routed by the app:
-
-- 41 in unrouted auth template pages (`Register`, `ResetPassword`, `Login`, `ForgotPassword`, `OAuthConsent`)
-- 13 in untyped shadcn UI primitives (`input-otp`, `button`, `input`, `label`) imported by those auth pages
-- 3 in `src/lib/app-params.js` (`import.meta.env` without `vite/client` ambient types)
+`npm run typecheck` (`tsc -p ./jsconfig.json`) now passes with **0 errors** in the existing configured scope, including active Elementa study files and unrouted authentication pages with their imported UI primitives, with `checkJs: true` intact and no additional exclusions or `@ts-ignore` directives.
 
 ## 3. iOS (owner actions)
 

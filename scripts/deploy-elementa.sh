@@ -8,6 +8,7 @@ npm test
 npm run verify
 npm test --prefix companion
 npm run lint --prefix companion
+npm run typecheck --prefix companion
 
 # Preserve old hashed assets for visitors who already opened the previous page.
 # rsync writes temporary files and renames completed updates into place.

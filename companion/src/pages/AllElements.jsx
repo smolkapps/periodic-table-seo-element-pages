@@ -42,8 +42,15 @@ export default function AllElements() {
             <Search className="w-4 h-4 text-[#7a8694] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="search"
+              aria-label="Filter 118 elements"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && filter !== "") {
+                  e.preventDefault();
+                  setFilter("");
+                }
+              }}
               placeholder="Filter 118 elements…"
               className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] text-sm text-white placeholder-[#7a8694] focus:outline-none focus:border-[#4f9dff]"
             />
@@ -98,6 +105,8 @@ export default function AllElements() {
                         <button
                           type="button"
                           onClick={() => toggleSavedSlug(el.slug)}
+                          aria-label={isSaved ? `Remove ${el.name} from Study Deck` : `Save ${el.name} to Study Deck`}
+                          aria-pressed={isSaved}
                           title={isSaved ? "Remove from Study Deck" : "Save to Study Deck"}
                           className={`p-1.5 rounded-lg border transition-colors ${
                             isSaved
