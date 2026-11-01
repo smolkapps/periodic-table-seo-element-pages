@@ -15,6 +15,8 @@ interface Props {
   /** Alt text for the social-card image. */
   ogImageAlt?: string;
   noindex?: boolean;
+  /** Suppress outbound Referer only on a page that needs this media policy. */
+  referrerPolicy?: "no-referrer";
 }
 
 const {
@@ -25,6 +27,7 @@ const {
   ogImagePath = "/og-default.png",
   ogImageAlt,
   noindex = false,
+  referrerPolicy,
 } = Astro.props;
 
 // canonicalPath (when passed) is site-root-relative WITHOUT the base, so it
@@ -49,6 +52,7 @@ const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {referrerPolicy && <meta name="referrer" content={referrerPolicy} />}
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

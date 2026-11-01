@@ -1,5 +1,7 @@
 # Original DeepMind video embed — November 1, 2026 UTC
 
+Historical implementation: this loaded the full X post and required another Play action. Its eventual-playback checks did not establish the first-click requirement. It is superseded by [the one-click native-video repair](../video-one-click-20261101/README.md).
+
 `src/components/ArgonVideo.astro` embeds the original Google DeepMind X player on an explicit **Load video** action. The nearby credit identifies Google DeepMind, Gemini 4 Argon / Antigravity and Tom Lehrer's “The Elements,” with an always-visible link to the exact original post. No video/poster file is rehosted and no X widget script is loaded in the parent document.
 
 ## Source verification
