@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { ELEMENTS, CATEGORY_META, categoryLabel, getElementBySlug } from "@/data/elementsData";
+import { ELEMENTS, CATEGORY_META, getElementBySlug, buildDeterministicQuiz } from "@/data/elementsData";
 import { useStudyProgress } from "@/lib/studyStore";
 import {
   BrainCircuit,
@@ -14,94 +14,41 @@ import {
   Award,
 } from "lucide-react";
 
-function buildDeterministicQuiz(pool, count = 5, mode = "all") {
-  if (!Array.isArray(pool) || pool.length === 0) return [];
-  const source = pool;
-  const questions = [];
-
-  for (let i = 0; i < count; i++) {
-    const target = source[i % source.length];
-    const distractors = ELEMENTS.filter((e) => e.slug !== target.slug && (e.period === target.period || e.category !== target.category))
-      .slice((i * 7) % 50, (i * 7) % 50 + 3);
-
-    const qType = mode === "trends" ? i % 2 : i % 4;
-
-    if (qType === 0) {
-      // Electron configuration & shell logic
-      const options = [target, ...distractors].map((el) => ({
-        slug: el.slug,
-        label: `${el.electronConfig} (${el.shells.join("·")} shells)`,
-      }));
-      questions.push({
-        id: `q-${i}-${target.slug}`,
-        target,
-        prompt: `Which ground-state electron configuration and shell occupancy belongs to ${target.name} (${target.symbol}, Z = ${target.number})?`,
-        options: rotateOptions(options, i),
-        correctSlug: target.slug,
-        explanation: `${target.name} has Z = ${target.number} protons and electrons, filling orbitals to ${target.electronConfig} across ${target.shells.length} principal shell(s) (${target.shells.join("·")}).`,
-      });
-    } else if (qType === 1) {
-      // Periodic Trend / Electronegativity / Ionization
-      const peer = distractors.find((d) => d.electronegativity !== null && d.electronegativity !== target.electronegativity) || ELEMENTS[7]; // Oxygen fallback
-      const options = [target, ...distractors].map((el) => ({
-        slug: el.slug,
-        label: `${el.name} (${el.symbol}) — Period ${el.period}, ${el.group ? `Group ${el.group}` : "f-block"}`,
-      }));
-      questions.push({
-        id: `q-${i}-${target.slug}`,
-        target,
-        prompt: `Identify the ${categoryLabel(target.category).toLowerCase()} in Period ${target.period} (${target.block}-block) known as ${target.highlight}:`,
-        options: rotateOptions(options, i),
-        correctSlug: target.slug,
-        explanation: `${target.name} (${target.symbol}, Z=${target.number}) sits in Period ${target.period}, ${target.group ? `Group ${target.group}` : "f-block"} and is ${target.highlight}.`,
-      });
-    } else if (qType === 2) {
-      // Real-world application -> Symbol & Z
-      const options = [target, ...distractors].map((el) => ({
-        slug: el.slug,
-        label: `${el.symbol} — ${el.name} (Z = ${el.number})`,
-      }));
-      questions.push({
-        id: `q-${i}-${target.slug}`,
-        target,
-        prompt: `Which element is ${target.highlight}?`,
-        options: rotateOptions(options, i),
-        correctSlug: target.slug,
-        explanation: `${target.name} (${target.symbol}, atomic number ${target.number}) is ${target.highlight}.`,
-      });
-    } else {
-      // Category & Valence classification
-      const options = [target, ...distractors].map((el) => ({
-        slug: el.slug,
-        label: `${el.name} (${el.symbol}) — ${categoryLabel(el.category)}, ${el.outerShellElectrons} outer-shell e⁻`,
-      }));
-      questions.push({
-        id: `q-${i}-${target.slug}`,
-        target,
-        prompt: `Select the correct chemical family and outer-shell electron count for atomic number Z = ${target.number}:`,
-        options: rotateOptions(options, i),
-        correctSlug: target.slug,
-        explanation: `Element #${target.number} is ${target.name} (${target.symbol}), a ${categoryLabel(target.category).toLowerCase()} in the ${target.block}-block with ${target.outerShellElectrons} outer-shell electron(s).`,
-      });
-    }
-  }
-
-  return questions;
-}
-
-function rotateOptions(arr, shift) {
-  const k = shift % arr.length;
-  return [...arr.slice(k), ...arr.slice(0, k)];
-}
-
 export default function Practice() {
   const [searchParams] = useSearchParams();
   const focusElementSlug = searchParams.get("element");
   const focusIdsParam = searchParams.get("ids");
-  const initialFocus = searchParams.get("focus") || (focusElementSlug ? "element" : focusIdsParam ? "compare" : "deck");
+  const focusParam = searchParams.get("focus");
+
+  const focusedElement = useMemo(
+    () => (focusElementSlug ? getElementBySlug(focusElementSlug) || null : null),
+    [focusElementSlug]
+  );
+  const comparedElements = useMemo(
+    () =>
+      focusIdsParam
+        ? Array.from(
+            new Map(
+              focusIdsParam
+                .split(",")
+                .map((s) => getElementBySlug(s))
+                .filter(Boolean)
+                .map((el) => [el.slug, el])
+            ).values()
+          )
+        : [],
+    [focusIdsParam]
+  );
+
+  const deriveRouteMode = () => {
+    if (focusParam) return focusParam;
+    if (focusedElement) return "element";
+    if (comparedElements.length > 0) return "compare";
+    return "deck";
+  };
 
   const { savedSlugs, recordQuizResult, toggleSavedSlug } = useStudyProgress();
-  const [quizMode, setQuizMode] = useState(initialFocus);
+  const [quizMode, setQuizMode] = useState(deriveRouteMode);
   const [deckSnapshotSlugs, setDeckSnapshotSlugs] = useState(() => [...savedSlugs]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -112,6 +59,16 @@ export default function Practice() {
   const firstOptionRef = useRef(null);
   const nextButtonRef = useRef(null);
   const shouldFocusQuestionRef = useRef(false);
+
+  // Sync quiz mode if route search params change.
+  useEffect(() => {
+    const nextMode = focusParam || (focusedElement ? "element" : comparedElements.length > 0 ? "compare" : "deck");
+    setQuizMode(nextMode);
+    setCurrentIdx(0);
+    setSelectedOption(null);
+    setAnswers([]);
+    setCompletedSession(null);
+  }, [focusParam, focusedElement, comparedElements.length]);
 
   // Keep deckSnapshotSlugs synced whenever not actively mid-question in deck mode.
   useEffect(() => {
@@ -128,19 +85,11 @@ export default function Practice() {
   const isEmptyDeckMode = quizMode === "deck" && deckElements.length === 0;
 
   const pool = useMemo(() => {
-    if (quizMode === "element" && focusElementSlug) {
-      const el = getElementBySlug(focusElementSlug);
-      if (el) {
-        const peers = ELEMENTS.filter((e) => e.category === el.category || e.period === el.period);
-        return [el, ...peers.filter((p) => p.slug !== el.slug)];
-      }
+    if (quizMode === "element" && focusedElement) {
+      return [focusedElement];
     }
-    if (quizMode === "compare" && focusIdsParam) {
-      const slugs = focusIdsParam.split(",");
-      const resolved = slugs.map((s) => getElementBySlug(s)).filter(Boolean);
-      if (resolved.length > 0) {
-        return resolved;
-      }
+    if (quizMode === "compare" && comparedElements.length > 0) {
+      return comparedElements;
     }
     if (quizMode === "deck") {
       return deckElements;
@@ -151,7 +100,7 @@ export default function Practice() {
         .filter(Boolean);
     }
     return ELEMENTS.filter((_, idx) => idx % 5 === 0);
-  }, [quizMode, focusElementSlug, focusIdsParam, deckElements]);
+  }, [quizMode, focusedElement, comparedElements, deckElements]);
 
   const questions = useMemo(() => buildDeterministicQuiz(pool, 5, quizMode), [pool, quizMode]);
   const currentQ = questions[currentIdx];
@@ -185,8 +134,10 @@ export default function Practice() {
             ? "Saved Study Deck"
             : quizMode === "trends"
             ? "Periodic Trends & Valence"
-            : quizMode === "element"
-            ? `Element Focus (${focusElementSlug})`
+            : quizMode === "element" && focusedElement
+            ? `Element Focus (${focusedElement.name})`
+            : quizMode === "compare" && comparedElements.length > 0
+            ? `Comparison Focus (${comparedElements.map((e) => e.symbol).join(", ")})`
             : "All 118 Elements Mix",
         score,
         total: questions.length,
@@ -245,6 +196,12 @@ export default function Practice() {
             { id: "deck", label: `My Study Deck (${savedSlugs.length})` },
             { id: "trends", label: "Periodic Trends & Valence" },
             { id: "all", label: "All 118 Elements Mix" },
+            ...(focusedElement
+              ? [{ id: "element", label: `Element Focus: ${focusedElement.name} (${focusedElement.symbol})` }]
+              : []),
+            ...(comparedElements.length > 0
+              ? [{ id: "compare", label: `Comparison (${comparedElements.map((e) => e.symbol).join(", ")})` }]
+              : []),
           ].map((m) => (
             <button
               key={m.id}
@@ -310,7 +267,8 @@ export default function Practice() {
                   Classroom &amp; Self-Study Worksheet
                 </span>
                 <h2 className="text-lg font-bold text-white mt-1">
-                  Printable Chemistry Quiz &amp; Answer Key ({questions.length} Questions)
+                  Printable Chemistry Quiz &amp; Answer Key ({questions.length}{" "}
+                  {questions.length === 1 ? "Question" : "Questions"})
                 </h2>
               </div>
               <button

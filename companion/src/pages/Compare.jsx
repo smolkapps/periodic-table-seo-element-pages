@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import {
   ELEMENTS,
   CATEGORY_META,
@@ -8,6 +9,7 @@ import {
   MIN_COMPARE,
   MAX_COMPARE,
   buildComparison,
+  buildElementContrastSummary,
   buildComparisonShareUrl,
   resolveComparisonSlugs,
 } from "@/data/elementsData";
@@ -118,22 +120,24 @@ export default function Compare() {
               configuration, periodic trends, and discovery. Greatest values in numeric rows are highlighted.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full md:w-auto">
             <button
               type="button"
               data-share-url={shareUrl}
+              aria-label="Copy shareable comparison link"
               onClick={handleCopyShareUrl}
-              className="px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-semibold text-white flex items-center gap-1.5"
+              className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-semibold text-white flex items-center justify-center gap-1.5"
             >
-              {copiedUrl ? <Check className="w-3.5 h-3.5 text-[#69db7c]" /> : <Share2 className="w-3.5 h-3.5" />}
-              <span>{copiedUrl ? `Copied ${copiedUrl}` : "Copy Shareable URL"}</span>
+              {copiedUrl ? <Check className="w-3.5 h-3.5 text-[#69db7c] shrink-0" /> : <Share2 className="w-3.5 h-3.5 shrink-0" />}
+              <span className="truncate">{copiedUrl ? `Copied ${copiedUrl}` : "Copy Shareable URL"}</span>
             </button>
             {resolvedElements.length >= MIN_COMPARE && (
               <Link
                 to={`/practice?ids=${resolvedElements.map((e) => e.slug).join(",")}`}
-                className="px-3.5 py-2 rounded-lg bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs font-semibold flex items-center gap-1.5 no-underline"
+                aria-label={`Start quiz comparing ${resolvedElements.map((e) => e.name).join(", ")}`}
+                className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs font-semibold flex items-center justify-center gap-1.5 no-underline"
               >
-                <BrainCircuit className="w-3.5 h-3.5" />
+                <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
                 <span>Quiz This Comparison</span>
               </Link>
             )}
@@ -141,24 +145,34 @@ export default function Compare() {
         </div>
 
         {/* One-Click Chemistry Comparison Presets */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div role="group" aria-label="Comparison presets" className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-mono text-[#7a8694] flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-[#ffd43b]" /> Presets:
           </span>
-          {CURATED_PRESETS.map((preset) => (
-            <button
-              key={preset.label}
-              type="button"
-              onClick={() => {
-                const next = [preset.slugs[0], preset.slugs[1], preset.slugs[2] || ""];
-                setSlots(next);
-                syncUrlToSelection(next);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-[#131822] border border-[#242c38] hover:border-[#4f9dff] text-xs text-[#aeb8c4] hover:text-white transition-colors"
-            >
-              {preset.label}
-            </button>
-          ))}
+          {CURATED_PRESETS.map((preset) => {
+            const isPresetActive =
+              preset.slugs.length === resolvedElements.length &&
+              preset.slugs.every((slug, i) => resolvedElements[i]?.slug === slug);
+            return (
+              <button
+                key={preset.label}
+                type="button"
+                aria-pressed={isPresetActive}
+                onClick={() => {
+                  const next = [preset.slugs[0], preset.slugs[1], preset.slugs[2] || ""];
+                  setSlots(next);
+                  syncUrlToSelection(next);
+                }}
+                className={`min-h-[40px] px-3 py-2 rounded-lg border text-xs transition-colors ${
+                  isPresetActive
+                    ? "bg-[#4f9dff]/20 border-[#4f9dff] text-white font-semibold"
+                    : "bg-[#131822] border-[#242c38] hover:border-[#4f9dff] text-[#aeb8c4] hover:text-white"
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* 3 Element Pickers */}
@@ -175,6 +189,7 @@ export default function Compare() {
               </span>
               <select
                 name={`el${idx + 1}`}
+                aria-label={`Element ${idx + 1}${idx >= 2 ? " (optional)" : ""}`}
                 value={selectedSlug}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -182,7 +197,7 @@ export default function Compare() {
                   setSlots(next);
                   syncUrlToSelection(next);
                 }}
-                className="js-compare-select px-3 py-2 rounded-lg bg-[#1c232d] border border-[#2a323d] text-sm text-white focus:outline-none focus:border-[#4f9dff]"
+                className="js-compare-select min-h-[44px] px-3 py-2.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-sm text-white focus:outline-none focus:border-[#4f9dff]"
               >
                 {idx >= 2 && <option value="">None</option>}
                 {ELEMENTS.map((el) => (
@@ -198,8 +213,19 @@ export default function Compare() {
         {/* Comparison Table or Hint */}
         <div className="js-compare-result cmp-result" aria-live="polite">
           {!comparison ? (
-            <div className="rounded-xl bg-[#131822] border border-[#ffd43b]/40 p-6 text-center">
+            <div className="rounded-xl bg-[#131822] border border-[#ffd43b]/40 p-6 text-center space-y-3">
               <p className="cmp-hint text-sm font-semibold text-[#ffd43b]">{hintMessage}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = [...DEFAULT_COMPARE_SLUGS];
+                  setSlots(next);
+                  syncUrlToSelection(next);
+                }}
+                className="min-h-[44px] px-4 py-2 rounded-lg bg-[#1c232d] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-semibold text-white"
+              >
+                Reset to Default Trio (Fe, Au, O)
+              </button>
             </div>
           ) : (
             <div className="space-y-6">
@@ -210,17 +236,22 @@ export default function Compare() {
                 <table className="cmp-table w-full text-xs sm:text-sm border-collapse">
                   <thead>
                     <tr className="bg-[#161c27] border-b border-[#242c38]">
-                      <td className="py-3.5 px-4 text-xs font-mono uppercase text-[#7a8694] w-48">Property</td>
+                      <th
+                        scope="col"
+                        className="sticky left-0 z-10 bg-[#161c27] py-3.5 px-3 sm:px-4 text-left text-xs font-mono uppercase text-[#7a8694] w-36 sm:w-48"
+                      >
+                        Property
+                      </th>
                       {comparison.elements.map((el) => {
                         const accent = CATEGORY_META[el.category]?.hex || "#4f9dff";
                         return (
-                          <th key={el.slug} scope="col" className="py-3.5 px-4 text-left">
+                          <th key={el.slug} scope="col" className="py-3.5 px-3 sm:px-4 text-left min-w-[140px]">
                             <Link
                               to={`/element/${el.slug}`}
-                              className="inline-flex items-center gap-2 text-white hover:text-[#7bb6ff] no-underline font-bold text-base"
+                              className="min-h-[40px] inline-flex items-center gap-2 text-white hover:text-[#7bb6ff] no-underline font-bold text-sm sm:text-base"
                             >
                               <span
-                                className="cmp-sym px-2 py-0.5 rounded bg-[#1c232d] font-mono text-sm border-l-[3px]"
+                                className="cmp-sym px-2 py-0.5 rounded bg-[#1c232d] font-mono text-xs sm:text-sm border-l-[3px]"
                                 style={{ borderLeftColor: accent }}
                               >
                                 {el.symbol}
@@ -235,7 +266,10 @@ export default function Compare() {
                   <tbody className="divide-y divide-[#242c38]">
                     {comparison.rows.map((row) => (
                       <tr key={row.label} className="hover:bg-[#18202c]/60">
-                        <th scope="row" className="py-3 px-4 text-left font-medium text-[#8b98a9] whitespace-nowrap">
+                        <th
+                          scope="row"
+                          className="sticky left-0 z-10 bg-[#131822] py-3 px-3 sm:px-4 text-left font-medium text-[#8b98a9] whitespace-nowrap border-r border-[#242c38]/60"
+                        >
                           {row.label}
                         </th>
                         {row.values.map((val, i) => {
@@ -260,6 +294,9 @@ export default function Compare() {
                     ))}
                   </tbody>
                 </table>
+                <p className="px-4 py-3 text-xs text-[#aeb8c4]">
+                  Atomic weights are dimensionless. Bracketed [A] values are reference isotope mass numbers, not measured atomic masses.
+                </p>
               </div>
 
               {/* Visual Synthesis of Key Contrasts */}
@@ -285,7 +322,9 @@ export default function Compare() {
                             {el.outerShellElectrons} outer e⁻ ({el.block}-block)
                           </span>
                         </div>
-                        <p className="text-xs text-[#aeb8c4] leading-relaxed">{meta.reactivity}</p>
+                        <p className="text-xs text-[#aeb8c4] leading-relaxed">
+                          {buildElementContrastSummary(el, comparison.elements)}
+                        </p>
                       </div>
                     );
                   })}
@@ -298,18 +337,20 @@ export default function Compare() {
         <div className="flex flex-wrap gap-3 pt-2">
           <Link
             to="/"
-            className="px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] text-xs font-medium text-[#aeb8c4] hover:text-white no-underline"
+            className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#161b22] border border-[#2a323d] text-xs font-medium text-[#aeb8c4] hover:text-white inline-flex items-center no-underline"
           >
             ← Back to the table
           </Link>
           <Link
             to="/elements"
-            className="px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] text-xs font-medium text-[#aeb8c4] hover:text-white no-underline"
+            className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#161b22] border border-[#2a323d] text-xs font-medium text-[#aeb8c4] hover:text-white inline-flex items-center no-underline"
           >
             Browse all 118 elements
           </Link>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

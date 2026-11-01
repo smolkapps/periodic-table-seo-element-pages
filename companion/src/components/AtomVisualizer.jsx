@@ -1,28 +1,21 @@
 import React, { useState } from "react";
-import { CATEGORY_META } from "@/data/elementsData";
+import { CATEGORY_META, AUFBAU_NOTES, getShellRoleLabel, isValenceSubshell } from "@/data/elementsData";
 import { Atom, Info } from "lucide-react";
 
 const SHELL_LABELS = ["K (n=1)", "L (n=2)", "M (n=3)", "N (n=4)", "O (n=5)", "P (n=6)", "Q (n=7)"];
 const SHELL_MAX = [2, 8, 18, 32, 32, 18, 8];
 
-// Known Aufbau exceptions in ground-state transition/inner-transition elements
-const AUFBAU_NOTES = {
-  Cr: "Aufbau exception: [Ar] 3d⁵ 4s¹ achieves extra exchange stabilization from a half-filled 3d⁵ subshell.",
-  Cu: "Aufbau exception: [Ar] 3d¹⁰ 4s¹ achieves a completely filled, lower-energy 3d¹⁰ subshell.",
-  Nb: "Aufbau exception: [Kr] 4d⁴ 5s¹ minimizes inter-electronic repulsion in the 4d orbitals.",
-  Mo: "Aufbau exception: [Kr] 4d⁵ 5s¹ benefits from exchange energy in the half-filled 4d⁵ subshell.",
-  Ru: "Aufbau exception: [Kr] 4d⁷ 5s¹ reflects close 4d and 5s orbital energies in Period 5.",
-  Rh: "Aufbau exception: [Kr] 4d⁸ 5s¹ lowers electron-electron repulsion compared to 4d⁷ 5s².",
-  Pd: "Unique Aufbau exception: [Kr] 4d¹⁰ 5s⁰ has a completely filled 4d¹⁰ shell and zero electrons in n=5.",
-  Ag: "Aufbau exception: [Kr] 4d¹⁰ 5s¹ mirrors Copper with a filled d¹⁰ subshell and one s¹ valence electron.",
-  Pt: "Aufbau exception: [Xe] 4f¹⁴ 5d⁹ 6s¹ reflects relativistic contraction of the 6s orbital.",
-  Au: "Aufbau exception: [Xe] 4f¹⁴ 5d¹⁰ 6s¹ combines a filled 5d¹⁰ subshell with relativistic 6s stabilization.",
-};
-
-export default function AtomVisualizer({ element, compact = false }) {
-  const [viewMode, setViewMode] = useState("bohr"); // 'bohr' | 'subshells'
+export default function AtomVisualizer({ element, compact = false, initialViewMode = "bohr" }) {
+  const [viewMode, setViewMode] = useState(initialViewMode); // 'bohr' | 'subshells'
+  const [selectedShell, setSelectedShell] = useState(null);
   const [hoveredShell, setHoveredShell] = useState(null);
   const accent = CATEGORY_META[element.category]?.hex || "#4f9dff";
+
+  const activeSelectedShell =
+    selectedShell !== null && selectedShell < element.shells.length ? selectedShell : null;
+  const activeHoveredShell =
+    hoveredShell !== null && hoveredShell < element.shells.length ? hoveredShell : null;
+  const highlightedShell = activeHoveredShell !== null ? activeHoveredShell : activeSelectedShell;
 
   return (
     <div className="rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3">
@@ -37,11 +30,16 @@ export default function AtomVisualizer({ element, compact = false }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-1 bg-[#161c26] p-1 rounded-lg border border-[#242c38]">
+        <div
+          role="group"
+          aria-label="Atomic model view mode"
+          className="flex items-center gap-1 bg-[#161c26] p-1 rounded-lg border border-[#242c38] w-full sm:w-auto"
+        >
           <button
             type="button"
+            aria-pressed={viewMode === "bohr"}
             onClick={() => setViewMode("bohr")}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial min-h-[40px] sm:min-h-[36px] px-3 py-1.5 rounded text-xs font-medium transition-colors ${
               viewMode === "bohr" ? "bg-[#4f9dff] text-[#07121f] font-semibold" : "text-[#aeb8c4] hover:text-white"
             }`}
           >
@@ -49,8 +47,9 @@ export default function AtomVisualizer({ element, compact = false }) {
           </button>
           <button
             type="button"
+            aria-pressed={viewMode === "subshells"}
             onClick={() => setViewMode("subshells")}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial min-h-[40px] sm:min-h-[36px] px-3 py-1.5 rounded text-xs font-medium transition-colors ${
               viewMode === "subshells" ? "bg-[#4f9dff] text-[#07121f] font-semibold" : "text-[#aeb8c4] hover:text-white"
             }`}
           >
@@ -89,7 +88,7 @@ export default function AtomVisualizer({ element, compact = false }) {
               {element.shells.map((count, sIdx) => {
                 const radius = 32 + sIdx * 12;
                 const isOuter = sIdx === element.shells.length - 1;
-                const isHovered = hoveredShell === sIdx;
+                const isHighlighted = highlightedShell === sIdx;
                 const dots = [];
                 for (let k = 0; k < count; k++) {
                   const angle = (2 * Math.PI * k) / count - Math.PI / 2;
@@ -100,7 +99,7 @@ export default function AtomVisualizer({ element, compact = false }) {
                       key={k}
                       cx={cx}
                       cy={cy}
-                      r={isHovered ? 3.5 : isOuter ? 3.0 : 2.2}
+                      r={isHighlighted ? 3.5 : isOuter ? 3.0 : 2.2}
                       fill={isOuter ? accent : "#7bb6ff"}
                     />
                   );
@@ -108,6 +107,7 @@ export default function AtomVisualizer({ element, compact = false }) {
                 return (
                   <g
                     key={sIdx}
+                    onClick={() => setSelectedShell((prev) => (prev === sIdx ? null : sIdx))}
                     onMouseEnter={() => setHoveredShell(sIdx)}
                     onMouseLeave={() => setHoveredShell(null)}
                     className="cursor-pointer"
@@ -117,8 +117,8 @@ export default function AtomVisualizer({ element, compact = false }) {
                       cy="120"
                       r={radius}
                       fill="none"
-                      stroke={isHovered ? "#ffffff" : isOuter ? accent : "#2a3546"}
-                      strokeWidth={isHovered ? "2" : isOuter ? "1.5" : "1"}
+                      stroke={isHighlighted ? "#ffffff" : isOuter ? accent : "#2a3546"}
+                      strokeWidth={isHighlighted ? "2" : isOuter ? "1.5" : "1"}
                       strokeDasharray={isOuter ? "none" : "2 2"}
                     />
                     {dots}
@@ -145,20 +145,28 @@ export default function AtomVisualizer({ element, compact = false }) {
 
             <div className="space-y-1.5">
               <span className="text-xs font-medium text-[#aeb8c4] block">
-                Principal Quantum Shells (hover ring or pill to inspect):
+                Principal Quantum Shells (tap or hover a shell to highlight its ring):
               </span>
               <div className={`grid gap-1.5 ${compact ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}>
                 {element.shells.map((count, idx) => {
                   const isOuter = idx === element.shells.length - 1;
-                  const active = hoveredShell === idx;
+                  const isSelected = activeSelectedShell === idx;
+                  const isHighlighted = highlightedShell === idx;
+                  const roleLabel = getShellRoleLabel(element, idx);
                   return (
-                    <div
+                    <button
                       key={idx}
+                      type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`Shell ${SHELL_LABELS[idx]}, ${roleLabel}: ${count} of ${SHELL_MAX[idx]} electrons`}
+                      onClick={() => setSelectedShell((prev) => (prev === idx ? null : idx))}
                       onMouseEnter={() => setHoveredShell(idx)}
                       onMouseLeave={() => setHoveredShell(null)}
-                      className={`p-2 rounded-lg border text-xs cursor-pointer transition-all ${
-                        active
-                          ? "bg-[#222c3c] border-white text-white"
+                      className={`min-h-[48px] p-2.5 rounded-lg border text-xs text-left cursor-pointer transition-all ${
+                        isSelected
+                          ? "bg-[#222c3c] border-white ring-1 ring-white text-white"
+                          : isHighlighted
+                          ? "bg-[#1e2736] border-[#7bb6ff] text-white"
                           : isOuter
                           ? "bg-[#1a2232] border-[#4f9dff] text-white"
                           : "bg-[#141a24] border-[#242c38] text-[#aeb8c4]"
@@ -166,12 +174,12 @@ export default function AtomVisualizer({ element, compact = false }) {
                     >
                       <div className="flex items-center justify-between font-mono text-[10px] text-[#8b98a9]">
                         <span>{SHELL_LABELS[idx]}</span>
-                        <span>{isOuter ? "Valence" : "Core"}</span>
+                        <span>{roleLabel}</span>
                       </div>
                       <div className="font-mono font-bold text-sm mt-0.5">
                         {count} <span className="text-[10px] font-normal text-[#7a8694]">/ {SHELL_MAX[idx]} e⁻</span>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -200,10 +208,7 @@ export default function AtomVisualizer({ element, compact = false }) {
                 const hasDown = sub.count > boxCount + bIdx;
                 return { hasUp, hasDown };
               });
-              const isValenceSub =
-                sub.n === element.shells.length ||
-                (sub.l === "d" && sub.n === element.shells.length - 1 && sub.count < 10) ||
-                (sub.l === "f" && sub.n === element.shells.length - 2 && sub.count < 14);
+              const isValenceSub = isValenceSubshell(element, sub);
 
               return (
                 <div

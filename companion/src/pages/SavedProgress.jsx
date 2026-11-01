@@ -246,7 +246,8 @@ export default function SavedProgress() {
                             {stats?.mastered && <CheckCircle2 className="w-4 h-4 text-[#69db7c]" />}
                           </h3>
                           <p className="text-xs font-mono text-[#8b98a9]">
-                            {meta.label} · {formatMass(el)} u · {el.electronConfig}
+                            {meta.label} · {formatMass(el)}
+                            {el.synthetic ? "" : " u"} · {el.electronConfig}
                           </p>
                         </div>
                       </Link>

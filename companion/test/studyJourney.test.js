@@ -3,16 +3,21 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
-import {
+import ts from "typescript";
+import * as elementsDataModule from "../src/data/elementsData.js";
+
+const {
   ELEMENTS,
   CATEGORY_META,
   getElementBySlug,
   buildArticle,
   buildComparison,
+  buildDeterministicQuiz,
+  nextCellIndex,
   buildElementShareUrl,
   buildComparisonShareUrl,
   resolveComparisonSlugs,
-} from "../src/data/elementsData.js";
+} = elementsDataModule;
 import {
   EMPTY_PROGRESS,
   readProgress,
@@ -273,5 +278,195 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     const reimported = validateImport(exported);
     assert.equal(reimported.ok, true);
     assert.equal(reimported.summary.savedElements, 2);
+  });
+
+  it("preserves learner-selected target scope for 1-element decks, 2-element comparisons, and explicit element quizzes while keeping (target, concept) pairs unique", () => {
+    // 1. One-element saved deck (e.g. Chromium) stays strictly on Chromium and caps honestly at 4 distinct concepts
+    const singleDeck = [getElementBySlug("chromium")];
+    const deckQuestions = buildDeterministicQuiz(singleDeck, 5, "deck");
+    assert.equal(deckQuestions.length, 4, "1-element pool caps at the 4 available distinct question concepts");
+    assert.deepEqual(
+      new Set(deckQuestions.map((q) => q.target.slug)),
+      new Set(["chromium"]),
+      "1-element deck must never pad unrelated target elements"
+    );
+    assert.equal(
+      new Set(deckQuestions.map((q) => `${q.target.slug}:${q.concept}`)).size,
+      4,
+      "Every (target, concept) pair in a 1-element deck quiz is unique"
+    );
+    assert.match(deckQuestions[0].explanation, /Aufbau exception/);
+
+    // 2. Explicit element route (/practice?element=oxygen) stays strictly on Oxygen across 4 distinct concepts
+    const oxygenQuestions = buildDeterministicQuiz([getElementBySlug("oxygen")], 5, "element");
+    assert.equal(oxygenQuestions.length, 4);
+    assert.ok(oxygenQuestions.every((q) => q.target.slug === "oxygen"));
+    assert.equal(new Set(oxygenQuestions.map((q) => `${q.target.slug}:${q.concept}`)).size, 4);
+    // Distractors come from other elements while the target remains strictly Oxygen
+    for (const q of oxygenQuestions) {
+      assert.equal(q.options.length, 4);
+      assert.equal(q.correctSlug, "oxygen");
+      assert.equal(q.options.filter((opt) => opt.slug !== "oxygen").length, 3);
+    }
+
+    // 3. Two-element comparison (/practice?ids=copper,silver) produces 5 questions targeting only Copper and Silver with unique (target, concept) pairs
+    const twoComparePool = [getElementBySlug("copper"), getElementBySlug("silver")];
+    const compareQuestions = buildDeterministicQuiz(twoComparePool, 5, "compare");
+    assert.equal(compareQuestions.length, 5);
+    assert.deepEqual(
+      new Set(compareQuestions.map((q) => q.target.slug)),
+      new Set(["copper", "silver"]),
+      "2-element comparison quiz targets only the 2 selected elements"
+    );
+    assert.equal(
+      new Set(compareQuestions.map((q) => `${q.target.slug}:${q.concept}`)).size,
+      5,
+      "Every (target, concept) pair in a 2-element comparison quiz is unique"
+    );
+
+    // 4. Periodic Trends & Valence mode asks quantitative electronegativity / ionization energy questions without leaking Period in options
+    const trendPool = ["fluorine", "oxygen", "caesium", "helium", "iron"]
+      .map((s) => getElementBySlug(s))
+      .filter(Boolean);
+    const trendQuestions = buildDeterministicQuiz(trendPool, 5, "trends");
+    assert.equal(trendQuestions.length, 5);
+    assert.match(trendQuestions[0].prompt, /Pauling electronegativity|first ionization energy/);
+    for (const opt of trendQuestions[0].options) {
+      assert.doesNotMatch(opt.label, /Period \d/, "Option labels must not leak the target Period");
+    }
+
+    // 5. Keyboard grid navigation moves across Period 4 and down Group 18 accurately
+    const cells = ELEMENTS.map((el) => ({ x: el.xpos, y: el.ypos, hidden: false }));
+    const heliumIdx = 1; // He (18, 1)
+    const neonIdx = nextCellIndex(cells, heliumIdx, "ArrowDown");
+    assert.equal(ELEMENTS[neonIdx].symbol, "Ne");
+    const oganessonIdx = nextCellIndex(cells, heliumIdx, "End");
+    assert.equal(ELEMENTS[oganessonIdx].symbol, "Og");
+  });
+
+  it("keeps AtomVisualizer persistent shell selection separate from transient hover across mouseenter, click, mouseleave, and keyboard/tap", () => {
+    const source = fs.readFileSync(path.resolve("src/components/AtomVisualizer.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    let hookCursor = 0;
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (initialValue) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) {
+          hookStates[idx] = typeof initialValue === "function" ? initialValue() : initialValue;
+        }
+        const setState = (updater) => {
+          hookStates[idx] = typeof updater === "function" ? updater(hookStates[idx]) : updater;
+        };
+        return [hookStates[idx], setState];
+      },
+    };
+
+    const cjsModule = { exports: {} };
+    fakeReact.default = fakeReact;
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "lucide-react") return { Atom: "AtomIcon", Info: "InfoIcon" };
+      throw new Error(`Unexpected import in AtomVisualizer: ${id}`);
+    };
+    const fn = new Function("require", "module", "exports", "React", code);
+    fn(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const AtomVisualizer = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) {
+        findNodes(child, predicate, acc);
+      }
+      return acc;
+    };
+
+    const sodium = getElementBySlug("sodium"); // shells: [2, 8, 1]
+    const render = (props = {}) => {
+      hookCursor = 0;
+      return AtomVisualizer({ element: sodium, ...props });
+    };
+
+    const getShellButtons = (tree) =>
+      findNodes(
+        tree,
+        (n) => n.type === "button" && typeof n.props?.["aria-label"] === "string" && n.props["aria-label"].startsWith("Shell ")
+      );
+    const getShellRings = (tree) =>
+      findNodes(tree, (n) => n.type === "g" && typeof n.props?.onMouseEnter === "function");
+
+    // 1. Initial render: no shell is persistently selected (aria-pressed is false on all 3 shells)
+    let tree = render();
+    let buttons = getShellButtons(tree);
+    assert.equal(buttons.length, 3);
+    assert.deepEqual(
+      buttons.map((b) => b.props["aria-pressed"]),
+      [false, false, false]
+    );
+
+    // 2. Transient hover (mouseenter on K shell, idx 0) highlights the ring but does NOT set aria-pressed
+    buttons[0].props.onMouseEnter();
+    tree = render();
+    buttons = getShellButtons(tree);
+    let rings = getShellRings(tree);
+    assert.equal(buttons[0].props["aria-pressed"], false, "Transient hover must not mark shell button aria-pressed");
+    const ring0CircleOnHover = findNodes(rings[0], (n) => n.type === "circle" && n.props?.fill === "none")[0];
+    assert.equal(ring0CircleOnHover.props.stroke, "#ffffff", "Hovered shell ring highlights in SVG");
+
+    // 3. Clicking K shell while hovered selects it persistently (does not toggle it off!)
+    buttons[0].props.onClick();
+    tree = render();
+    buttons = getShellButtons(tree);
+    assert.equal(buttons[0].props["aria-pressed"], true, "Clicking after mouseenter must select the shell");
+
+    // 4. Mouseleave clears transient hover while keeping persistent selection and ring highlight
+    buttons[0].props.onMouseLeave();
+    tree = render();
+    buttons = getShellButtons(tree);
+    rings = getShellRings(tree);
+    assert.equal(buttons[0].props["aria-pressed"], true, "Persistent selection survives mouseleave");
+    const ring0CircleAfterLeave = findNodes(rings[0], (n) => n.type === "circle" && n.props?.fill === "none")[0];
+    assert.equal(ring0CircleAfterLeave.props.stroke, "#ffffff", "Selected shell ring stays highlighted after mouseleave");
+
+    // 5. Clicking the selected K shell again (even after mouseenter) deselects it honestly
+    buttons[0].props.onMouseEnter();
+    tree = render();
+    buttons = getShellButtons(tree);
+    buttons[0].props.onClick();
+    buttons[0].props.onMouseLeave();
+    tree = render();
+    buttons = getShellButtons(tree);
+    assert.equal(buttons[0].props["aria-pressed"], false, "Second click deselects the shell");
+
+    // 6. Direct keyboard/tap click on L shell (idx 1) without mouseenter selects then deselects
+    buttons[1].props.onClick();
+    tree = render();
+    buttons = getShellButtons(tree);
+    assert.deepEqual(
+      buttons.map((b) => b.props["aria-pressed"]),
+      [false, true, false]
+    );
+    buttons[1].props.onClick();
+    tree = render();
+    buttons = getShellButtons(tree);
+    assert.deepEqual(
+      buttons.map((b) => b.props["aria-pressed"]),
+      [false, false, false]
+    );
   });
 });
