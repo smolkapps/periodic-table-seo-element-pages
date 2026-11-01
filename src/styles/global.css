@@ -194,6 +194,7 @@ p {
   --fblock-gap: 10px;
 }
 .pt-cell {
+  text-decoration: none;
   grid-column: var(--x);
   grid-row: var(--y);
   position: relative;
