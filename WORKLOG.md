@@ -55,3 +55,7 @@ Check CI and merge the verified launch; authenticate the official Base44 CLI usi
 ## User steering — stop extra work
 
 Michael clarified that Base44 should build the app for now and we do not need to do anything else yet. Additional local integration, native packaging, self-hosted companion deployment and uploads are stopped. Both workers were interrupted and instructed to checkpoint only. Preserve existing source and scaffold files; do not resume these tasks merely because earlier messages requested full completion. The already-dispatched Base44 build is allowed to finish; no further builder request is authorized by this checkpoint.
+
+- That Base44 turn completed with status ready and no error/paywall. Its claimed fixes/packages remain independently unverified and are not yet a refreshed local export or GitHub merge. The prior 106-file export remains the local backup. Do not confuse the two revisions.
+- Native scaffolds exist with Capacitor 8.5.3; org.smolkapps.elementa bundle registered. Apple rejected the name Elementa as already used; no app record, alternate name, compiled package, signing artifact or upload was created. Native worker stopped and closed its owned browser.
+- Registration skill linkage exists and Elementa's real no-op passed. Independent forward-testing found four helper gaps (rename title, eligibility, equivalent category markup and whitespace in robots meta). Automation is incomplete; the installed skill will carry an explicit do-not-apply guard until repaired. No new hub mutation was made.
