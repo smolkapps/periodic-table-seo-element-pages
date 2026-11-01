@@ -44,3 +44,14 @@ Verify Elementa's smolkapps.com listing; add deterministic portfolio registratio
 ## Next
 
 Check CI and merge the verified launch; authenticate the official Base44 CLI using the existing approved account, export and inspect the companion; verify complete study journeys and platform packaging. Record exact artifacts, checks, merges and any concrete remaining store gates.
+
+## Completion checkpoint
+
+- Launch PR #6 passed both CI runs and merged to main at 6ed4b521404a39ac5425d328bc722f70d95e0705. Local main now tracks that revision. Older divergent local main is preserved as archive/local-main-5b0c592-20261031.
+- Official Base44 CLI normal device login completed for the existing account. Source export returned HTTP 200: 106 files, 218353 bytes, SHA-256 7ca8b88cce9d2d4db316338e7209b3e083f6244e41cfc645789d6d13b833f402. Private raw export retained outside this public checkout; editable source at ../elementa-companion pending review/integration.
+- Source review found seeded quiz/mastery/notes, incomplete cloud history hydration and silent storage failure. Base44 is correcting these with device-local, honest empty progress and backend-independent startup; independent review will follow.
+- Native worker owns iOS/Android packaging; Chrome MV3 packaging will reuse the complete offline companion. No public store release performed.
+
+## User steering — stop extra work
+
+Michael clarified that Base44 should build the app for now and we do not need to do anything else yet. Additional local integration, native packaging, self-hosted companion deployment and uploads are stopped. Both workers were interrupted and instructed to checkpoint only. Preserve existing source and scaffold files; do not resume these tasks merely because earlier messages requested full completion. The already-dispatched Base44 build is allowed to finish; no further builder request is authorized by this checkpoint.
