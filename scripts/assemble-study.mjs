@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
+import sharp from 'sharp';
 
 export function scopeManifest(manifest) {
   return {
@@ -53,6 +54,14 @@ export async function assemble(root = process.cwd()) {
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
   await cp(source, destination, { recursive: true });
+  // Exported artwork has an alpha channel even when its pixels look opaque.
+  // Home-screen PNGs must be opaque RGB on both Apple and Android.
+  for (const name of await readdir(join(destination, 'icons'))) {
+    if (!name.endsWith('.png')) continue;
+    const path = join(destination, 'icons', name);
+    const bytes = await sharp(await readFile(path)).flatten({ background: '#0b0e14' }).removeAlpha().png().toBuffer();
+    await writeFile(path, bytes);
+  }
   let html = await readFile(join(destination, 'index.html'), 'utf8');
   html = html.replace(/href="\/(favicon\.svg|icons\/[^"\s]+|manifest\.json)"/g, 'href="/study/$1"');
   html = html.replace(/rel="canonical" href="https:\/\/elementalearn\.com\/"/, 'rel="canonical" href="https://elementalearn.com/study/"');
