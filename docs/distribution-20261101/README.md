@@ -13,7 +13,7 @@ Prepared November1,2026. Public Main features were checked against canonical sou
 
 ## Setup status
 
-- SearchConsole: existing business Googlesessionverified as smolkapps@gmail.com; Elementa absent from original property list. New domain verification instructions prepared with oneTXTproposal, existing3DNSrecords snapshotted privately. No TXTpublished or newownership yet; action-time approval pending. No CloudflareOAuth grant. Sitemap submission follows successful property verification.
+- SearchConsole: Michael approved verification; sc-domain:elementalearn.com is now verified for smolkapps@gmail.com using oneTXTrecord, preserving all3previousDNSrecords. Google accepted https://elementalearn.com/sitemap-index.xml and reports “Sitemap index processed successfully”. InitialCouldNotFetchstatusclearedwithoutresubmission/securitychanges. Publicchildsitemapcontains122canonicalURLs; indexedpages/searchdemand remainunverified. Keep theTXTrecord toretainverification. No CloudflareOAuthgrant.
 - ProductHunt: actual /posts/new redirects tologin. Existing IABGitHubidentity is unrelatedmyastroapp and requires2FA; it was preserved. Google route reaches profile/email-only consent for the existing business account. Approval pending before that possible newaccount/terms step and exactfreepubliclisting. No OAuthgrant, fee, newsletter subscription or publication.
 - CommonSenseEducation: current official FAQ saysnewreviews/curatedadditionspaused; no false submissionclaim.
 - TPT: no fee/account/selleragreement accepted. Prepared resource route is conditional on an appropriate existingstore or separately approved seller plan; do not submit a promotional link sheet.
