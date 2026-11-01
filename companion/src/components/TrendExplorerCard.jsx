@@ -31,13 +31,18 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
 
   const peerElements = useMemo(() => {
     if (axisMode === "period") {
+      if (element.ypos > 7) {
+        return ELEMENTS.filter((e) => e.category === element.category).sort((a, b) => a.number - b.number);
+      }
       return ELEMENTS.filter((e) => e.period === element.period && e.ypos <= 7).sort((a, b) => a.number - b.number);
     }
     if (element.group !== null) {
       return ELEMENTS.filter((e) => e.group === element.group).sort((a, b) => a.period - b.period);
     }
-    // f-block series
-    return ELEMENTS.filter((e) => e.category === element.category).sort((a, b) => a.number - b.number);
+    // f-block series compared against Period main-body peers + current element
+    return ELEMENTS.filter((e) => e.period === element.period && (e.ypos <= 7 || e.slug === element.slug)).sort(
+      (a, b) => a.number - b.number
+    );
   }, [element, axisMode]);
 
   const maxVal = useMemo(() => {
@@ -55,38 +60,45 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
           </h3>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex items-center gap-1 bg-[#161c26] p-1 rounded-lg border border-[#242c38]">
+        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+          <div
+            role="group"
+            aria-label="Periodic comparison axis"
+            className="flex items-center gap-1 bg-[#161c26] p-1 rounded-lg border border-[#242c38] w-full sm:w-auto"
+          >
             <button
               type="button"
+              aria-pressed={axisMode === "period"}
               onClick={() => setAxisMode("period")}
-              className={`px-2 py-0.5 rounded text-xs font-medium ${
+              className={`flex-1 sm:flex-initial min-h-[40px] sm:min-h-[36px] px-3 py-1.5 rounded text-xs font-medium ${
                 axisMode === "period" ? "bg-[#4f9dff] text-[#07121f] font-semibold" : "text-[#aeb8c4] hover:text-white"
               }`}
             >
-              Across Period {element.period}
+              {element.ypos > 7 ? `Across ${element.category}s` : `Across Period ${element.period}`}
             </button>
             <button
               type="button"
+              aria-pressed={axisMode === "group"}
               onClick={() => setAxisMode("group")}
-              className={`px-2 py-0.5 rounded text-xs font-medium ${
+              className={`flex-1 sm:flex-initial min-h-[40px] sm:min-h-[36px] px-3 py-1.5 rounded text-xs font-medium ${
                 axisMode === "group" ? "bg-[#4f9dff] text-[#07121f] font-semibold" : "text-[#aeb8c4] hover:text-white"
               }`}
             >
-              {element.group !== null ? `Down Group ${element.group}` : `Across ${element.category}s`}
+              {element.group !== null ? `Down Group ${element.group}` : `Period ${element.period} + ${element.symbol}`}
             </button>
           </div>
         </div>
       </div>
 
       {/* Metric Tabs */}
-      <div className="flex flex-wrap gap-1.5">
+      <div role="group" aria-label="Periodic trend metric" className="flex flex-wrap gap-1.5">
         {METRICS.map((m) => (
           <button
             key={m.key}
             type="button"
+            aria-pressed={metricKey === m.key}
             onClick={() => setMetricKey(m.key)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+            className={`min-h-[40px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
               metricKey === m.key
                 ? "bg-[#4f9dff]/20 border-[#4f9dff] text-white"
                 : "bg-[#141a24] border-[#242c38] text-[#aeb8c4] hover:text-white"
@@ -99,20 +111,23 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
 
       {/* Bar chart comparison across Period or Group */}
       <div className="pt-2 pb-1 overflow-x-auto">
-        <div className="flex items-end gap-2 min-h-[120px] pt-6 px-1">
+        <div className="flex items-end gap-2 min-h-[130px] pt-6 px-1">
           {peerElements.map((peer) => {
             const val = peer[metricKey];
             const isCurrent = peer.slug === element.slug;
             const heightPct = val !== null ? Math.max(12, Math.round((val / maxVal) * 84)) : 8;
             const color = CATEGORY_META[peer.category]?.hex || "#4f9dff";
+            const metricValueText = val !== null ? `${val}${activeMetric.unit ? ` ${activeMetric.unit}` : ""}` : "Not established";
 
             return (
               <button
                 key={peer.slug}
                 type="button"
+                aria-label={`Inspect ${peer.name} (${peer.symbol}), ${activeMetric.label}: ${metricValueText}`}
+                aria-current={isCurrent ? "true" : undefined}
                 onClick={() => onSelectElement && onSelectElement(peer.slug)}
-                title={`${peer.name} (${peer.symbol}): ${val !== null ? `${val} ${activeMetric.unit}` : "Not established"}`}
-                className={`flex flex-col items-center flex-1 min-w-[36px] group focus:outline-none ${
+                title={`${peer.name} (${peer.symbol}): ${metricValueText}`}
+                className={`flex flex-col items-center flex-1 min-w-[44px] py-1 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4f9dff] rounded ${
                   isCurrent ? "scale-105" : "opacity-80 hover:opacity-100"
                 }`}
               >

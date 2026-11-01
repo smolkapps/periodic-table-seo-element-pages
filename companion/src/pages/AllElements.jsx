@@ -98,7 +98,8 @@ export default function AllElements() {
                               )}
                             </div>
                             <div className="text-[11px] font-mono text-[#8b98a9] truncate">
-                              {formatMass(el)} u · {el.electronConfig}
+                              {formatMass(el)}
+                              {el.synthetic ? "" : " u"} · {el.electronConfig}
                             </div>
                           </div>
                         </Link>

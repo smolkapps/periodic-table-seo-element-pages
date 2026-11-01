@@ -224,8 +224,8 @@ export const HIGHLIGHTS = {
   Hg: "the only metal liquid at room temperature, long used in thermometers despite its toxicity",
   Tl: "a soft, highly toxic metal once used in rat poison and now in electronics",
   Pb: "a dense, soft metal long used in pipes and paint before its toxicity was understood",
-  Bi: "a brittle metal used in stomach medicine and low-melting-point alloys",
-  Po: "an intensely radioactive metalloid, infamous as a poison",
+  Bi: "a dense post-transition metal with a primordially long-lived radioisotope (²⁰⁹Bi), used in stomach medicine and low-melting fusible alloys",
+  Po: "an intensely radioactive post-transition chalcogen metal discovered by Marie and Pierre Curie, used in antistatic devices and alpha-particle sources",
   At: "the rarest naturally occurring element on Earth, studied for cancer therapy",
   Rn: "a radioactive noble gas that seeps from rock and is a leading cause of lung cancer",
   Fr: "the second-rarest naturally occurring element, intensely radioactive",
@@ -295,10 +295,24 @@ const ATOMIC_RADIUS_BY_Z = {
   87: 260, 88: 221, 89: 215, 90: 206, 91: 200, 92: 196, 93: 190, 94: 187, 95: 180, 96: 169,
 };
 
+// 34 elements lacking a CIAAW standard atomic weight (displayed as bracketed mass number [A] of longest-lived/reference radioisotope).
+// Note: Bi (83), Th (90), Pa (91), and U (92) have no stable isotopes but occur naturally in terrestrial ores with CIAAW standard atomic weights.
 const SYNTHETIC_NUMBERS = new Set([
-  43, 61, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
+  43, 61, 84, 85, 86, 87, 88, 89, 93, 94, 95, 96, 97, 98, 99, 100,
   101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115,
   116, 117, 118,
+]);
+
+// Primordial radioelements whose long-lived isotopes (209Bi, 232Th, 238U/235U) have survived since Earth's formation.
+// Protactinium (Z=91) has a CIAAW standard atomic weight (231.04 u) from radiogenic 231Pa in 235U decay chains, not surviving primordial Pa.
+const PRIMORDIAL_RADIOACTIVE_NUMBERS = new Set([83, 90, 92]);
+
+// All 38 elements with zero stable isotopes (Tc, Pm, and all elements with Z >= 83: primordial Bi, Th, U; decay-chain Pa; and 34 elements without a CIAAW standard atomic weight).
+const RADIOACTIVE_NUMBERS = new Set([43, 61, 83, 90, 91, 92, ...SYNTHETIC_NUMBERS]);
+
+// 19 stable mononuclidic elements whose standard atomic weight derives from a single naturally occurring stable nuclide.
+const MONONUCLIDIC_STABLE_NUMBERS = new Set([
+  4, 9, 11, 13, 15, 21, 25, 27, 33, 39, 41, 45, 53, 55, 59, 65, 67, 69, 79,
 ]);
 
 const NOBLE_CORE_EXPANSIONS = {
@@ -319,6 +333,65 @@ export function expandElectronConfig(config) {
     }
   }
   return expanded;
+}
+
+// Known Aufbau exceptions in ground-state transition and inner-transition elements (NIST Atomic Spectra Database)
+export const AUFBAU_NOTES = {
+  Cr: "Aufbau exception: [Ar] 3d⁵ 4s¹ achieves extra exchange stabilization from a half-filled 3d⁵ subshell.",
+  Cu: "Aufbau exception: [Ar] 3d¹⁰ 4s¹ achieves a completely filled, lower-energy 3d¹⁰ subshell.",
+  Nb: "Aufbau exception: [Kr] 4d⁴ 5s¹ minimizes inter-electronic repulsion in the 4d orbitals.",
+  Mo: "Aufbau exception: [Kr] 4d⁵ 5s¹ benefits from exchange energy in the half-filled 4d⁵ subshell.",
+  Ru: "Aufbau exception: [Kr] 4d⁷ 5s¹ reflects close 4d and 5s orbital energies in Period 5.",
+  Rh: "Aufbau exception: [Kr] 4d⁸ 5s¹ lowers electron-electron repulsion compared to 4d⁷ 5s².",
+  Pd: "Unique Aufbau exception: [Kr] 4d¹⁰ 5s⁰ has a completely filled 4d¹⁰ shell and zero electrons in n=5.",
+  Ag: "Aufbau exception: [Kr] 4d¹⁰ 5s¹ mirrors Copper with a filled d¹⁰ subshell and one s¹ valence electron.",
+  La: "Aufbau exception: [Xe] 5d¹ 6s² places the differentiating electron in 5d¹ before 4f filling begins at Cerium.",
+  Ce: "Aufbau exception: [Xe] 4f¹ 5d¹ 6s² reflects nearly degenerate 4f and 5d orbital energies at the start of the lanthanides.",
+  Gd: "Aufbau exception: [Xe] 4f⁷ 5d¹ 6s² preserves a half-filled 4f⁷ subshell with strong exchange stabilization.",
+  Pt: "Aufbau exception: [Xe] 4f¹⁴ 5d⁹ 6s¹ reflects relativistic contraction of the 6s orbital.",
+  Au: "Aufbau exception: [Xe] 4f¹⁴ 5d¹⁰ 6s¹ combines a filled 5d¹⁰ subshell with relativistic 6s stabilization.",
+  Ac: "Aufbau exception: [Rn] 6d¹ 7s² occupies 6d¹ before 5f orbitals begin filling in the actinide series.",
+  Th: "Aufbau exception: [Rn] 6d² 7s² has an empty 5f subshell in the neutral ground state because 6d lies below 5f at Z=90.",
+  Pa: "Aufbau exception: [Rn] 5f² 6d¹ 7s² reflects close 5f and 6d orbital energies in early actinides.",
+  U: "Aufbau exception: [Rn] 5f³ 6d¹ 7s² retains one 6d¹ electron alongside three 5f³ electrons in the neutral ground state.",
+  Np: "Aufbau exception: [Rn] 5f⁴ 6d¹ 7s² retains a 6d¹ electron due to overlapping 5f and 6d energy levels.",
+  Cm: "Aufbau exception: [Rn] 5f⁷ 6d¹ 7s² stabilizes a half-filled 5f⁷ subshell by placing the next electron in 6d¹.",
+  Lr: "Relativistic exception: [Rn] 5f¹⁴ 7s² 7p¹ places the final electron in the relativistically stabilized 7p₁/₂ orbital rather than 6d¹ (Sato et al., Nature 2015; NIST ASD).",
+};
+
+export function getShellRoleLabel(element, shellIdx) {
+  const n = shellIdx + 1;
+  const maxN = element.shells.length;
+  if (element.symbol === "Pd" && n === 4) {
+    return "Valence (4d¹⁰)";
+  }
+  if (element.block === "s" || element.block === "p") {
+    return n === maxN ? "Valence" : "Core";
+  }
+  if (element.block === "d") {
+    if (n === maxN) return `Outer (${n}s)`;
+    if (n === maxN - 1) return `Inner + ${n}d`;
+    return "Core";
+  }
+  if (n === maxN) return `Outer (${n}s/${n}p)`;
+  if (n === maxN - 1) {
+    const hasD = element.subshells.some((s) => s.n === n && s.l === "d");
+    return hasD ? `Inner + ${n}d` : "Inner shell";
+  }
+  if (n === maxN - 2) {
+    const hasF = element.subshells.some((s) => s.n === n && s.l === "f");
+    return hasF ? `Inner + ${n}f` : "Core";
+  }
+  return "Core";
+}
+
+export function isValenceSubshell(element, sub) {
+  return (
+    sub.n === element.period ||
+    (element.symbol === "Pd" && sub.n === 4 && sub.l === "d") ||
+    (sub.l === "d" && sub.n === element.period - 1 && sub.count < 10) ||
+    (sub.l === "f" && sub.n === element.period - 2 && sub.count < 14)
+  );
 }
 
 export function parseShellsAndSubshells(electronConfig) {
@@ -396,6 +469,9 @@ export const ELEMENTS = Object.freeze(
       block: blockForElement(number, xpos, ypos),
       slug: slugify(name),
       synthetic: SYNTHETIC_NUMBERS.has(number),
+      radioactive: RADIOACTIVE_NUMBERS.has(number),
+      primordialRadioactive: PRIMORDIAL_RADIOACTIVE_NUMBERS.has(number),
+      mononuclidic: MONONUCLIDIC_STABLE_NUMBERS.has(number),
       shells,
       subshells,
       outerShellElectrons,
@@ -433,6 +509,14 @@ export function formatMass(element) {
   return element.synthetic ? `[${Math.round(element.atomicMass)}]` : String(element.atomicMass);
 }
 
+export function getRadioactiveBadgeLabel(element) {
+  if (!element?.radioactive) return null;
+  if (element.number >= 95) return "Synthetic Radioelement";
+  if (element.primordialRadioactive) return "Primordial Radioelement";
+  if (element.number === 91) return "Radioactive decay-chain element";
+  return "Radioactive (No Stable Isotopes)";
+}
+
 export function discoveryPhrase(element) {
   if (element.discoveredBy === "Ancient" || element.discoveredYear === null) {
     return "has been known and utilized since antiquity";
@@ -463,7 +547,11 @@ export function buildArticle(element) {
       ? "the lanthanide f-block series"
       : "the actinide f-block series";
 
-  const summary = `${element.name} (${element.symbol}, Z = ${element.number}) is ${element.highlight}. Located in ${groupText}, Period ${element.period} (${element.block}-block), it is a ${catLower} with standard atomic weight ${mass}.`;
+  const weightClause = element.synthetic
+    ? `reference isotope mass number ${mass} (no CIAAW standard atomic weight)`
+    : `standard atomic weight ${mass}`;
+
+  const summary = `${element.name} (${element.symbol}, Z = ${element.number}) is ${element.highlight}. Located in ${groupText}, Period ${element.period} (${element.block}-block), it is a ${catLower} with ${weightClause}.`;
 
   const shellString = element.shells.map((c, idx) => `${["K", "L", "M", "N", "O", "P", "Q"][idx]}=${c}`).join(", ");
   const trendNotes = [
@@ -478,7 +566,10 @@ export function buildArticle(element) {
       : "an unestablished empirical covalent radius due to short half-life",
   ].join(", ");
 
-  const applicationsAndBehavior = `In practical chemistry and materials science, ${element.name} is notable as ${element.highlight}. As a ${catLower} at standard temperature and pressure (${element.phase} phase), its chemical behavior reflects its family: ${catMeta.reactivity}`;
+  const applicationsAndBehavior =
+    element.number >= 104
+      ? `In nuclear and heavy-element research, ${element.name} is notable as ${element.highlight}. Because superheavy elements (Z ≥ 104) are produced only a few short-lived atoms at a time in heavy-ion accelerators, bulk STP phase (${element.phase}) is predicted rather than measured macroscopically; by periodic placement in ${groupText}, it is classified with ${catLower}s: ${catMeta.reactivity}`
+      : `In practical chemistry and materials science, ${element.name} is notable as ${element.highlight}. As a ${catLower} at standard temperature and pressure (${element.phase} phase), its chemical behavior reflects its family: ${catMeta.reactivity}`;
 
   const electronicAndTrends = `A neutral ${element.name} atom contains ${element.number} proton${element.number === 1 ? "" : "s"} and ${element.number} electron${element.number === 1 ? "" : "s"} with ground-state configuration ${element.electronConfig} (shell distribution: ${shellString}; ${element.outerShellElectrons} outer-shell electron${element.outerShellElectrons === 1 ? "" : "s"}). Across Period ${element.period}, it exhibits ${trendNotes}.`;
 
@@ -492,9 +583,26 @@ export function buildArticle(element) {
       ? `Following ${prev.name} (${prev.symbol}), it closes Period 7 as the heaviest confirmed element to date.`
       : "";
 
-  const isotopeClause = element.synthetic
-    ? `Because ${element.name} has no stable naturally occurring isotopes, its bracketed weight ${mass} denotes the mass number of its longest-lived or standard reference radioisotope.`
-    : `Its standard atomic weight of ${mass} u represents the abundance-weighted average of its naturally occurring stable isotopes.`;
+  let isotopeClause;
+  if (element.synthetic && element.number >= 95) {
+    isotopeClause = `${element.name} is a synthetic transplutonium element with no stable or naturally occurring isotopes; CIAAW assigns no standard atomic weight, and ${mass} denotes a reference radioisotope mass number (A).`;
+  } else if (element.synthetic) {
+    isotopeClause = `Because all isotopes of ${element.name} are radioactive (occurring in nature only in trace decay or fission quantities), CIAAW assigns no standard atomic weight; its bracketed value ${mass} denotes a reference radioisotope mass number (A).`;
+  } else if (element.radioactive) {
+    if (element.number === 83) {
+      isotopeClause = `Although ${element.name} has no stable isotopes, primordial ²⁰⁹Bi (alpha decay half-life ~2.01 × 10¹⁹ years) occurs naturally in Earth's crust, allowing IUPAC CIAAW to assign a standard atomic weight of ${mass}.`;
+    } else if (element.number === 90) {
+      isotopeClause = `Although ${element.name} has no stable isotopes, primordial ²³²Th (half-life ~1.40 × 10¹⁰ years) occurs naturally in Earth's crust, allowing IUPAC CIAAW to assign a standard atomic weight of ${mass}.`;
+    } else if (element.number === 91) {
+      isotopeClause = `Although ${element.name} has no stable isotopes and primordial protactinium has long decayed away, natural ²³¹Pa in ²³⁵U decay chains occurs in Earth's crust, allowing IUPAC CIAAW to assign a standard atomic weight of ${mass}.`;
+    } else {
+      isotopeClause = `Although ${element.name} has no stable isotopes, primordial ²³⁸U and ²³⁵U (along with radiogenic ²³⁴U maintained through ²³⁸U decay) occur naturally in Earth's crust, allowing IUPAC CIAAW to assign a standard atomic weight of ${mass}.`;
+    }
+  } else if (element.mononuclidic) {
+    isotopeClause = `Its CIAAW standard atomic weight of ${mass} is determined by its single naturally occurring stable isotope (${element.symbol}-${Math.round(element.atomicMass)}).`;
+  } else {
+    isotopeClause = `Its CIAAW standard atomic weight of ${mass} reflects the terrestrial isotopic composition across its naturally occurring isotopes.`;
+  }
 
   const discoveryAndContext = `${element.name} ${discoveryPhrase(element)}. ${isotopeClause} ${neighbourClause}`;
 
@@ -507,7 +615,10 @@ export function buildArticle(element) {
   const facts = [
     { label: "Atomic number (Z)", value: String(element.number) },
     { label: "Symbol", value: element.symbol },
-    { label: "Standard atomic weight", value: `${mass} u` },
+    {
+      label: "Standard atomic weight",
+      value: element.synthetic ? `${mass} (reference mass number A; no CIAAW weight)` : mass,
+    },
     { label: "Chemical category", value: catMeta.label },
     { label: "Group / Period / Block", value: `${element.group !== null ? `Group ${element.group}` : "f-block"} · Period ${element.period} · ${element.block}-block` },
     { label: "Ground-state configuration", value: element.electronConfig },
@@ -590,7 +701,7 @@ export function buildComparison(elements) {
   const rowSpecs = [
     { label: "Atomic number (Z)", value: (e) => String(e.number), numeric: (e) => e.number },
     { label: "Symbol", value: (e) => e.symbol, numeric: null },
-    { label: "Atomic mass (u)", value: (e) => formatMass(e), numeric: (e) => e.atomicMass },
+    { label: "Atomic weight / isotope mass number", value: (e) => formatMass(e), numeric: null },
     { label: "Category", value: (e) => categoryLabel(e.category), numeric: null },
     { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "— (f-block)"), numeric: null },
     { label: "Period & Block", value: (e) => `Period ${e.period} (${e.block}-block)`, numeric: null },
@@ -600,7 +711,7 @@ export function buildComparison(elements) {
     { label: "Electronegativity (Pauling)", value: (e) => (e.electronegativity !== null ? String(e.electronegativity) : "—"), numeric: (e) => (e.electronegativity !== null ? e.electronegativity : -Infinity) },
     { label: "1st Ionization energy", value: (e) => (e.ionizationEnergy !== null ? `${e.ionizationEnergy} kJ/mol` : "—"), numeric: (e) => (e.ionizationEnergy !== null ? e.ionizationEnergy : -Infinity) },
     { label: "Covalent radius", value: (e) => (e.atomicRadius !== null ? `${e.atomicRadius} pm` : "—"), numeric: (e) => (e.atomicRadius !== null ? e.atomicRadius : -Infinity) },
-    { label: "Discovered", value: (e) => (e.discoveredYear !== null ? String(e.discoveredYear) : "Antiquity"), numeric: (e) => (e.discoveredYear !== null ? e.discoveredYear : -Infinity) },
+    { label: "Discovered", value: (e) => (e.discoveredYear !== null ? String(e.discoveredYear) : "Antiquity"), numeric: null },
     { label: "Key applications & notability", value: (e) => e.highlight.charAt(0).toUpperCase() + e.highlight.slice(1) + ".", numeric: null },
   ];
 
@@ -611,6 +722,23 @@ export function buildComparison(elements) {
   });
 
   return { elements, rows };
+}
+
+export function buildElementContrastSummary(element, peerElements = []) {
+  const peers = peerElements.filter((p) => p && p.slug !== element.slug);
+  const meta = CATEGORY_META[element.category];
+  const shellSummary = `${element.shells.length} occupied shell${element.shells.length === 1 ? "" : "s"} (${element.shells.join("·")}) with ground-state ${element.electronConfig}`;
+  const trendParts = [
+    element.electronegativity !== null ? `EN ${element.electronegativity}` : "EN not established",
+    element.ionizationEnergy !== null ? `IE₁ ${element.ionizationEnergy} kJ/mol` : "IE₁ not established",
+    element.atomicRadius !== null ? `r_cov ${element.atomicRadius} pm` : "r_cov not established",
+  ].join(", ");
+
+  if (peers.length > 0 && peers.every((p) => p.category === element.category)) {
+    return `Within the ${meta.label.toLowerCase()} family, ${element.name} sits in Period ${element.period} (Z = ${element.number}) with ${shellSummary}. Its periodic metrics (${trendParts}) distinguish its atomic size and electron-attracting strength from ${peers.map((p) => `${p.symbol} (Period ${p.period})`).join(" and ")}; in practice it is ${element.highlight}.`;
+  }
+
+  return `In Period ${element.period} (${element.group !== null ? `Group ${element.group}` : "f-block"}, ${element.block}-block), ${element.name} has ${shellSummary} (${trendParts}). ${meta.reactivity} In practice, it is ${element.highlight}.`;
 }
 
 export function resolveComparisonSlugs(slugs) {
@@ -628,6 +756,134 @@ export function resolveComparisonSlugs(slugs) {
     return DEFAULT_COMPARE_SLUGS.map((s) => getElementBySlug(s)).filter(Boolean);
   }
   return out;
+}
+
+function rotateQuizOptions(arr, shift) {
+  const k = shift % arr.length;
+  return [...arr.slice(k), ...arr.slice(0, k)];
+}
+
+export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
+  if (!Array.isArray(pool) || pool.length === 0) return [];
+
+  // Preserve the learner-selected target pool strictly without padding unrelated elements.
+  const uniqueTargets = [];
+  const seenSlugs = new Set();
+  for (const el of pool) {
+    if (el && el.slug && !seenSlugs.has(el.slug)) {
+      seenSlugs.add(el.slug);
+      uniqueTargets.push(el);
+    }
+  }
+  if (uniqueTargets.length === 0) return [];
+
+  const conceptOrder = mode === "trends" ? [1, 0, 3, 2] : [0, 1, 2, 3];
+  const conceptCount = conceptOrder.length;
+  const requestedCount = Math.max(0, Number(count) || 0);
+  const totalQuestions = Math.min(requestedCount, uniqueTargets.length * conceptCount);
+  const questions = [];
+
+  for (let i = 0; i < totalQuestions; i++) {
+    const targetIndex = i % uniqueTargets.length;
+    const pass = Math.floor(i / uniqueTargets.length);
+    const target = uniqueTargets[targetIndex];
+    const distractors = ELEMENTS.filter(
+      (e) => e.slug !== target.slug && (e.period === target.period || e.category !== target.category)
+    ).slice((i * 7) % 50, (i * 7) % 50 + 3);
+
+    const qType =
+      mode === "trends" && uniqueTargets.length >= 5 && pass === 0
+        ? [1, 0, 3, 1, 2][i % 5]
+        : conceptOrder[(targetIndex + pass) % conceptCount];
+
+    if (qType === 0) {
+      const options = [target, ...distractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.electronConfig} (${el.shells.join("·")} shells)`,
+      }));
+      const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        target,
+        prompt: `Which ground-state electron configuration and principal shell occupancy belongs to ${target.name} (${target.symbol}, Z = ${target.number})?`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `${target.name} has Z = ${target.number} protons and electrons, filling orbitals to ${target.electronConfig} across ${target.shells.length} occupied principal shell(s) (${target.shells.join("·")}).${aufbauNote}`,
+      });
+    } else if (qType === 1) {
+      const hasTrendData =
+        target.electronegativity !== null || target.ionizationEnergy !== null || target.atomicRadius !== null;
+      const trendDistractors = hasTrendData
+        ? ELEMENTS.filter(
+            (e) =>
+              e.slug !== target.slug &&
+              (e.electronegativity !== target.electronegativity || e.ionizationEnergy !== target.ionizationEnergy)
+          ).slice((i * 11) % 60, (i * 11) % 60 + 3)
+        : distractors;
+
+      const options = [target, ...trendDistractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name} (${el.symbol}) — ${categoryLabel(el.category)}, Z = ${el.number}`,
+      }));
+
+      const prompt =
+        target.electronegativity !== null
+          ? `Which Period ${target.period} element (${target.group !== null ? `Group ${target.group}` : "f-block"}) has a Pauling electronegativity of ${target.electronegativity} and first ionization energy of ${target.ionizationEnergy !== null ? `${target.ionizationEnergy} kJ/mol` : "unestablished"}?`
+          : target.ionizationEnergy !== null
+          ? `Which Period ${target.period} element (${target.group !== null ? `Group ${target.group}` : "f-block"}) has a first ionization energy of ${target.ionizationEnergy} kJ/mol (NIST ASD) and covalent radius of ${target.atomicRadius !== null ? `${target.atomicRadius} pm` : "unestablished"}?`
+          : `Which superheavy Period ${target.period} (${target.block}-block) element is ${target.highlight}?`;
+
+      const explanation = hasTrendData
+        ? `${target.name} (${target.symbol}, Z = ${target.number}) in Period ${target.period}, ${target.group !== null ? `Group ${target.group}` : "f-block"} has ${target.electronegativity !== null ? `Pauling electronegativity ${target.electronegativity}` : "no established Pauling electronegativity"}, first ionization energy ${target.ionizationEnergy !== null ? `${target.ionizationEnergy} kJ/mol (NIST ASD)` : "not established"}, and covalent radius ${target.atomicRadius !== null ? `${target.atomicRadius} pm` : "not established"}.`
+        : `${target.name} (${target.symbol}, Z = ${target.number}) sits in Period ${target.period}, ${target.group !== null ? `Group ${target.group}` : "f-block"}; due to its short half-life, its Pauling electronegativity, ionization energy, and covalent radius are not experimentally established.`;
+
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        target,
+        prompt,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation,
+      });
+    } else if (qType === 2) {
+      const options = [target, ...distractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.symbol} — ${el.name} (Z = ${el.number})`,
+      }));
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        target,
+        prompt: `Which element is ${target.highlight}?`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `${target.name} (${target.symbol}, atomic number ${target.number}) is ${target.highlight}.`,
+      });
+    } else {
+      const options = [target, ...distractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name} (${el.symbol}) — ${categoryLabel(el.category)}, ${el.outerShellElectrons} outer-shell e⁻ (${el.block}-block)`,
+      }));
+      const valenceDetail =
+        target.block === "d" || target.block === "f"
+          ? `with ${target.outerShellElectrons} electron(s) in its outermost principal shell (n=${target.shells.length}) and ground-state configuration ${target.electronConfig} (where inner ${target.block}-subshell electrons also participate in valence bonding)`
+          : `with ${target.outerShellElectrons} valence electron(s) in its outermost principal shell (n=${target.shells.length}, ${target.electronConfig})`;
+
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        target,
+        prompt: `Select the correct chemical family and outermost principal-shell electron count for atomic number Z = ${target.number}:`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `Element #${target.number} is ${target.name} (${target.symbol}), a ${categoryLabel(target.category).toLowerCase()} in the ${target.block}-block ${valenceDetail}.`,
+      });
+    }
+  }
+
+  return questions;
 }
 
 export const NAV_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];

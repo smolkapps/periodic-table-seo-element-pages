@@ -107,6 +107,17 @@ first to include them).
 
 ## Deploy
 
+Base44 Main is a builder workspace, not the production deployment. Export a
+completed Main revision, review changes against the last imported export, retain
+this repository's auth-free entry and deployment configuration, and run the checks
+below before deploying. Tutor work stays on `chemistry-tutor-journey`.
+
+Base44 branches are snapshots, not automatic followers of Main. Before continuing
+tutor work or switching its preview, use **Update branch** to pull Main into it,
+resolve conflicts, and verify zero pending Main changes. Export and test the
+updated tutor source independently; selecting its preview does not publish it.
+See the [Base44 branch documentation](https://docs.base44.com/Building-your-app/working-with-branches).
+
 `bash scripts/deploy-elementa.sh` runs the release checks, backs up the current
 domain, and updates its existing static Caddy document root through SSH. It keeps
 old hashed assets available for open tabs. The study app's offline cache and
