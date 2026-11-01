@@ -1,0 +1,108 @@
+---
+const originalPost = "https://x.com/GoogleDeepMind/status/2112557925264752930";
+---
+
+<section class="argon-video" aria-labelledby="argon-video-title" data-argon-video>
+  <div class="video-copy">
+    <p class="eyebrow">The elements, in motion</p>
+    <h2 id="argon-video-title">A periodic table you can see and hear</h2>
+    <p>
+      Google DeepMind’s demo pairs a 3D periodic table with electron animations
+      and light spectra.
+    </p>
+    <p class="video-credit">
+      Video: <a href={originalPost} target="_blank" rel="noopener noreferrer">Google DeepMind on X</a>.
+      Built with Gemini 4 Argon in Antigravity. Song: “The Elements” by Tom Lehrer.
+    </p>
+  </div>
+
+  <figure class="video-figure">
+    <div class="video-host" data-video-host>
+      <button class="load-video" type="button" data-load-video>
+        <svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+          <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M26 20 45 32 26 44Z" fill="currentColor" />
+        </svg>
+        <span>Load video</span>
+        <small>88 seconds · Google DeepMind</small>
+      </button>
+    </div>
+    <figcaption>
+      <span data-video-status role="status">The X player loads when you choose.</span>
+      <a href={originalPost} target="_blank" rel="noopener noreferrer">Watch the original on X ↗</a>
+    </figcaption>
+  </figure>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll<HTMLElement>("[data-argon-video]")) {
+    const button = section.querySelector<HTMLButtonElement>("[data-load-video]");
+    const host = section.querySelector<HTMLElement>("[data-video-host]");
+    const status = section.querySelector<HTMLElement>("[data-video-status]");
+    if (!button || !host || !status) continue;
+
+    button.addEventListener("click", () => {
+      // Keep third-party requests out of the initial page load. This is X's
+      // original player, including its attribution and controls, not a rehost.
+      const player = document.createElement("iframe");
+      const embedUrl = new URL("https://platform.twitter.com/embed/Tweet.html");
+      embedUrl.search = new URLSearchParams({ id: "2112557925264752930", dnt: "true", lang: "en", theme: "dark", embedId: "elementa-argon-video", origin: window.location.origin, width: `${host.clientWidth}px` }).toString();
+      player.src = embedUrl.href;
+      player.title = "Google DeepMind’s 3D periodic table video";
+      player.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      player.allowFullscreen = true;
+      player.referrerPolicy = "strict-origin-when-cross-origin";
+      player.className = "argon-player";
+      // X reports its rendered post height. Accept only this iframe's own
+      // messages so the player stays complete at narrow widths without a gap.
+      window.addEventListener("message", (event) => {
+        if (event.origin !== "https://platform.twitter.com" || event.source !== player.contentWindow) return;
+        const embed = event.data?.["twttr.embed"];
+        const height = embed?.params?.[0]?.height;
+        if (embed?.method === "twttr.private.resize" && Number.isFinite(height) && height >= 200 && height <= 1600) {
+          player.style.height = `${Math.ceil(height)}px`;
+        }
+      });
+      player.addEventListener("load", () => {
+        host.setAttribute("aria-busy", "false");
+        status.textContent = "Press Play in the X player.";
+      }, { once: true });
+      host.setAttribute("aria-busy", "true");
+      status.textContent = "Loading the X player…";
+      host.replaceChildren(player);
+    }, { once: true });
+  }
+</script>
+
+<style>
+  .argon-video {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+    padding: clamp(1.25rem, 4vw, 3rem);
+    border: 1px solid var(--rule, #2a323d);
+    border-radius: 1.25rem;
+    background: var(--surface, #161b22);
+    color: var(--ink, #e9edf2);
+  }
+  .eyebrow { color: var(--accent, #4f9dff); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; }
+  h2 { margin: .5rem 0 1rem; line-height: 1.15; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+  .video-copy > p + p { margin-top: 1rem; }
+  .video-credit, figcaption { font-size: .85rem; color: var(--ink-soft, #aeb8c4); }
+  a { color: var(--accent, #4f9dff); }
+  a:hover { text-decoration: underline; }
+  .video-figure { margin: 0; min-width: 0; width: 100%; max-width: 550px; justify-self: center; }
+  .video-host { overflow: hidden; border-radius: 12px; background: #080c12; }
+  .load-video {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .65rem; width: 100%; aspect-ratio: 16 / 9; border: 0;
+    background: radial-gradient(ellipse at 50% 45%, #17314b, #080c12 75%);
+    color: #e9edf2; cursor: pointer; font: inherit;
+  }
+  .load-video:hover { background: radial-gradient(ellipse at 50% 45%, #244a70, #080c12 75%); }
+  .load-video:focus-visible { outline: 3px solid var(--accent, #4f9dff); outline-offset: -5px; }
+  .load-video small { color: #aeb8c4; }
+  .video-host :global(.argon-player) { display: block; width: 100%; height: 710px; border: 0; }
+  figcaption { display: grid; gap: .35rem; margin-top: .8rem; }
+  @media (min-width: 920px) { .argon-video { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } }
+</style>

@@ -44,3 +44,49 @@ Verify Elementa's smolkapps.com listing; add deterministic portfolio registratio
 ## Next
 
 Check CI and merge the verified launch; authenticate the official Base44 CLI using the existing approved account, export and inspect the companion; verify complete study journeys and platform packaging. Record exact artifacts, checks, merges and any concrete remaining store gates.
+
+## Completion checkpoint
+
+- Launch PR #6 passed both CI runs and merged to main at 6ed4b521404a39ac5425d328bc722f70d95e0705. Local main now tracks that revision. Older divergent local main is preserved as archive/local-main-5b0c592-20261031.
+- Official Base44 CLI normal device login completed for the existing account. Source export returned HTTP 200: 106 files, 218353 bytes, SHA-256 7ca8b88cce9d2d4db316338e7209b3e083f6244e41cfc645789d6d13b833f402. Private raw export retained outside this public checkout; editable source at ../elementa-companion pending review/integration.
+- Source review found seeded quiz/mastery/notes, incomplete cloud history hydration and silent storage failure. Base44 is correcting these with device-local, honest empty progress and backend-independent startup; independent review will follow.
+- Native worker owns iOS/Android packaging; Chrome MV3 packaging will reuse the complete offline companion. No public store release performed.
+
+## User steering — stop extra work
+
+Michael clarified that Base44 should build the app for now and we do not need to do anything else yet. Additional local integration, native packaging, self-hosted companion deployment and uploads are stopped. Both workers were interrupted and instructed to checkpoint only. Preserve existing source and scaffold files; do not resume these tasks merely because earlier messages requested full completion. The already-dispatched Base44 build is allowed to finish; no further builder request is authorized by this checkpoint.
+
+- That Base44 turn completed with status ready and no error/paywall. Its claimed fixes/packages remain independently unverified and are not yet a refreshed local export or GitHub merge. The prior 106-file export remains the local backup. Do not confuse the two revisions.
+- Native scaffolds exist with Capacitor 8.5.3; org.smolkapps.elementa bundle registered. Apple rejected the name Elementa as already used; no app record, alternate name, compiled package, signing artifact or upload was created. Native worker stopped and closed its owned browser.
+- Registration skill linkage exists and Elementa's real no-op passed. Independent forward-testing found four helper gaps (rename title, eligibility, equivalent category markup and whitespace in robots meta). Automation is incomplete; the installed skill will carry an explicit do-not-apply guard until repaired. No new hub mutation was made.
+
+
+## Tutor branch — October 31
+
+User requested verification of Argon Max builder messages, location of quizzes/atom visuals, and a separate tutor branch. Existing extra local/native delivery pause remains; resume only Base44-directed tutoring work and read-only verification/backup.
+
+- Browser model menu explicitly selected Gemini 4 Argon; effort menu explicitly selected Max. Re-selected and submitted tutor prompt via browser, creating Base44 branch chemistry-tutor-journey. Main remains separate and unmerged.
+- Correction: previous CLI turn receipt reports model Base 1 despite browser composer showing Argon 4/Max. Exact CLI model control was not established; do not claim all historical turns used Argon Max. User informed.
+- Existing practice quizzes and shell/subshell visualization are in the Base44 companion preview, not elementalearn.com. The original static site remains the deployed version. No migration/deployment resumed.
+- Tutor brief requests context-sensitive Socratic teaching, real AI with explicit unavailable states, server-side provider isolation and portable source/config, no exposed keys, local chats, honest privacy, and actual journey/build/test checks. No publication, spending, GitHub grant or store work.
+
+- Saved conversation metadata proves tutor Argon+Max, not only UI labels. Initial main build/review prompts also prove Argon+Max; automatic interrupted-turn continuation used Argon/medium, and the later generic CLI send used Base1/default.
+- Main quizzes and both Oxygen Bohr/subshell views were exercised in Base44. Screenshots and fresh complete main export are retained privately; 126 files / 389357 bytes / SHA256 8579a07aca9ddc6a9e9223eb4d878b5677ab719f9f69ce23ded24c33c635820c. This updates the source backup without changing the local native scaffolds or deploying anything.
+
+
+## Explicit website deployment and marketing resume — October31
+
+Michael now explicitly requests all Base44 main features deployed on elementalearn.com (tutor remains separate), marketing, continued Argon work and the credited video from @GoogleDeepMind tweet2112557925264752930. Website integration/deployment resumes; native/store work remains paused. Lead owns integration/build/deploy, bounded workers own official video embed component and search/indexing/marketing evidence. Preserve crawlable Astro reference pages; expose the complete standalone companion with obvious feature entry points.
+
+- Imported the complete current Base44 main into companion/ in the canonical repo, preserving the unrelated native scaffold checkout. Added a plain Vite deployment config and deterministic assembly under /study/ with hash routing, scoped manifest, complete asset precache, cache namespace isolation and correct social metadata. CI installs/tests/builds both applications.
+- Public reference pages now link directly to practice, the study lab and each element's shell/orbital view. Hero describes actual learning capabilities. Sitemap includes /study/. Original static articles remain available to crawlers.
+- Initial combined check: zero errors/warnings/hints;137 root tests and23 companion tests pass,0skips. Build123HTMLpages/2775internal links before video integration. Browser completed a real fixture quiz with one deliberate wrong answer (4/5); after reload Saved shows one session/80% and missed Caesium in the deck. This is QA, not demand.
+- Network inspection found an unnecessary Base44 SDK analytics POST to /api/apps/undefined/analytics/track/batch, even without auth. Removed the unused AuthProvider/bootstrap from the main app; standalone bundle dropped558→422KB. Must rerun network/offline checks on the final source before publishing.
+- Video component d9a5bc1 uses the official original X player and nearby GoogleDeepMind/GeminiArgon/Antigravity/TomLehrer attribution. Child verified actual advancing playback at1365×900 and390×844 with no requests before click. Integrated on homepage; final live replay still pending.
+- Argon4/Max is concurrently improving main production portability/sharing/empty-deck handling. Tutor branch remains separate; integration-credit clarification queued there. Do not export a partial build or merge tutor.
+- Marketing packet docs/marketing-20261031 contains technical/baseline receipts and3unsent social drafts. Existing31pageviews/22sessions includes ownerQA. Google SearchConsole actual IAB account is signed out and offers an existing passkey. No newGoogle owner grant made; no socialposts/spend/outsideemail. IndexNow changed-URL submission waits for real deployment.
+
+- Argon main production turn finished; imported its complete127file/395937byte export, SHA2568eab79abb93161a85a879493050d23eba2cbe0d1f2bbc4184e7c33ada89c9a6d. Kept the plain production build and removed unused auth bootstrap/owner-only blueprint from learner routes. Adopted newer Argon sharing/empty-deck/type fixes instead of duplicate local helpers.
+- Current checks:137reference/integration tests +28companion tests pass,0skips; lint clean;123HTMLpages/2775links; Astrocheck0errors/warnings/hints. Full companion typecheck retains57unrouted template diagnostics, with used learning files clean. Do not report full typecheck as passed.
+- Deployment-specific SW Cache-Control added through validated Caddy reload; MainPID unchanged. Backup /var/backups/elementa-cache-20261101T014103Z. No other vhost changed. New deployment command validates both apps and backs up this domain before per-file atomic rsync updates, retaining old hashed assets for open tabs.
+- Fresh integrated desktop1365×900 and390×844 captures inspected; no horizontal overflow. Root source scan found no credential-pattern matches in companion. Public deployment and final readback are next.

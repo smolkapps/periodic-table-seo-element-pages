@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PeriodicTable from "../components/PeriodicTable.astro";
+import ArgonVideo from "../components/ArgonVideo.astro";
 import { SITE, absUrl } from "../config";
 import { ELEMENTS, CATEGORY_META, type Category } from "../lib/elements";
 
@@ -41,13 +42,28 @@ const itemList = {
 >
   <div class="container">
     <div class="hero-copy">
-      <h1>Interactive Periodic Table</h1>
+      <h1>Understand the elements. Then test yourself.</h1>
       <p>
-        Explore all 118 chemical elements. Search by name, symbol, number or
-        category. Open an element for its properties, electron configuration and
-        discovery history, or compare elements side by side.
+        Explore all 118 chemical elements, see their electron shells and orbitals,
+        compare their properties, and practise what you learn. Keep your study
+        deck, notes and quiz progress on your own device. No account required.
       </p>
+      <div class="study-actions" aria-label="Explore the study lab">
+        <a class="icon-btn study-primary" href="/study/#/practice" data-umami-event="practice-open">Start a five-question quiz →</a>
+        <a class="icon-btn" href="/study/#/?element=oxygen">Explore an atom</a>
+        <a class="icon-btn" href="/study/#/compare?ids=iron,gold,oxygen">Compare elements</a>
+      </div>
     </div>
+
+    <section class="study-features" aria-label="Ways to learn chemistry">
+      <a href="/study/#/?element=oxygen"><strong>See atomic structure</strong><span>Switch between simplified electron shells and subshell orbitals.</span></a>
+      <a href="/study/#/practice"><strong>Learn through practice</strong><span>Get answer explanations, review missed elements and print worksheets.</span></a>
+      <a href="/study/#/saved"><strong>Build your study deck</strong><span>Save elements and notes, then export a backup of your progress.</span></a>
+    </section>
+
+    <ArgonVideo />
+
+    <h2 class="reference-heading">Look up any element</h2>
 
     <div class="search-box">
       <label for="pt-search" class="visually-hidden">Filter elements</label>

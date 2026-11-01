@@ -1,0 +1,59 @@
+{
+  "id": "./",
+  "name": "Elementa — Interactive Periodic Table & Chemistry Study Lab",
+  "short_name": "Elementa",
+  "description": "Explore all 118 chemical elements with atomic structure, periodic trends, comparisons and quizzes. Works offline; study progress stays on your device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0b0e14",
+  "theme_color": "#0d1117",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "reference"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Periodic table",
+      "url": "./#/",
+      "description": "Open the interactive 118-element table"
+    },
+    {
+      "name": "Practice quiz",
+      "url": "./#/practice",
+      "description": "Test yourself on configurations and trends"
+    },
+    {
+      "name": "Saved progress",
+      "url": "./#/saved",
+      "description": "Review your study deck, notes and quiz history"
+    }
+  ]
+}

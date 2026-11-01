@@ -6,9 +6,9 @@ export const SITE = {
   url: "https://elementalearn.com",
   name: "Elementa",
   shortName: "Elementa",
-  title: "Elementa — Interactive Periodic Table",
+  title: "Elementa — Periodic Table & Chemistry Practice",
   description:
-    "Explore all 118 chemical elements. Find atomic properties, electron configurations and discovery history, then compare elements side by side.",
+    "Learn all 118 chemical elements with readable reference pages, electron-shell and orbital views, comparisons and practice quizzes. Save your study notes and progress on your device.",
   author: "Michael Smolkin",
   authorUrl: "https://www.smolkin.org",
   /** Leave blank to omit the analytics beacon. */

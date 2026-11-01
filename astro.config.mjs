@@ -15,5 +15,5 @@ export default defineConfig({
   // Hover-prefetch internal links (still fully static — just fetches the next
   // page's HTML early) so moving between element pages feels instant.
   prefetch: { prefetchAll: true, defaultStrategy: "hover" },
-  integrations: [sitemap()],
+  integrations: [sitemap({ customPages: ["https://elementalearn.com/study/"] })],
 });

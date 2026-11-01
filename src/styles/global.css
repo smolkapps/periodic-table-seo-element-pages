@@ -526,6 +526,13 @@ p {
   color: var(--ink-soft);
   max-width: 60ch;
 }
+.study-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 20px 28px; }
+.study-primary { background: var(--accent); color: var(--surface); font-weight: 700; }
+.study-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-block: 24px 36px; }
+.study-features a { display: grid; gap: 8px; padding: 20px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+.study-features span { color: var(--ink-soft); font-size: var(--step--1); }
+.reference-heading { margin-top: 32px; }
+@media (max-width: 650px) { .study-features { grid-template-columns: 1fr; } }
 .search-box {
   margin-block: var(--space-m);
 }

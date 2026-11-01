@@ -16,7 +16,12 @@ jobs:
         run: npm ci || npm install
       - name: build
         working-directory: .
+        run: npm ci --prefix companion
+      - name: build reference and study app
+        working-directory: .
         run: npm run build
+      - name: verify published links and study tests
+        run: npm run verify && npm test --prefix companion
       - name: test
         working-directory: .
         run: npm test
