@@ -1,0 +1,106 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { absUrl } from "../../config";
+
+const title = "Why do oxygen and sulfur have similar properties?";
+const answer = "Oxygen and sulfur have similar chemical properties because both are in group 16 and have six electrons in their outermost occupied shell.";
+const url = absUrl("oxygen-and-sulfur/");
+const faq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [{
+    "@type": "Question",
+    name: title,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  }],
+};
+---
+
+<BaseLayout title={title} description={answer} jsonLd={faq}>
+  <article class="container explainer">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › Oxygen and sulfur</nav>
+    <h1>{title}</h1>
+    <p class="summary"><strong>Short answer.</strong> {answer}</p>
+    <p>
+      Those outer electrons help explain patterns in bonding and reactivity.
+      Oxygen and sulfur share an outer-shell pattern, so the periodic table
+      places them in the same column. They have different numbers of occupied
+      shells, which is why they sit in different rows.
+      The <a href="https://periodic-table.rsc.org/element/8/oxygen">Royal Society of Chemistry's oxygen reference</a>
+      and <a href="https://periodic-table.rsc.org/element/16/sulfur">sulfur reference</a>
+      give their group, period and ground-state configurations.
+    </p>
+
+    <h2>How do their electron configurations compare?</h2>
+    <p>
+      A neutral oxygen atom has eight electrons; a neutral sulfur atom has sixteen.
+      Count the electrons in the highest numbered shell to find their outer-shell
+      electrons: oxygen's 2s² 2p⁴ and sulfur's 3s² 3p⁴ each contain six.
+    </p>
+    <table class="facts">
+      <caption>Neutral atoms in their ground state</caption>
+      <thead><tr><th scope="col">Property</th><th scope="col"><a href="/element/oxygen/">Oxygen</a></th><th scope="col"><a href="/element/sulfur/">Sulfur</a></th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Atomic number</th><td>8</td><td>16</td></tr>
+        <tr><th scope="row">Group</th><td>16</td><td>16</td></tr>
+        <tr><th scope="row">Period</th><td>2</td><td>3</td></tr>
+        <tr><th scope="row">Electron configuration</th><td>[He] 2s² 2p⁴</td><td>[Ne] 3s² 3p⁴</td></tr>
+        <tr><th scope="row">Electrons by shell</th><td>2, 6</td><td>2, 8, 6</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The bracketed symbols stand for filled inner shells: [He] accounts for two
+      electrons and [Ne] for ten. Adding the remaining six gives the full electron
+      count for each neutral atom. The shell counts summarize that arrangement;
+      they don't show electron paths or orbital shapes.
+    </p>
+
+    <h2>Does the same group mean identical properties?</h2>
+    <p>
+      No. Group membership predicts useful chemical similarities, but doesn't make
+      two elements interchangeable. At 20°C oxygen is a gas, while sulfur is a
+      solid. The RSC also lists different common oxidation states: −1 and −2 for
+      oxygen, compared with −2, +2, +4 and +6 for sulfur. A shared outer-shell
+      count is a starting point for understanding their chemistry.
+    </p>
+
+    <h2>Try the comparison</h2>
+    <p>
+      <a href="/compare/?ids=oxygen,sulfur">Compare oxygen and sulfur side by side</a>,
+      then open <a href="/study/#/element/oxygen">oxygen's shell and orbital views</a>
+      and <a href="/study/#/element/sulfur">sulfur's views</a>.
+      Check that each neutral atom's electrons add up to its atomic number, then
+      identify the six outer-shell electrons in each configuration.
+    </p>
+    <div class="toolbar">
+      <button class="icon-btn js-share" type="button" data-share-title={title}
+        data-share-text={answer} data-share-url={url}>Share this explanation</button>
+      <a class="icon-btn" href="/elements/">Browse all elements</a>
+    </div>
+    <p class="source-note">Sources: Royal Society of Chemistry, <a href="https://periodic-table.rsc.org/element/8/oxygen">Oxygen</a> and <a href="https://periodic-table.rsc.org/element/16/sulfur">Sulfur</a>. Fact boxes and oxidation-state tables checked November 3, 2026.</p>
+  </article>
+  <div class="toast js-toast" role="status" aria-live="polite"></div>
+</BaseLayout>
+
+<style>
+  .explainer { max-width: 820px; padding-bottom: 2rem; }
+  .explainer h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.15; }
+  .explainer h2 { margin-top: 2rem; }
+  .explainer p { line-height: 1.7; }
+  .explainer caption { text-align: left; padding-bottom: .6rem; }
+  .explainer .facts { width: 100%; }
+  .source-note { font-size: .9rem; }
+</style>
+
+<script>
+  import { wireStandaloneShareButtons } from "../../scripts/table-ui";
+  const toast = document.querySelector<HTMLElement>(".js-toast");
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  wireStandaloneShareButtons((message) => {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(timer);
+    timer = setTimeout(() => toast.classList.remove("show"), 2600);
+  });
+</script>

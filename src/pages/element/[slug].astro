@@ -114,7 +114,9 @@ const compareIds = [prev, element, next]
       <a class="icon-btn" href="/" style="margin-left:auto;">← Back to table</a>
     </div>
 
-    <ArticleBody element={element} />
+    <ArticleBody element={element} />{ ["oxygen", "sulfur"].includes(element.slug) && (
+      <p><a href="/oxygen-and-sulfur/">Why do oxygen and sulfur have similar properties?</a></p>
+    ) }
 
     <nav class="prevnext" aria-label="Element navigation">
       {
