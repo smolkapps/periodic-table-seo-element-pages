@@ -13,13 +13,15 @@ jobs:
           node-version: '20'
       - name: install
         working-directory: .
-        run: npm ci || npm install
+        run: npm ci
       - name: build
         working-directory: .
         run: npm ci --prefix companion
       - name: build reference and study app
         working-directory: .
         run: npm run build
+      - name: check reference types
+        run: npm run check
       - name: verify published links and study tests
         run: npm run verify && npm test --prefix companion
       - name: check study types and lint
@@ -27,3 +29,16 @@ jobs:
       - name: test
         working-directory: .
         run: npm test
+      - name: test atomic publication and preserve separate tutor
+        run: python3 test/promote-elementa.test.py && test ! -f companion/src/pages/Tutor.jsx
+      - name: Record checked release identity
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node scripts/release-manifest.mjs create dist "$GITHUB_SHA" "$GITHUB_RUN_ID"
+      - name: Upload checked website for automatic publication
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: elementa-site-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
