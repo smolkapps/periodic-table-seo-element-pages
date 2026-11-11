@@ -9,7 +9,7 @@ Prepared November1,2026. Public Main features were checked against canonical sou
 - [ProductHunt listing and maker comment for approval](product-hunt-review-copy.md). This is the canonical copy for the current approval question; the alternative in directories.md is research only.
 - [Two weeks of X posts](x-element-of-the-day.md), plus [CSV](x-element-of-the-day.csv), [structured drafts](x-element-of-the-day.json) and [14successful link checks](x-link-checks.json). Every tracked /element/<slug>/ URL returned200 with the correct title and clean canonical. All14posts are ASCII outsideURLs and fit X's280-character limit with23-characterURLweighting; longest240characters. Nothing is scheduled or posted.
 - [Teacher outreach blurb](teacher-outreach.md), unsent; no bulk list or cold-email automation. [Complete printable student worksheet and teacher key](teacher-resource/oxygen-and-sulfur-worksheet.pdf), with [editableHTML](teacher-resource/oxygen-and-sulfur-worksheet.html) and renderedQA.
-- [Feature announcement and release gate](feature-announcement.md). Current public GitHubMain has no long-session/difficulty controls; the newer Base44Main preview has5/10/20andEasy/Standard/Hard source controls, not yet verified/deployed here. Quiet daily thread watch `watch-elementa-quiz-release` is active and will prepare a verified announcement for approval once both features are merged and publicly deployed; no automatic posting.
+- [Feature announcement](feature-announcement.md). November 11 public release now verifies5/10/20 questions and Easy/Standard/Hard; exact final @GlobalAITeacher copy is prepared and unsent. The daily task now improves/releases Elementa under Michael’s new authorization, with separate public-social approval.
 
 ## Setup status
 

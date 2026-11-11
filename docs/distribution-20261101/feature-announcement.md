@@ -1,27 +1,23 @@
 # Longer quiz and difficulty release announcement
 
-Status: release-gated draft. Current public GitHub Main uses buildDeterministicQuiz(pool,5,quizMode), with no difficulty selector. A fresh Base44 Main export now contains5/10/20question controls andEasy/Standard/Hard levels. Those changes are only in the private builder source, with public deployment and learner-journey verification still pending; nothing has been announced. Marketing work does not take over the separate site-fix task.
+Status: **publicly verified November 11,2026; copy prepared, unsent**. Public application revision `052d42996899d7f0cd27b276afd91a7bc2b18aa3`, main CI 43122202075, automatic publication23:48:34UTC. [Verification](../carbon-20261111/verification.json) records actual desktop 1365×900 and phone 390×844 journeys.
 
-## Release gate
+## Verified behavior
 
-Before describing these as available, verify the merged canonical source and actual public /study/ version offer a session longer than5questions and meaningful difficulty choices. Exercise every offered difficulty, complete a longer session, check honest question totals and score/save/reload behavior, and confirm focused element/deck/comparison questions stay scoped. Difficulty must change the question work, not just the label. Check desktop and phone-sized views. Record the source revision, deployed assets, actual lengths and actual level labels. No tutor/native-app or learning-outcome claim.
+The public practice controls offer **5,10,20 questions** and **Easy,Standard,Hard**. Easy asks symbols/names/placement, Standard asks properties/trends/uses, Hard asks ground-state configurations/subshells/exceptions. Completed actual Easy 5, Standard 10 and Hard 20 rounds; correct scores, totals and level names save and reload. Preferences persist. Single-element iron and two-element copper/silver selections honestly cap at4/8 unique questions instead of padding unrelated targets. Daily clue reveal/guess/save/atom/subshell and keyboard focus work. Comparison same-count URL and Back/Forward synchronization pass. Offline reload preserves app/progress. No observed Base44 requests/page errors or page overflow; these are responsive browser checks, not native/physical-device certification.
 
-## X draft after the gate passes
+## Final X copy for @GlobalAITeacher
 
-Elementa now has longer chemistry quizzes and difficulty choices. Choose [verified lengths, expected5/10/20] questions and [verified level names, expectedEasy/Standard/Hard], then practise element properties and electron configurations at your pace. Free, no signup.
+Elementa now has 5, 10 and 20-question chemistry quizzes: Easy for symbols and names, Standard for trends and uses, Hard for electron configurations. There’s a daily element clue too. Free, no signup.
 
-https://elementalearn.com/study/#/practice
+https://elementalearn.com/study/?utm_source=x&utm_medium=social&utm_campaign=elementa_quiz_levels#/practice
 
-Replace every bracketed field with the public controls that actually passed. Build the tracked URL with UTM parameters BEFORE #/practice, so routing remains correct. Recheck standard X length. Show Michael the final text/account for the public-post approval required by AGENTS.md; don't reuse approval of an earlier availability post.
+Approval is still required for this exact new post/account; do not reuse the earlier availability-post approval. Nothing is scheduled or posted. The tracked URL puts UTM parameters before the hash route.
 
 ## Community follow-up
 
-Reply only where a previous authorized post and that community's current update rules allow it. A useful update explains the tested change and asks a specific question about quiz difficulty; don't make a new launch post everywhere. Don't announce in r/chemistry without moderator approval or violate a weekly/monthly promotion thread. Teacher outreach remains individual and authorized.
+Reply only where an existing authorized post and current community rules allow an update. Do not post in r/chemistry without moderator permission or bypass a promotion thread. Teacher outreach remains individual and authorized. No tutor/native-app, learning-outcome or acquisition claim.
 
-## Monitor
+## Continuing task
 
-A quiet daily follow-up will check public Main for this specific release. It must stay silent while the features aren't shipped, avoid editing/building/publishing, and notify Michael once the verified release and final announcement are ready for approval. No recurring directory submissions, blind retries or unsupervised social posts.
-
-## Builder checkpoint
-
-Read-only export main-quiz-update.zip has128paths and new questionCount/difficulty state in Practice.jsx; current source defines5/10/20lengths andEasy/Standard/Hard options. It also renames the private preview toElementaLearn and changes its footer to2026. The latter conflicts with the standing2025SmolkApps credit. Existing deployedMain remains unchanged. Source is backed up privately; no newbuilderprompt, codeimport, merge or deployment was done by this marketing task. The actual source/deployment owner must resolve the copyright conflict and verify the public release.
+Michael’s November 11instruction superseded the former passive one-time watch: `watch-elementa-quiz-release` is now the active daily **Improve and release Elementa** task. It uses bounded Gemini 4 Carbon/Max passes with independent review and automatic checked-main publication; no unsupervised social posts. This release announcement is prepared once; do not duplicate it or resurrect the old passive restrictions.
