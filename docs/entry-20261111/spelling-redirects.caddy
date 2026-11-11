@@ -1,0 +1,13 @@
+# Add inside ONLY the elementalearn.com site block, before file serving.
+# Exact path matchers cover both slash forms. rewrite preserves the query;
+# route retains rewrite-before-redir order, and {uri} includes that query.
+@elementaAluminum path /element/aluminum /element/aluminum/
+route @elementaAluminum {
+    rewrite * /element/aluminium/
+    redir {uri} 308
+}
+@elementaCesium path /element/cesium /element/cesium/
+route @elementaCesium {
+    rewrite * /element/caesium/
+    redir {uri} 308
+}

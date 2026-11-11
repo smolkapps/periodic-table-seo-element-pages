@@ -127,6 +127,31 @@ d("static build output", () => {
     expect(home).not.toContain('data-umami-event="element-open"');
   });
 
+  it("starts the promised homepage quiz without needing a saved deck", () => {
+    const home = readFileSync(join(DIST, "index.html"), "utf8");
+    const action = home.match(/<a\b[^>]*href="([^"]+)"[^>]*>Start a five-question quiz/);
+    expect(action, "homepage must offer its quick practice action").not.toBeNull();
+    const target = new URL(action![1].replaceAll("&amp;", "&"), "https://elementalearn.com");
+    const quiz = new URL(target.hash.slice(1), "https://elementalearn.com");
+    expect(target.pathname).toBe("/study/");
+    expect(quiz.pathname).toBe("/practice");
+    // The bare route opens a learner's deck, which is empty on first use.
+    expect(quiz.searchParams.get("focus")).toBe("trends");
+    expect(quiz.searchParams.get("count")).toBe("5");
+  });
+
+  it("makes the site information reachable as real, canonical static pages", () => {
+    const home = readFileSync(join(DIST, "index.html"), "utf8");
+    for (const slug of ["about", "privacy", "terms"]) {
+      const html = readFileSync(join(DIST, slug, "index.html"), "utf8");
+      expect(home).toContain(`href="/${slug}/"`);
+      expect(html).toContain(`<link rel="canonical" href="https://elementalearn.com/${slug}/"`);
+      expect(html).toMatch(/<h1\b[^>]*>/);
+      expect(html).toContain('href="/apple-touch-icon.png"');
+      expect(html).not.toContain("404 — Off the table");
+    }
+  });
+
   it("home page ships the interactive table cells with data attributes", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toMatch(
