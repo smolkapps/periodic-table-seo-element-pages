@@ -58,6 +58,9 @@ export default function Footer() {
           <Link to="/practice" className="text-[#aeb8c4] hover:text-white">
             Practice
           </Link>
+          <Link to="/about" className="text-[#aeb8c4] hover:text-white">
+            About
+          </Link>
           <Link to="/privacy" className="text-[#aeb8c4] hover:text-white">
             Privacy
           </Link>

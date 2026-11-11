@@ -1,8 +1,17 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { ELEMENTS, CATEGORY_META, getElementBySlug, buildDeterministicQuiz } from "@/data/elementsData";
+import Footer from "@/components/Footer";
+import {
+  ELEMENTS,
+  CATEGORY_META,
+  QUIZ_LENGTH_OPTIONS,
+  QUIZ_DIFFICULTY_META,
+  getElementBySlug,
+  buildDeterministicQuiz,
+} from "@/data/elementsData";
 import { useStudyProgress } from "@/lib/studyStore";
+import { readQuizPrefs, writeQuizPrefs } from "@/lib/quizPreferences";
 import {
   BrainCircuit,
   CheckCircle2,
@@ -14,11 +23,59 @@ import {
   Award,
 } from "lucide-react";
 
+const TREND_DEFAULT_SLUGS = [
+  "fluorine",
+  "oxygen",
+  "caesium",
+  "helium",
+  "iron",
+  "lithium",
+  "silicon",
+  "gold",
+  "sodium",
+  "chlorine",
+  "carbon",
+  "nitrogen",
+  "magnesium",
+  "aluminium",
+  "phosphorus",
+  "sulfur",
+  "potassium",
+  "calcium",
+  "copper",
+  "zinc",
+];
+
+const HARD_DEFAULT_SLUGS = [
+  "chromium",
+  "copper",
+  "palladium",
+  "silver",
+  "gold",
+  "platinum",
+  "molybdenum",
+  "niobium",
+  "ruthenium",
+  "rhodium",
+  "lanthanum",
+  "cerium",
+  "gadolinium",
+  "uranium",
+  "iron",
+  "cobalt",
+  "nickel",
+  "vanadium",
+  "manganese",
+  "titanium",
+];
+
 export default function Practice() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const focusElementSlug = searchParams.get("element");
   const focusIdsParam = searchParams.get("ids");
   const focusParam = searchParams.get("focus");
+  const difficultyParam = searchParams.get("difficulty");
+  const countParam = Number(searchParams.get("count"));
 
   const focusedElement = useMemo(
     () => (focusElementSlug ? getElementBySlug(focusElementSlug) || null : null),
@@ -40,15 +97,27 @@ export default function Practice() {
     [focusIdsParam]
   );
 
+  const { savedSlugs, recordQuizResult, toggleSavedSlug } = useStudyProgress();
+
+  const savedPrefs = useMemo(() => readQuizPrefs(), []);
+
   const deriveRouteMode = () => {
     if (focusParam) return focusParam;
     if (focusedElement) return "element";
     if (comparedElements.length > 0) return "compare";
-    return "deck";
+    if (savedPrefs.mode === "deck" && savedSlugs.length === 0) return "trends";
+    return savedPrefs.mode || (savedSlugs.length > 0 ? "deck" : "trends");
   };
 
-  const { savedSlugs, recordQuizResult, toggleSavedSlug } = useStudyProgress();
   const [quizMode, setQuizMode] = useState(deriveRouteMode);
+  const [difficulty, setDifficulty] = useState(() =>
+    difficultyParam && QUIZ_DIFFICULTY_META[difficultyParam]
+      ? difficultyParam
+      : savedPrefs.difficulty
+  );
+  const [questionCount, setQuestionCount] = useState(() =>
+    QUIZ_LENGTH_OPTIONS.includes(countParam) ? countParam : savedPrefs.count
+  );
   const [deckSnapshotSlugs, setDeckSnapshotSlugs] = useState(() => [...savedSlugs]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -60,15 +129,33 @@ export default function Practice() {
   const nextButtonRef = useRef(null);
   const shouldFocusQuestionRef = useRef(false);
 
-  // Sync quiz mode if route search params change.
+  // Sync quiz mode, difficulty, and count if route search params change.
   useEffect(() => {
-    const nextMode = focusParam || (focusedElement ? "element" : comparedElements.length > 0 ? "compare" : "deck");
+    const fallbackGeneralMode =
+      savedPrefs.mode === "deck" && savedSlugs.length === 0
+        ? "trends"
+        : savedPrefs.mode || (savedSlugs.length > 0 ? "deck" : "trends");
+    const nextMode =
+      focusParam ||
+      (focusedElement
+        ? "element"
+        : comparedElements.length > 0
+        ? "compare"
+        : quizMode === "element" || quizMode === "compare"
+        ? fallbackGeneralMode
+        : quizMode);
     setQuizMode(nextMode);
+    if (difficultyParam && QUIZ_DIFFICULTY_META[difficultyParam]) {
+      setDifficulty(difficultyParam);
+    }
+    if (QUIZ_LENGTH_OPTIONS.includes(countParam)) {
+      setQuestionCount(countParam);
+    }
     setCurrentIdx(0);
     setSelectedOption(null);
     setAnswers([]);
     setCompletedSession(null);
-  }, [focusParam, focusedElement, comparedElements.length]);
+  }, [focusParam, focusElementSlug, focusIdsParam, difficultyParam, countParam]);
 
   // Keep deckSnapshotSlugs synced whenever not actively mid-question in deck mode.
   useEffect(() => {
@@ -94,16 +181,25 @@ export default function Practice() {
     if (quizMode === "deck") {
       return deckElements;
     }
+    if (difficulty === "hard") {
+      const slugs =
+        quizMode === "trends"
+          ? [...HARD_DEFAULT_SLUGS.slice(4), ...HARD_DEFAULT_SLUGS.slice(0, 4)]
+          : HARD_DEFAULT_SLUGS;
+      return slugs.map((s) => getElementBySlug(s)).filter(Boolean);
+    }
     if (quizMode === "trends") {
-      return ["fluorine", "oxygen", "caesium", "helium", "iron", "lithium", "silicon", "gold"]
-        .map((s) => getElementBySlug(s))
-        .filter(Boolean);
+      return TREND_DEFAULT_SLUGS.map((s) => getElementBySlug(s)).filter(Boolean);
     }
     return ELEMENTS.filter((_, idx) => idx % 5 === 0);
-  }, [quizMode, focusedElement, comparedElements, deckElements]);
+  }, [quizMode, difficulty, focusedElement, comparedElements, deckElements]);
 
-  const questions = useMemo(() => buildDeterministicQuiz(pool, 5, quizMode), [pool, quizMode]);
-  const currentQ = questions[currentIdx];
+  const questions = useMemo(
+    () => buildDeterministicQuiz(pool, questionCount, quizMode, difficulty),
+    [pool, questionCount, quizMode, difficulty]
+  );
+  const safeCurrentIdx = currentIdx < questions.length ? currentIdx : 0;
+  const currentQ = questions[safeCurrentIdx];
 
   useEffect(() => {
     if (selectedOption !== null) {
@@ -122,23 +218,25 @@ export default function Practice() {
   };
 
   const handleNext = () => {
-    if (currentIdx + 1 < questions.length) {
+    if (safeCurrentIdx + 1 < questions.length) {
       shouldFocusQuestionRef.current = true;
-      setCurrentIdx((i) => i + 1);
+      setCurrentIdx(safeCurrentIdx + 1);
       setSelectedOption(null);
     } else {
       const score = answers.filter((a) => a.isCorrect).length;
+      const diffLabel = QUIZ_DIFFICULTY_META[difficulty]?.label || "Standard";
+      const baseModeLabel =
+        quizMode === "deck"
+          ? "Saved Study Deck"
+          : quizMode === "trends"
+          ? "Periodic Trends & Valence"
+          : quizMode === "element" && focusedElement
+          ? `Element Focus (${focusedElement.name})`
+          : quizMode === "compare" && comparedElements.length > 0
+          ? `Comparison Focus (${comparedElements.map((e) => e.symbol).join(", ")})`
+          : "Mixed Elements";
       const session = recordQuizResult({
-        mode:
-          quizMode === "deck"
-            ? "Saved Study Deck"
-            : quizMode === "trends"
-            ? "Periodic Trends & Valence"
-            : quizMode === "element" && focusedElement
-            ? `Element Focus (${focusedElement.name})`
-            : quizMode === "compare" && comparedElements.length > 0
-            ? `Comparison Focus (${comparedElements.map((e) => e.symbol).join(", ")})`
-            : "All 118 Elements Mix",
+        mode: `${baseModeLabel} · ${diffLabel}`,
         score,
         total: questions.length,
         perElementResults: answers,
@@ -148,15 +246,30 @@ export default function Practice() {
     }
   };
 
-  const resetQuiz = (newMode = quizMode) => {
+  const resetQuiz = (newMode = quizMode, newDifficulty = difficulty, newCount = questionCount) => {
     shouldFocusQuestionRef.current = true;
     setDeckSnapshotSlugs([...savedSlugs]);
     setQuizMode(newMode);
+    setDifficulty(newDifficulty);
+    setQuestionCount(newCount);
     setCurrentIdx(0);
     setSelectedOption(null);
     setAnswers([]);
     setCompletedSession(null);
     setShowWorksheet(false);
+
+    writeQuizPrefs({ mode: newMode, difficulty: newDifficulty, count: newCount });
+
+    // Sync to URL to preserve settings across reload
+    const nextParams = new URLSearchParams(searchParams);
+    if (newMode !== "element" && newMode !== "compare") {
+      nextParams.set("focus", newMode);
+      nextParams.delete("element");
+      nextParams.delete("ids");
+    }
+    nextParams.set("difficulty", newDifficulty);
+    nextParams.set("count", String(newCount));
+    setSearchParams(nextParams, { replace: true });
   };
 
   return (
@@ -190,32 +303,85 @@ export default function Practice() {
           </button>
         </div>
 
-        {/* Mode Selector */}
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: "deck", label: `My Study Deck (${savedSlugs.length})` },
-            { id: "trends", label: "Periodic Trends & Valence" },
-            { id: "all", label: "All 118 Elements Mix" },
-            ...(focusedElement
-              ? [{ id: "element", label: `Element Focus: ${focusedElement.name} (${focusedElement.symbol})` }]
-              : []),
-            ...(comparedElements.length > 0
-              ? [{ id: "compare", label: `Comparison (${comparedElements.map((e) => e.symbol).join(", ")})` }]
-              : []),
-          ].map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => resetQuiz(m.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                quizMode === m.id
-                  ? "bg-[#4f9dff] text-[#07121f] border-[#4f9dff]"
-                  : "bg-[#131822] text-[#aeb8c4] border-[#242c38] hover:text-white"
-              }`}
-            >
-              {m.label}
-            </button>
-          ))}
+        {/* Mode, Difficulty & Length Controls */}
+        <div className="rounded-xl bg-[#131822] border border-[#242c38] p-4 space-y-3.5">
+          {questions.length > 0 && questions.length < questionCount && !completedSession && !showWorksheet && (
+            <div className="text-xs text-[#ffd43b] bg-[#ffd43b]/10 border border-[#ffd43b]/30 p-2.5 rounded-lg">
+              Showing all {questions.length} unique questions available for your selection (no repeated concepts).
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-mono text-[#7a8694] mr-1">Topic:</span>
+            {[
+              { id: "trends", label: "Periodic Trends & Valence" },
+              { id: "all", label: "Mixed Elements" },
+              { id: "deck", label: `My Study Deck (${savedSlugs.length})` },
+              ...(focusedElement
+                ? [{ id: "element", label: `Element Focus: ${focusedElement.name} (${focusedElement.symbol})` }]
+                : []),
+              ...(comparedElements.length > 0
+                ? [{ id: "compare", label: `Comparison (${comparedElements.map((e) => e.symbol).join(", ")})` }]
+                : []),
+            ].map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => resetQuiz(m.id, difficulty, questionCount)}
+                className={`min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                  quizMode === m.id
+                    ? "bg-[#4f9dff] text-[#07121f] border-[#4f9dff]"
+                    : "bg-[#0e121a] text-[#aeb8c4] border-[#242c38] hover:text-white"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#1e2634]">
+            {/* Difficulty Selector */}
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quiz difficulty level">
+              <span className="text-xs font-mono text-[#7a8694] mr-1">Level:</span>
+              {Object.values(QUIZ_DIFFICULTY_META).map((lvl) => (
+                <button
+                  key={lvl.id}
+                  type="button"
+                  aria-pressed={difficulty === lvl.id}
+                  onClick={() => resetQuiz(quizMode, lvl.id, questionCount)}
+                  className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                    difficulty === lvl.id
+                      ? "bg-[#69db7c]/20 border-[#69db7c] text-white"
+                      : "bg-[#0e121a] border-[#242c38] text-[#aeb8c4] hover:text-white"
+                  }`}
+                >
+                  <span>{lvl.label}</span>
+                  <span className="hidden md:inline text-[11px] font-normal text-[#8b98a9] ml-1">
+                    ({lvl.subtitle})
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Length Selector */}
+            <div className="flex items-center gap-1.5" role="group" aria-label="Number of questions">
+              <span className="text-xs font-mono text-[#7a8694] mr-1">Length:</span>
+              {QUIZ_LENGTH_OPTIONS.map((len) => (
+                <button
+                  key={len}
+                  type="button"
+                  aria-pressed={questionCount === len}
+                  onClick={() => resetQuiz(quizMode, difficulty, len)}
+                  className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border transition-all ${
+                    questionCount === len
+                      ? "bg-[#ffd43b]/20 border-[#ffd43b] text-[#ffd43b]"
+                      : "bg-[#0e121a] border-[#242c38] text-[#aeb8c4] hover:text-white"
+                  }`}
+                >
+                  {len} Qs
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {isEmptyDeckMode ? (
@@ -248,7 +414,7 @@ export default function Practice() {
                 onClick={() => resetQuiz("all")}
                 className="px-4 py-2 rounded-xl bg-[#1c232d] border border-[#2a323d] hover:border-[#4f9dff] text-xs sm:text-sm font-semibold text-white transition-colors"
               >
-                Quiz All 118 Elements Mix
+                Quiz Mixed Elements
               </button>
               <Link
                 to="/"
@@ -347,7 +513,7 @@ export default function Practice() {
           <div className="rounded-2xl bg-[#131822] border border-[#242c38] p-5 sm:p-6 space-y-5 shadow-xl">
             <div className="flex items-center justify-between text-xs font-mono text-[#8b98a9]">
               <span>
-                Question {currentIdx + 1} of {questions.length}
+                Question {safeCurrentIdx + 1} of {questions.length}
               </span>
               <span
                 className="px-2 py-0.5 rounded border"
@@ -426,7 +592,7 @@ export default function Practice() {
                     onClick={handleNext}
                     className="px-4 py-2 rounded-lg bg-[#4f9dff] text-[#07121f] font-semibold text-xs sm:text-sm flex items-center gap-1.5 hover:bg-[#7bb6ff]"
                   >
-                    <span>{currentIdx + 1 < questions.length ? "Next Question" : "Finish & Save Progress"}</span>
+                    <span>{safeCurrentIdx + 1 < questions.length ? "Next Question" : "Finish & Save Progress"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -435,6 +601,8 @@ export default function Practice() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

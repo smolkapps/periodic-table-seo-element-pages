@@ -11,6 +11,13 @@ import {
   validateImport,
   writeProgress,
 } from "../src/lib/progressStore.js";
+import {
+  DEFAULT_QUIZ_PREFS,
+  QUIZ_PREFS_STORAGE_KEY,
+  readQuizPrefs,
+  sanitizeQuizPrefs,
+  writeQuizPrefs,
+} from "../src/lib/quizPreferences.js";
 
 function createMemoryStorage(initial = {}) {
   const map = new Map(Object.entries(initial));
@@ -186,5 +193,34 @@ describe("progress import validation", () => {
     assert.deepEqual(sanitizeMasteryMap({ oxygen: { attempts: 2, correct: 1, mastered: true } }), {
       oxygen: { attempts: 2, correct: 1, mastered: true, lastPracticed: null },
     });
+  });
+
+  it("persists chosen quiz preferences across reloads without corrupting prior study progress", () => {
+    const storage = createMemoryStorage();
+    const initialProgress = {
+      savedSlugs: ["iron"],
+      masteryMap: { iron: { attempts: 3, correct: 3, mastered: true, lastPracticed: "2025-11-01" } },
+      notesMap: { iron: "Core transition metal." },
+      quizHistory: [
+        { id: "q-prev", mode: "Periodic Trends", score: 5, total: 5, date: "2025-11-01", missedSlugs: [] },
+      ],
+    };
+    assert.equal(writeProgress(initialProgress, storage).ok, true);
+    assert.deepEqual(readQuizPrefs(storage), DEFAULT_QUIZ_PREFS);
+
+    assert.equal(writeQuizPrefs({ mode: "all", difficulty: "hard", count: 20 }, storage).ok, true);
+    assert.deepEqual(readQuizPrefs(storage), { mode: "all", difficulty: "hard", count: 20 });
+    assert.equal(storage.getItem(QUIZ_PREFS_STORAGE_KEY) !== null, true);
+
+    // Prior study progress remains completely intact after quiz preference updates and reload
+    const reloaded = readProgress(storage);
+    assert.equal(reloaded.error, null);
+    assert.deepEqual(reloaded.progress.savedSlugs, ["iron"]);
+    assert.equal(reloaded.progress.notesMap.iron, "Core transition metal.");
+    assert.equal(reloaded.progress.masteryMap.iron.mastered, true);
+    assert.equal(reloaded.progress.quizHistory.length, 1);
+
+    // Invalid quiz preference shapes fall back safely
+    assert.deepEqual(sanitizeQuizPrefs({ mode: "unknown", difficulty: "extreme", count: 99 }), DEFAULT_QUIZ_PREFS);
   });
 });

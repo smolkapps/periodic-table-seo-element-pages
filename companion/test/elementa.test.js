@@ -12,12 +12,17 @@ import {
   buildComparison,
   buildElementContrastSummary,
   buildDeterministicQuiz,
+  buildDailySpotlight,
   AUFBAU_NOTES,
   getShellRoleLabel,
   isValenceSubshell,
   buildElementShareUrl,
+  buildElementPageTitle,
   buildComparisonShareUrl,
   resolveComparisonSlugs,
+  resolveElementSlug,
+  QUIZ_LENGTH_OPTIONS,
+  QUIZ_DIFFICULTY_META,
   nextCellIndex,
   firstVisibleIndex,
 } from "../src/data/elementsData.js";
@@ -57,11 +62,66 @@ describe("Elementa 118-element dataset", () => {
     assert.equal(formatMass(iron), "55.845");
   });
 
-  it("looks elements up by slug, symbol and number", () => {
+  it("looks elements up by slug, symbol, number, and US/UK spelling aliases", () => {
     assert.equal(getElementBySlug("iron").symbol, "Fe");
     assert.equal(getElementBySymbol("fe").slug, "iron");
     assert.equal(getElementByNumber(1).slug, "hydrogen");
+    assert.equal(resolveElementSlug("aluminum"), "aluminium");
+    assert.equal(resolveElementSlug("cesium"), "caesium");
+    assert.equal(getElementBySlug("aluminum").slug, "aluminium");
+    assert.equal(getElementBySlug("cesium").slug, "caesium");
     assert.equal(getElementBySlug("unobtanium"), undefined);
+    assert.equal(
+      buildElementPageTitle(getElementBySlug("iron")),
+      "Iron (Fe): Electron Configuration, Properties & Quiz — Elementa"
+    );
+  });
+
+  it("supports 5, 10, and 20 question quizzes across Easy, Standard, and Hard levels with neighboring-element distractors", () => {
+    assert.deepEqual(QUIZ_LENGTH_OPTIONS, [5, 10, 20]);
+    assert.deepEqual(Object.keys(QUIZ_DIFFICULTY_META), ["easy", "standard", "hard"]);
+
+    const easyQuiz = buildDeterministicQuiz(ELEMENTS.slice(0, 10), 10, "all", "easy");
+    assert.equal(easyQuiz.length, 10);
+    assert.ok(easyQuiz.every((q) => q.difficulty === "easy"));
+
+    const hardPool = [getElementBySlug("chromium"), getElementBySlug("copper"), getElementBySlug("palladium"), getElementBySlug("gold"), getElementBySlug("iron")];
+    const hardQuiz = buildDeterministicQuiz(hardPool, 20, "all", "hard");
+    assert.equal(hardQuiz.length, 20);
+    assert.ok(hardQuiz.every((q) => q.difficulty === "hard"));
+    // Verify Cr question distractors come from neighboring Period 4 d-block elements
+    const crQuestion = hardQuiz.find((q) => q.target.slug === "chromium");
+    assert.ok(crQuestion);
+    const distractorNumbers = crQuestion.options
+      .filter((o) => o.slug !== "chromium")
+      .map((o) => getElementBySlug(o.slug).number);
+    assert.ok(
+      distractorNumbers.every((z) => Math.abs(z - 24) <= 6),
+      `Expected neighboring elements around Z=24 for Cr distractors, got ${distractorNumbers.join(", ")}`
+    );
+  });
+
+  it("builds daily spotlights across all 118 elements with 4 distinct options without leaking element symbol or name", () => {
+    const seenSlugs = new Set();
+    for (let offset = 0; offset < 118; offset++) {
+      const spotlight = buildDailySpotlight("2025-11-01", offset);
+      seenSlugs.add(spotlight.target.slug);
+      assert.equal(spotlight.options.length, 4, "Spotlight has exactly 4 options");
+      assert.equal(new Set(spotlight.options.map((o) => o.slug)).size, 4, "Spotlight options are distinct");
+      assert.ok(spotlight.options.some((o) => o.slug === spotlight.target.slug), "Target is included in options");
+
+      assert.doesNotMatch(
+        spotlight.clue.toLowerCase(),
+        new RegExp(`\\b${spotlight.target.name.toLowerCase()}\\b`),
+        `Clue leaks element name for ${spotlight.target.name}`
+      );
+      assert.doesNotMatch(
+        spotlight.clue,
+        new RegExp(`\\b${spotlight.target.symbol}\\b`),
+        `Clue leaks element symbol for ${spotlight.target.symbol}`
+      );
+    }
+    assert.equal(seenSlugs.size, 118, "Cycling 118 offsets visits all 118 elements");
   });
 });
 

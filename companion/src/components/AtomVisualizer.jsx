@@ -20,7 +20,7 @@ export default function AtomVisualizer({ element, compact = false, initialViewMo
   return (
     <div className="rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Atom className="w-4 h-4 text-[#4f9dff]" />
           <h3 className="text-xs sm:text-sm font-bold text-white">
             Electron Shells &amp; Subshells

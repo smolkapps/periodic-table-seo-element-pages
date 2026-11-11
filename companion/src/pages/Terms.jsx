@@ -7,7 +7,7 @@ const SECTIONS = [
   {
     title: "Educational use",
     paragraphs: [
-      "Elementa is a study aid for learning the periodic table. It is provided free for personal, classroom, and non-commercial educational use.",
+      "Elementa is a study aid for learning the periodic table. It is free to use. Source-code reuse is governed by the project’s MIT license at github.com/smolkapps/periodic-table-seo-element-pages/blob/main/LICENSE.",
       "The app is not a substitute for a textbook, a lab manual, a teacher, or official exam materials. Always confirm values that matter for an assignment, experiment, or safety decision against a primary reference.",
     ],
   },
@@ -30,7 +30,7 @@ const SECTIONS = [
     title: "Acceptable use",
     paragraphs: [
       "Do not present Elementa as an official source, misrepresent its data as certified measurements, or redistribute modified copies in a way that implies endorsement by IUPAC, NIST, PubChem, the Royal Society of Chemistry, or Smolk Apps.",
-      "Bulk automated scraping, resale of the app, and attempts to disrupt the service are not permitted.",
+      "The MIT license governs reuse of the source code. Linked reference material and the credited third-party video retain their owners’ terms. Do not disrupt the hosted service.",
     ],
   },
   {
@@ -56,7 +56,7 @@ export default function Terms() {
         <header className="space-y-2 border-b border-[#242c38] pb-5">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Terms of Use</h1>
           <p className="text-sm text-[#aeb8c4]">
-            The terms that apply when you use Elementa. Last updated November 2025.
+            The terms that apply when you use Elementa. Last updated November 11, 2026.
           </p>
         </header>
 
@@ -88,6 +88,10 @@ export default function Terms() {
             . See also the{" "}
             <Link to="/privacy" className="text-[#7bb6ff] hover:underline">
               Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link to="/about" className="text-[#7bb6ff] hover:underline">
+              About Elementa
             </Link>
             . © 2025 Smolk Apps.
           </p>

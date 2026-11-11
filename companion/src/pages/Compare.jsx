@@ -28,15 +28,6 @@ export default function Compare() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [copiedUrl, setCopiedUrl] = useState("");
 
-  const readIdsFromLocation = () => {
-    const routerIds = searchParams.get("ids");
-    if (routerIds) return routerIds;
-    if (typeof window !== "undefined" && window.location.search) {
-      return new URLSearchParams(window.location.search).get("ids");
-    }
-    return null;
-  };
-
   const computeSlotsFromParam = (idsParam) => {
     if (!idsParam) return [...DEFAULT_COMPARE_SLUGS];
     const resolved = resolveComparisonSlugs(idsParam.split(","));
@@ -46,15 +37,19 @@ export default function Compare() {
     return Array.from({ length: MAX_COMPARE }, (_, i) => (i < resolved.length ? resolved[i].slug : ""));
   };
 
-  const [slots, setSlots] = useState(() => computeSlotsFromParam(readIdsFromLocation()));
+  const effectiveIdsParam =
+    searchParams.get("ids") ??
+    (typeof window !== "undefined" && window.location.search
+      ? new URLSearchParams(window.location.search).get("ids")
+      : null);
 
-  // Sync slots when ?ids= query param changes via navigation
-  const urlIdsParam = searchParams.get("ids");
+  const [slots, setSlots] = useState(() => computeSlotsFromParam(effectiveIdsParam));
+
+  // Sync slots unconditionally whenever URL changes, preventing stale slots
+  // on same-count navigation or navigating back to /compare (null)
   useEffect(() => {
-    if (urlIdsParam !== null) {
-      setSlots(computeSlotsFromParam(urlIdsParam));
-    }
-  }, [urlIdsParam]);
+    setSlots(computeSlotsFromParam(effectiveIdsParam));
+  }, [effectiveIdsParam]);
 
   const chosenSlugs = useMemo(() => slots.filter((s) => s && s.length > 0), [slots]);
   const distinctChosenCount = useMemo(() => new Set(chosenSlugs.map((s) => s.toLowerCase())).size, [chosenSlugs]);
@@ -67,10 +62,15 @@ export default function Compare() {
   }, [chosenSlugs, distinctChosenCount]);
 
   const syncUrlToSelection = (nextSlots) => {
-    const valid = resolveComparisonSlugs(nextSlots.filter(Boolean));
-    if (valid.length >= MIN_COMPARE) {
-      const ids = valid.map((e) => e.slug).join(",");
-      setSearchParams({ ids }, { replace: true });
+    const nonEmpty = nextSlots.filter(Boolean);
+    const uniqueCount = new Set(nonEmpty.map((s) => s.toLowerCase())).size;
+    // Only write to URL when all selected non-empty slots are distinct
+    if (uniqueCount >= MIN_COMPARE && uniqueCount === nonEmpty.length) {
+      const valid = resolveComparisonSlugs(nonEmpty);
+      if (valid.length >= MIN_COMPARE) {
+        const ids = valid.map((e) => e.slug).join(",");
+        setSearchParams({ ids }, { replace: true });
+      }
     }
   };
 

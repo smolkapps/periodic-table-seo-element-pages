@@ -3,9 +3,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AtomVisualizer from "@/components/AtomVisualizer";
+import DailyElementSpotlight from "@/components/DailyElementSpotlight";
 import {
   ELEMENTS,
   CATEGORY_META,
+  ELEMENT_SEARCH_ALIASES,
   categoryLabel,
   formatMass,
   buildArticle,
@@ -14,7 +16,7 @@ import {
   isNavKey,
   nextCellIndex,
   firstVisibleIndex,
-  } from "@/data/elementsData";
+} from "@/data/elementsData";
 import { useStudyProgress } from "@/lib/studyStore";
 import {
   Search,
@@ -122,7 +124,9 @@ export default function Home() {
     if (!container) return;
     const maxScroll = container.scrollWidth - container.clientWidth;
     const targetLeft = position === "start" ? 0 : position === "center" ? maxScroll * 0.45 : maxScroll;
-    container.scrollTo({ left: targetLeft, behavior: "smooth" });
+    const prefersReducedMotion =
+      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    container.scrollTo({ left: targetLeft, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
 
   const showToast = (msg) => {
@@ -135,12 +139,13 @@ export default function Home() {
     showToast(added ? `Saved ${slug} to study deck` : `Removed ${slug} from study deck`);
   };
 
-  // Filter logic matching canonical table-ui.ts + category/phase filters
+  // Filter logic matching canonical table-ui.ts + category/phase filters + US/UK spelling aliases
   const filteredFlags = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return ELEMENTS.map((el) => {
       const catText = CATEGORY_META[el.category].label.toLowerCase();
-      const hay = `${el.name} ${el.symbol} ${el.number} ${catText} ${el.electronConfig}`.toLowerCase();
+      const alias = ELEMENT_SEARCH_ALIASES[el.slug] || "";
+      const hay = `${el.name} ${alias} ${el.symbol} ${el.number} ${catText} ${el.electronConfig}`.toLowerCase();
       const matchesQuery = q.length === 0 || hay.includes(q);
       const matchesCat = selectedCategory === "all" || el.category === selectedCategory;
       const matchesPhase = selectedPhase === "all" || el.phase === selectedPhase;
@@ -238,6 +243,13 @@ export default function Home() {
 
       {/* Main Content */}
       <main id="main" className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Daily Spotlight Micro-Discovery */}
+        <DailyElementSpotlight
+          savedSlugs={savedSlugs}
+          onToggleSave={toggleSaveElement}
+          onInspectElement={openDrawer}
+        />
+
         {/* Hero + Journey Ribbon */}
         <section className="rounded-xl bg-gradient-to-br from-[#141a24] via-[#11161f] to-[#0d1118] border border-[#242c38] p-4 sm:p-6 shadow-lg">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -271,11 +283,11 @@ export default function Home() {
                 <span className="text-xs font-semibold text-white mt-0.5 block">Fe vs Au vs O →</span>
               </Link>
               <Link
-                to="/practice?focus=trends"
+                to="/practice?focus=trends&count=5"
                 className="p-2.5 rounded-lg bg-[#1a2230] hover:bg-[#222c3d] border border-[#2c374b] text-left transition-all"
               >
                 <span className="text-[10px] font-mono uppercase text-[#69db7c] block">3. Practice</span>
-                <span className="text-xs font-semibold text-white mt-0.5 block">Quick Quiz →</span>
+                <span className="text-xs font-semibold text-white mt-0.5 block">Start a 5-Question Quiz →</span>
               </Link>
               <Link
                 to="/saved"
@@ -494,7 +506,7 @@ export default function Home() {
                         ? "#253042"
                         : "#181f29",
                   }}
-                  className={`pt-cell js-cell relative flex flex-col justify-between p-1.5 rounded-[5px] border border-[#2a323d] border-l-[4px] text-left no-underline transition-transform duration-100 hover:-translate-y-0.5 hover:border-[#4f9dff] hover:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4f9dff] ${
+                  className={`pt-cell js-cell relative flex flex-col justify-between p-1.5 rounded-[5px] border border-[#2a323d] border-l-[4px] text-left no-underline transition-transform duration-100 motion-reduce:transition-none hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 hover:border-[#4f9dff] hover:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4f9dff] ${
                     isSelected ? "ring-2 ring-[#4f9dff] z-10" : ""
                   }`}
                 >
@@ -583,11 +595,11 @@ export default function Home() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="panel-title"
-            className="relative z-10 w-full max-w-xl bg-[#131822] border-l border-[#2a323d] h-full flex flex-col shadow-2xl overflow-hidden"
+            className="relative z-10 w-full min-w-0 max-w-xl bg-[#131822] border-l border-[#2a323d] h-full flex flex-col shadow-2xl overflow-hidden"
             style={{ borderTop: `5px solid ${CATEGORY_META[drawerElement.category].hex}` }}
           >
             {/* Drawer Header — controls on the RIGHT per canonical spec */}
-            <div className="p-4 sm:p-5 border-b border-[#242c38] flex items-start justify-between gap-3 bg-[#161c27]">
+            <div className="p-4 sm:p-5 border-b border-[#242c38] flex flex-wrap items-start justify-between gap-3 bg-[#161c27]">
               <div className="flex items-center gap-3.5">
                 <div
                   className="w-14 h-14 rounded-lg bg-[#1c232d] border border-[#2a323d] border-l-4 flex flex-col items-center justify-center shrink-0"

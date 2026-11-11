@@ -335,13 +335,510 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
       assert.doesNotMatch(opt.label, /Period \d/, "Option labels must not leak the target Period");
     }
 
-    // 5. Keyboard grid navigation moves across Period 4 and down Group 18 accurately
+    // 5. Multi-pass 10- and 20-question quizzes across Easy, Standard, and Hard keep every (target, concept) pair strictly unique and cap honestly on small scopes
+    const fivePool = ["fluorine", "oxygen", "caesium", "helium", "iron"].map((s) => getElementBySlug(s));
+    for (const diff of ["easy", "standard", "hard"]) {
+      for (const mode of ["trends", "all", "deck", "compare"]) {
+        const q20 = buildDeterministicQuiz(fivePool, 20, mode, diff);
+        assert.equal(q20.length, 20, `5-element pool supports 20 unique questions in ${mode}/${diff}`);
+        assert.equal(
+          new Set(q20.map((q) => `${q.target.slug}:${q.concept}`)).size,
+          20,
+          `Zero duplicate (target, concept) pairs in ${mode}/${diff}`
+        );
+      }
+      // Honest shorter totals when 10 or 20 questions are requested on a 2-element comparison (max 8 unique concepts)
+      const shortCompare = buildDeterministicQuiz(twoComparePool, 20, "compare", diff);
+      assert.equal(shortCompare.length, 8);
+      assert.deepEqual(new Set(shortCompare.map((q) => q.target.slug)), new Set(["copper", "silver"]));
+    }
+
+    // 6. Keyboard grid navigation moves across Period 4 and down Group 18 accurately
     const cells = ELEMENTS.map((el) => ({ x: el.xpos, y: el.ypos, hidden: false }));
     const heliumIdx = 1; // He (18, 1)
     const neonIdx = nextCellIndex(cells, heliumIdx, "ArrowDown");
     assert.equal(ELEMENTS[neonIdx].symbol, "Ne");
     const oganessonIdx = nextCellIndex(cells, heliumIdx, "End");
     assert.equal(ELEMENTS[oganessonIdx].symbol, "Og");
+  });
+
+  it("updates Compare slots cleanly on same-count 2- and 3-element URL changes without retaining stale slots", () => {
+    const source = fs.readFileSync(path.resolve("src/pages/Compare.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    const effectDeps = [];
+    let pendingEffects = [];
+    let hookCursor = 0;
+    let currentSearch = "ids=copper,silver";
+
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+        const setState = (u) => {
+          hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+        };
+        return [hookStates[idx], setState];
+      },
+      useMemo: (factory) => {
+        hookCursor++;
+        return factory();
+      },
+      useEffect: (fn, deps) => {
+        const idx = hookCursor++;
+        const prev = effectDeps[idx];
+        const changed = !prev || !deps || deps.some((d, i) => !Object.is(d, prev[i]));
+        if (changed) {
+          effectDeps[idx] = deps;
+          pendingEffects.push(fn);
+        }
+      },
+    };
+    fakeReact.default = fakeReact;
+
+    const fakeRouter = {
+      Link: "Link",
+      useSearchParams: () => [
+        new URLSearchParams(currentSearch),
+        (nextObj) => {
+          currentSearch = new URLSearchParams(nextObj).toString();
+        },
+      ],
+    };
+
+    const cjsModule = { exports: {} };
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "react-router-dom") return fakeRouter;
+      if (id === "@/components/Navbar") return { default: () => null };
+      if (id === "@/components/Footer") return { default: () => null };
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "lucide-react") return { Share2: "i", BrainCircuit: "i", Sparkles: "i", Check: "i" };
+      throw new Error(`Unexpected import in Compare: ${id}`);
+    };
+    new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const Compare = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+
+    const renderAndFlush = () => {
+      let tree;
+      for (let pass = 0; pass < 3; pass++) {
+        hookCursor = 0;
+        pendingEffects = [];
+        tree = Compare({});
+        if (pendingEffects.length === 0) break;
+        for (const eff of pendingEffects) eff();
+      }
+      return tree;
+    };
+
+    const getSelectValues = (tree) => findNodes(tree, (n) => n.type === "select").map((s) => s.props.value);
+
+    // Initial 2-element URL (?ids=copper,silver)
+    let tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["copper", "silver", ""]);
+
+    // Same-count 2-element URL change (?ids=lithium,sodium) must update slots without stale copper/silver
+    currentSearch = "ids=lithium,sodium";
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["lithium", "sodium", ""]);
+
+    // 3-element URL change (?ids=iron,gold,oxygen) -> same-count 3-element URL change (?ids=carbon,nitrogen,oxygen) -> back
+    currentSearch = "ids=iron,gold,oxygen";
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["iron", "gold", "oxygen"]);
+
+    // User edits Slot 1 via select dropdown to copper -> ?ids=copper,gold,oxygen
+    const selects = findNodes(tree, (n) => n.type === "select");
+    selects[0].props.onChange({ target: { value: "copper" } });
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["copper", "gold", "oxygen"]);
+    assert.equal(new URLSearchParams(currentSearch).get("ids"), "copper,gold,oxygen");
+
+    // External same-count URL change to carbon,nitrogen,oxygen and then back to copper,gold,oxygen
+    currentSearch = "ids=carbon,nitrogen,oxygen";
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["carbon", "nitrogen", "oxygen"]);
+
+    currentSearch = "ids=copper,gold,oxygen";
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["copper", "gold", "oxygen"]);
+
+    // Navigating to bare /compare (empty search) resets to default trio
+    currentSearch = "";
+    tree = renderAndFlush();
+    assert.deepEqual(getSelectValues(tree), ["iron", "gold", "oxygen"]);
+  });
+
+  it("starts a real quiz immediately on empty deck, resets rounds when settings change, and preserves settings/scores/missed elements across reload", () => {
+    const source = fs.readFileSync(path.resolve("src/pages/Practice.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const storage = createMemoryStorage();
+    // Pre-seed prior progress (note + mastered element) to ensure quiz changes never corrupt it
+    writeProgress(
+      {
+        savedSlugs: [],
+        masteryMap: { helium: { attempts: 2, correct: 2, mastered: true, lastPracticed: "2025-11-01" } },
+        notesMap: { helium: "Inert 1s2 shell." },
+        quizHistory: [],
+      },
+      storage
+    );
+
+    const quizPrefsMod = {
+      readQuizPrefs: () => {
+        const raw = storage.getItem("elementa_quiz_prefs_v1");
+        return raw ? JSON.parse(raw) : { mode: null, difficulty: "standard", count: 5 };
+      },
+      writeQuizPrefs: (prefs) => {
+        storage.setItem("elementa_quiz_prefs_v1", JSON.stringify(prefs));
+        return { ok: true, prefs };
+      },
+    };
+
+    let currentSearch = "";
+    let progressState = readProgress(storage).progress;
+
+    const mountPractice = () => {
+      const hookStates = [];
+      const effectDeps = [];
+      const refs = [];
+      let pendingEffects = [];
+      let hookCursor = 0;
+
+      const fakeReact = {
+        Fragment: Symbol("Fragment"),
+        createElement: (type, props, ...children) => ({
+          type,
+          props: { ...(props || {}), children: children.flat() },
+        }),
+        useState: (init) => {
+          const idx = hookCursor++;
+          if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+          const setState = (u) => {
+            hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+          };
+          return [hookStates[idx], setState];
+        },
+        useMemo: (factory) => {
+          hookCursor++;
+          return factory();
+        },
+        useRef: (initial) => {
+          const idx = hookCursor++;
+          if (!(idx in refs)) refs[idx] = { current: initial };
+          return refs[idx];
+        },
+        useEffect: (fn, deps) => {
+          const idx = hookCursor++;
+          const prev = effectDeps[idx];
+          const changed = !prev || !deps || deps.some((d, i) => !Object.is(d, prev[i]));
+          if (changed) {
+            effectDeps[idx] = deps;
+            pendingEffects.push(fn);
+          }
+        },
+      };
+      fakeReact.default = fakeReact;
+
+      const fakeRouter = {
+        Link: "Link",
+        useSearchParams: () => [
+          new URLSearchParams(currentSearch),
+          (nextParams) => {
+            currentSearch = new URLSearchParams(nextParams).toString();
+          },
+        ],
+      };
+
+      const fakeStudyStore = {
+        useStudyProgress: () => ({
+          savedSlugs: progressState.savedSlugs,
+          masteryMap: progressState.masteryMap,
+          notesMap: progressState.notesMap,
+          quizHistory: progressState.quizHistory,
+          toggleSavedSlug: () => false,
+          recordQuizResult: ({ mode, score, total, perElementResults }) => {
+            const missedSlugs = perElementResults.filter((r) => !r.isCorrect).map((r) => r.slug);
+            const session = {
+              id: "quiz-live",
+              mode,
+              score,
+              total,
+              accuracy: Math.round((score / total) * 100),
+              date: "2025-11-11",
+              missedSlugs,
+            };
+            progressState = {
+              ...progressState,
+              savedSlugs: Array.from(new Set([...progressState.savedSlugs, ...missedSlugs])),
+              quizHistory: [session, ...progressState.quizHistory],
+            };
+            writeProgress(progressState, storage);
+            return session;
+          },
+        }),
+      };
+
+      const cjsModule = { exports: {} };
+      const customRequire = (id) => {
+        if (id === "react") return fakeReact;
+        if (id === "react-router-dom") return fakeRouter;
+        if (id === "@/components/Navbar") return { default: () => null };
+        if (id === "@/components/Footer") return { default: () => null };
+        if (id === "@/data/elementsData") return elementsDataModule;
+        if (id === "@/lib/studyStore") return fakeStudyStore;
+        if (id === "@/lib/quizPreferences") return quizPrefsMod;
+        if (id === "lucide-react") {
+          return {
+            BrainCircuit: "i",
+            CheckCircle2: "i",
+            XCircle: "i",
+            RotateCcw: "i",
+            BookmarkCheck: "i",
+            Printer: "i",
+            ArrowRight: "i",
+            Award: "i",
+          };
+        }
+        throw new Error(`Unexpected import in Practice: ${id}`);
+      };
+      new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+      const Practice = cjsModule.exports.default;
+
+      const render = () => {
+        let tree;
+        for (let pass = 0; pass < 3; pass++) {
+          hookCursor = 0;
+          pendingEffects = [];
+          tree = Practice({});
+          if (pendingEffects.length === 0) break;
+          for (const eff of pendingEffects) eff();
+        }
+        return tree;
+      };
+      return { render };
+    };
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    // 1. Fresh empty-deck visit to /practice immediately renders Question 1 of 5 (not empty-deck wall)
+    const app1 = mountPractice();
+    let tree = app1.render();
+    assert.equal(findNodes(tree, (n) => n.props?.["data-testid"] === "empty-study-deck-notice").length, 0);
+    assert.match(textOf(tree), /Question 1 of 5/);
+
+    // 2. Answer Q1 and advance to Q2, then switch settings to Hard + 10 Qs -> round resets consistently to Question 1 of 10
+    const getAnswerButtons = (t) =>
+      findNodes(t, (n) => n.type === "button" && typeof n.props?.className === "string" && n.props.className.includes("w-full p-3.5"));
+    getAnswerButtons(tree)[0].props.onClick();
+    tree = app1.render();
+    const nextBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Next Question"))[0];
+    nextBtn.props.onClick();
+    tree = app1.render();
+    assert.match(textOf(tree), /Question 2 of 5/);
+
+    const hardBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).startsWith("Hard"))[0];
+    hardBtn.props.onClick();
+    tree = app1.render();
+    assert.match(textOf(tree), /Question 1 of 5/, "Changing difficulty mid-round resets back to Question 1");
+
+    const tenBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).trim() === "10 Qs")[0];
+    tenBtn.props.onClick();
+    tree = app1.render();
+    assert.match(textOf(tree), /Question 1 of 10/, "Changing question count updates round length to 10");
+
+    // 3. Switch back to 5 Qs on Hard and complete all 5 questions (4 right, 1 wrong)
+    const fiveBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).trim() === "5 Qs")[0];
+    fiveBtn.props.onClick();
+    tree = app1.render();
+
+    const expectedQuestions = buildDeterministicQuiz(
+      [
+        "gold", "platinum", "molybdenum", "niobium", "ruthenium", "rhodium", "lanthanum", "cerium",
+        "gadolinium", "uranium", "iron", "cobalt", "nickel", "vanadium", "manganese", "titanium",
+        "chromium", "copper", "palladium", "silver",
+      ].map((s) => getElementBySlug(s)),
+      5,
+      "trends",
+      "hard"
+    );
+
+    for (let i = 0; i < 5; i++) {
+      const q = expectedQuestions[i];
+      const pickSlug = i === 0 ? q.options.find((o) => o.slug !== q.correctSlug).slug : q.correctSlug;
+      const ansBtns = getAnswerButtons(tree);
+      const chosenIndex = q.options.findIndex((o) => o.slug === pickSlug);
+      ansBtns[chosenIndex].props.onClick();
+      tree = app1.render();
+      const proceed = findNodes(
+        tree,
+        (n) => n.type === "button" && (textOf(n).includes("Next Question") || textOf(n).includes("Finish & Save Progress"))
+      )[0];
+      proceed.props.onClick();
+      tree = app1.render();
+    }
+    assert.match(textOf(tree), /You scored 4 \/ 5 \(80%\)/);
+
+    // 4. Simulate full browser reload (even with bare search "") -> preserves Hard setting, missed element in deck, score, and prior notes/mastery
+    currentSearch = "";
+    progressState = readProgress(storage).progress;
+    const appReloaded = mountPractice();
+    const reloadedTree = appReloaded.render();
+    const hardBtnReloaded = findNodes(reloadedTree, (n) => n.type === "button" && textOf(n).startsWith("Hard"))[0];
+    assert.equal(hardBtnReloaded.props["aria-pressed"], true, "Chosen Hard difficulty persists across reload");
+    assert.deepEqual(progressState.savedSlugs, ["gold"], "Missed element (gold) was saved to study deck");
+    assert.equal(progressState.quizHistory[0].score, 4);
+    assert.equal(progressState.notesMap.helium, "Inert 1s2 shell.", "Prior study notes remain uncorrupted");
+    assert.equal(progressState.masteryMap.helium.mastered, true, "Prior mastery remains uncorrupted");
+  });
+
+  it("exercises DailyElementSpotlight clue -> neighbor guess -> feedback -> inspect/save -> next clue flow", () => {
+    const source = fs.readFileSync(path.resolve("src/components/DailyElementSpotlight.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    let hookCursor = 0;
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+        const setState = (u) => {
+          hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+        };
+        return [hookStates[idx], setState];
+      },
+      useRef: (initial) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = { current: initial };
+        return hookStates[idx];
+      },
+      useEffect: () => {},
+      useMemo: (fn) => {
+        hookCursor++;
+        return fn();
+      },
+    };
+    fakeReact.default = fakeReact;
+
+    const cjsModule = { exports: {} };
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "react-router-dom") return { Link: "Link" };
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "lucide-react") {
+        return { Sparkles: "i", Eye: "i", BookmarkCheck: "i", ArrowLeftRight: "i", Shuffle: "i", CheckCircle2: "i" };
+      }
+      throw new Error(`Unexpected import in DailyElementSpotlight: ${id}`);
+    };
+    new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const DailyElementSpotlight = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    let inspectedSlug = null;
+    let savedSlug = null;
+    const render = (saved = []) => {
+      hookCursor = 0;
+      return DailyElementSpotlight({
+        savedSlugs: saved,
+        onInspectElement: (s) => {
+          inspectedSlug = s;
+        },
+        onToggleSave: (s) => {
+          savedSlug = s;
+        },
+      });
+    };
+
+    // 1. Renders Daily Element Clue with 4 guess buttons + Reveal button
+    let tree = render();
+    assert.match(textOf(tree), /Daily Element Clue/);
+    const guessGroup = findNodes(tree, (n) => n.props?.role === "group")[0];
+    const buttons = findNodes(guessGroup, (n) => n.type === "button");
+    assert.equal(buttons.length, 5, "4 element options + 1 Reveal button");
+
+    // 2. Pick the first element option -> resolves clue with polite status feedback + Inspect/Save/Next Clue actions
+    buttons[0].props.onClick();
+    tree = render();
+    const statusBox = findNodes(tree, (n) => n.props?.role === "status")[0];
+    assert.ok(statusBox, "Feedback region rendered with role=status");
+
+    const inspectBtn = findNodes(statusBox, (n) => n.type === "button" && textOf(n).includes("Inspect Atom"))[0];
+    inspectBtn.props.onClick({ currentTarget: null });
+    assert.ok(inspectedSlug && getElementBySlug(inspectedSlug), "Inspect Atom opens target element in drawer");
+
+    const saveBtn = findNodes(statusBox, (n) => n.type === "button" && textOf(n).includes("Save"))[0];
+    saveBtn.props.onClick();
+    assert.equal(savedSlug, inspectedSlug, "Save button toggles target element in study deck");
+
+    // 3. Next Clue advances to Element Clue #2 with a fresh unresolved element
+    const nextClueBtn = findNodes(statusBox, (n) => n.type === "button" && textOf(n).includes("Next Clue"))[0];
+    nextClueBtn.props.onClick();
+    tree = render();
+    assert.match(textOf(tree), /Element Clue #2/);
+    assert.equal(findNodes(tree, (n) => n.props?.role === "status").length, 0);
   });
 
   it("keeps AtomVisualizer persistent shell selection separate from transient hover across mouseenter, click, mouseleave, and keyboard/tap", () => {

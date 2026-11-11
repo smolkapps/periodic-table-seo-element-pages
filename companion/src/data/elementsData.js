@@ -483,13 +483,36 @@ export const ELEMENTS = Object.freeze(
   })
 );
 
+export const ELEMENT_SLUG_ALIASES = Object.freeze({
+  aluminum: "aluminium",
+  cesium: "caesium",
+  sulphur: "sulfur",
+});
+
+export const ELEMENT_SEARCH_ALIASES = Object.freeze({
+  aluminium: "aluminum",
+  caesium: "cesium",
+  sulfur: "sulphur",
+});
+
+export function resolveElementSlug(slug) {
+  if (!slug) return "";
+  const normalized = String(slug).trim().toLowerCase().replace(/^\/+|\/+$/g, "");
+  return ELEMENT_SLUG_ALIASES[normalized] || normalized;
+}
+
 const BY_SLUG = new Map(ELEMENTS.map((e) => [e.slug, e]));
 const BY_SYMBOL = new Map(ELEMENTS.map((e) => [e.symbol.toLowerCase(), e]));
 const BY_NUMBER = new Map(ELEMENTS.map((e) => [e.number, e]));
 
 export function getElementBySlug(slug) {
   if (!slug) return undefined;
-  return BY_SLUG.get(String(slug).trim().toLowerCase());
+  return BY_SLUG.get(resolveElementSlug(slug));
+}
+
+export function buildElementPageTitle(element) {
+  if (!element) return "Element not found — Elementa";
+  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz — Elementa`;
 }
 
 export function getElementBySymbol(symbol) {
@@ -758,12 +781,113 @@ export function resolveComparisonSlugs(slugs) {
   return out;
 }
 
+export const QUIZ_LENGTH_OPTIONS = Object.freeze([5, 10, 20]);
+export const QUIZ_DIFFICULTY_META = Object.freeze({
+  easy: {
+    id: "easy",
+    label: "Easy",
+    subtitle: "Symbols & Names",
+    description: "Identify chemical symbols, element names, atomic numbers, and periodic placement.",
+  },
+  standard: {
+    id: "standard",
+    label: "Standard",
+    subtitle: "Trends & Uses",
+    description: "Connect electronegativity, ionization energy, atomic radius, families, and real-world uses.",
+  },
+  hard: {
+    id: "hard",
+    label: "Hard",
+    subtitle: "Configurations & Exceptions",
+    description: "Master subshell configurations, outer vs. inner valence shells, and Aufbau exceptions (Cr, Cu, Pd, Au).",
+  },
+});
+
 function rotateQuizOptions(arr, shift) {
   const k = shift % arr.length;
   return [...arr.slice(k), ...arr.slice(0, k)];
 }
 
-export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
+export function getNeighborDistractors(target, shift = 0, extraFilter = null, symbolSimilarity = false) {
+  const targetNameInitial = target.name[0]?.toLowerCase() || "";
+  const targetSymInitial = target.symbol[0]?.toLowerCase() || "";
+
+  const candidates = ELEMENTS.filter((e) => {
+    if (e.slug === target.slug) return false;
+    if (extraFilter && !extraFilter(e)) return false;
+    return true;
+  });
+
+  // Sort by periodic proximity: atomic-number neighbours first, then same period/group/block
+  const scored = candidates
+    .map((e) => {
+      const zDiff = Math.abs(e.number - target.number);
+      const samePeriod = e.period === target.period ? 0 : 4;
+      const sameBlock = e.block === target.block ? 0 : 3;
+      const sameGroup = target.group !== null && e.group === target.group ? -2 : 0;
+      const letterBonus =
+        symbolSimilarity &&
+        (e.symbol[0]?.toLowerCase() === targetSymInitial ||
+          e.name[0]?.toLowerCase() === targetNameInitial ||
+          e.symbol[0]?.toLowerCase() === targetNameInitial)
+          ? -3
+          : 0;
+      return { el: e, score: zDiff + samePeriod + sameBlock + sameGroup + letterBonus };
+    })
+    .sort((a, b) => a.score - b.score || a.el.number - b.el.number);
+
+  const neighborWindow = scored.slice(0, Math.min(8, scored.length)).map((item) => item.el);
+  const picks = [];
+  for (let k = 0; k < neighborWindow.length && picks.length < 3; k++) {
+    const candidate = neighborWindow[(shift + k * 2) % neighborWindow.length];
+    if (candidate && !picks.some((p) => p.slug === candidate.slug)) {
+      picks.push(candidate);
+    }
+  }
+  for (const item of scored) {
+    if (picks.length >= 3) break;
+    if (!picks.some((p) => p.slug === item.el.slug)) {
+      picks.push(item.el);
+    }
+  }
+  return picks;
+}
+
+export function buildDailySpotlight(dateKey = "2025-11-01", offset = 0) {
+  const str = String(dateKey || "2025-11-01");
+  let hash = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  const baseIdx = Math.abs(hash) % ELEMENTS.length;
+  const stepOffset = Math.max(0, Math.floor(Number(offset) || 0));
+  // Multiply offset by 29 (coprime with 118) so cycling visits diverse families across the table
+  const target = ELEMENTS[(baseIdx + stepOffset * 29) % ELEMENTS.length];
+  const distractors = getNeighborDistractors(target, baseIdx + stepOffset);
+  const options = rotateQuizOptions([target, ...distractors], (baseIdx + stepOffset) % 4);
+
+  const trendBit =
+    target.electronegativity !== null
+      ? `Pauling EN ${target.electronegativity}`
+      : target.ionizationEnergy !== null
+      ? `1st ionization energy ${target.ionizationEnergy} kJ/mol`
+      : `${target.shells.length} occupied electron shells`;
+
+  // Redact any direct mention of the element's name or isotope symbol inside its highlight
+  const sanitizedHighlight = target.highlight
+    .replace(new RegExp(target.name, "gi"), "___")
+    .replace(new RegExp(`[⁰¹²³⁴⁵⁶⁷⁸⁹]+${target.symbol}\\b`, "g"), "a long-lived isotope")
+    .replace(new RegExp(`\\b${target.symbol}\\b`, "g"), "___");
+
+  const clue = `Known as ${sanitizedHighlight} — a ${categoryLabel(target.category).toLowerCase()} with ${
+    target.outerShellElectrons
+  } outer-shell e⁻ (${target.block}-block, ${trendBit}). Can you identify this element?`;
+
+  return { target, clue, options };
+}
+
+export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty = "standard") {
   if (!Array.isArray(pool) || pool.length === 0) return [];
 
   // Preserve the learner-selected target pool strictly without padding unrelated elements.
@@ -777,7 +901,15 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
   }
   if (uniqueTargets.length === 0) return [];
 
-  const conceptOrder = mode === "trends" ? [1, 0, 3, 2] : [0, 1, 2, 3];
+  const normDiff = difficulty === "easy" || difficulty === "hard" ? difficulty : "standard";
+  const conceptOrder =
+    normDiff === "easy"
+      ? [4, 5, 8, 2]
+      : normDiff === "hard"
+      ? [0, 6, 7, 10]
+      : mode === "trends" || mode === "all"
+      ? [1, 2, 3, 0]
+      : [0, 1, 2, 3];
   const conceptCount = conceptOrder.length;
   const requestedCount = Math.max(0, Number(count) || 0);
   const totalQuestions = Math.min(requestedCount, uniqueTargets.length * conceptCount);
@@ -787,14 +919,8 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
     const targetIndex = i % uniqueTargets.length;
     const pass = Math.floor(i / uniqueTargets.length);
     const target = uniqueTargets[targetIndex];
-    const distractors = ELEMENTS.filter(
-      (e) => e.slug !== target.slug && (e.period === target.period || e.category !== target.category)
-    ).slice((i * 7) % 50, (i * 7) % 50 + 3);
-
-    const qType =
-      mode === "trends" && uniqueTargets.length >= 5 && pass === 0
-        ? [1, 0, 3, 1, 2][i % 5]
-        : conceptOrder[(targetIndex + pass) % conceptCount];
+    const distractors = getNeighborDistractors(target, i, null, normDiff === "easy");
+    const qType = conceptOrder[(targetIndex + pass) % conceptCount];
 
     if (qType === 0) {
       const options = [target, ...distractors].map((el) => ({
@@ -805,6 +931,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
       questions.push({
         id: `q-${i}-${target.slug}-c${qType}`,
         concept: qType,
+        difficulty: normDiff,
         target,
         prompt: `Which ground-state electron configuration and principal shell occupancy belongs to ${target.name} (${target.symbol}, Z = ${target.number})?`,
         options: rotateQuizOptions(options, i),
@@ -815,11 +942,11 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
       const hasTrendData =
         target.electronegativity !== null || target.ionizationEnergy !== null || target.atomicRadius !== null;
       const trendDistractors = hasTrendData
-        ? ELEMENTS.filter(
-            (e) =>
-              e.slug !== target.slug &&
-              (e.electronegativity !== target.electronegativity || e.ionizationEnergy !== target.ionizationEnergy)
-          ).slice((i * 11) % 60, (i * 11) % 60 + 3)
+        ? getNeighborDistractors(
+            target,
+            i,
+            (e) => e.electronegativity !== target.electronegativity || e.ionizationEnergy !== target.ionizationEnergy
+          )
         : distractors;
 
       const options = [target, ...trendDistractors].map((el) => ({
@@ -841,6 +968,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
       questions.push({
         id: `q-${i}-${target.slug}-c${qType}`,
         concept: qType,
+        difficulty: normDiff,
         target,
         prompt,
         options: rotateQuizOptions(options, i),
@@ -855,11 +983,131 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
       questions.push({
         id: `q-${i}-${target.slug}-c${qType}`,
         concept: qType,
+        difficulty: normDiff,
         target,
         prompt: `Which element is ${target.highlight}?`,
         options: rotateQuizOptions(options, i),
         correctSlug: target.slug,
         explanation: `${target.name} (${target.symbol}, atomic number ${target.number}) is ${target.highlight}.`,
+      });
+    } else if (qType === 4) {
+      // Easy: Element Name -> Chemical Symbol
+      const options = [target, ...distractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.symbol}`,
+      }));
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt: `Which chemical symbol represents ${target.name} (Period ${target.period} ${categoryLabel(target.category).toLowerCase()})?`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `${target.name} is represented by the chemical symbol ${target.symbol} (atomic number Z = ${target.number}, Period ${target.period}).`,
+      });
+    } else if (qType === 5) {
+      // Easy: Chemical Symbol -> Element Name
+      const options = [target, ...distractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name}`,
+      }));
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt: `Which element is represented by the chemical symbol “${target.symbol}”?`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `The symbol ${target.symbol} stands for ${target.name} (atomic number Z = ${target.number}, ${categoryLabel(target.category).toLowerCase()} in Period ${target.period}).`,
+      });
+    } else if (qType === 8) {
+      // Easy: Atomic Number & Periodic Coordinates -> Name & Symbol
+      const nearDistractors = getNeighborDistractors(target, i, null, false);
+      const options = [target, ...nearDistractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name} (${el.symbol})`,
+      }));
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt: `Which element sits at atomic number Z = ${target.number} (${target.group !== null ? `Group ${target.group}` : "f-block"}, Period ${target.period})?`,
+        options: rotateQuizOptions(options, i + 1),
+        correctSlug: target.slug,
+        explanation: `Atomic number Z = ${target.number} belongs to ${target.name} (${target.symbol}), located in ${target.group !== null ? `Group ${target.group}` : "the f-block"}, Period ${target.period}.`,
+      });
+    } else if (qType === 6) {
+      // Hard: Ground-state electron configuration -> Element identity (without leaking Z in option labels)
+      const nearDistractors = getNeighborDistractors(target, i, null, false);
+      const options = [target, ...nearDistractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name} (${el.symbol})`,
+      }));
+      const aufbauHint = AUFBAU_NOTES[target.symbol]
+        ? " (Watch for subshell exchange or relativistic stabilization.)"
+        : "";
+      const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt: `Which neutral element has the ground-state electron configuration ${target.electronConfig}?${aufbauHint}`,
+        options: rotateQuizOptions(options, i),
+        correctSlug: target.slug,
+        explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has the ground-state configuration ${target.electronConfig} with shell distribution ${target.shells.join("·")}.${aufbauNote}`,
+      });
+    } else if (qType === 7) {
+      // Hard: Subshell / Aufbau shell occupancy -> Element identity (without leaking shell counts in options)
+      const nearDistractors = getNeighborDistractors(target, i + 1, null, false);
+      const options = [target, ...nearDistractors].map((el) => ({
+        slug: el.slug,
+        label: `${el.name} (${el.symbol}) — ${el.group !== null ? `Group ${el.group}` : "f-block"}`,
+      }));
+      const topSubs = target.subshells
+        .slice(-2)
+        .map((s) => `${s.label}^${s.count}`)
+        .join(" ");
+      const prompt = AUFBAU_NOTES[target.symbol]
+        ? `Due to subshell stabilization, which Period ${target.period} (${target.block}-block) element adopts an anomalous ground-state occupancy with ${target.outerShellElectrons} electron(s) in n = ${target.shells.length} and top subshells ${topSubs}?`
+        : `Which Period ${target.period} (${target.block}-block) element has principal shell occupancy ${target.shells.join("·")} and top subshells ${topSubs}?`;
+      const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt,
+        options: rotateQuizOptions(options, i + 1),
+        correctSlug: target.slug,
+        explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has ground-state configuration ${target.electronConfig} and shell occupancy ${target.shells.join("·")}.${aufbauNote}`,
+      });
+    } else if (qType === 10) {
+      // Hard: Element -> Highest subshells & outer-shell distribution against immediate Z neighbours
+      const nearDistractors = getNeighborDistractors(target, i + 2, null, false);
+      const options = [target, ...nearDistractors].map((el) => {
+        const subSummary = el.subshells
+          .slice(-2)
+          .map((s) => `${s.label}^${s.count}`)
+          .join(" ");
+        return {
+          slug: el.slug,
+          label: `${subSummary} — ${el.outerShellElectrons} outer-shell e⁻ in n = ${el.shells.length} (${el.shells.join("·")})`,
+        };
+      });
+      const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
+      questions.push({
+        id: `q-${i}-${target.slug}-c${qType}`,
+        concept: qType,
+        difficulty: normDiff,
+        target,
+        prompt: `For neutral ${target.name} (${target.symbol}, Z = ${target.number}), which option gives its displayed subshell occupancies and principal-shell occupancy?`,
+        options: rotateQuizOptions(options, i + 2),
+        correctSlug: target.slug,
+        explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has ground-state configuration ${target.electronConfig} across shells ${target.shells.join("·")}.${aufbauNote}`,
       });
     } else {
       const options = [target, ...distractors].map((el) => ({
@@ -874,6 +1122,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all") {
       questions.push({
         id: `q-${i}-${target.slug}-c${qType}`,
         concept: qType,
+        difficulty: normDiff,
         target,
         prompt: `Select the correct chemical family and outermost principal-shell electron count for atomic number Z = ${target.number}:`,
         options: rotateQuizOptions(options, i),
