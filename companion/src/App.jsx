@@ -10,6 +10,7 @@ import AllElements from './pages/AllElements';
 import Compare from './pages/Compare';
 import Practice from './pages/Practice';
 import SavedProgress from './pages/SavedProgress';
+import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
       <Route path="/compare" element={<Compare />} />
       <Route path="/practice" element={<Practice />} />
       <Route path="/saved" element={<SavedProgress />} />
+      <Route path="/about" element={<About />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="*" element={<PageNotFound />} />
