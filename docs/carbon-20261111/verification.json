@@ -1,0 +1,262 @@
+{
+  "release": {
+    "status": "published",
+    "source_revision": "052d42996899d7f0cd27b276afd91a7bc2b18aa3",
+    "ci_run_id": "43122202075",
+    "backup": "/var/backups/elementa-auto-20261111T234834Z-052d42996899",
+    "warnings": [],
+    "verified_at": "2026-11-11T23:48:34.787Z",
+    "origin": "https://elementalearn.com"
+  },
+  "journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "rounds": [
+        {
+          "level": "Easy",
+          "total": 5,
+          "score": 2,
+          "unique_prompts": 5,
+          "first_prompt": "Which chemical symbol represents Fluorine (Period 2 halogen)?"
+        },
+        {
+          "level": "Standard",
+          "total": 10,
+          "score": 3,
+          "unique_prompts": 10,
+          "first_prompt": "Which Period 2 element (Group 17) has a Pauling electronegativity of 3.98 and first ionization energy of 1681 kJ/mol?"
+        },
+        {
+          "level": "Hard",
+          "total": 20,
+          "score": 5,
+          "unique_prompts": 20,
+          "first_prompt": "Which ground-state electron configuration and principal shell occupancy belongs to Gold (Au, Z = 79)?"
+        }
+      ],
+      "focused_caps": [
+        4,
+        8
+      ],
+      "comparison_history": true,
+      "daily_save_inspect_next": true,
+      "policy_routes": true,
+      "page_errors": [],
+      "base44_requests": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "rounds": [
+        {
+          "level": "Easy",
+          "total": 5,
+          "score": 2,
+          "unique_prompts": 5,
+          "first_prompt": "Which chemical symbol represents Fluorine (Period 2 halogen)?"
+        },
+        {
+          "level": "Standard",
+          "total": 10,
+          "score": 3,
+          "unique_prompts": 10,
+          "first_prompt": "Which Period 2 element (Group 17) has a Pauling electronegativity of 3.98 and first ionization energy of 1681 kJ/mol?"
+        },
+        {
+          "level": "Hard",
+          "total": 20,
+          "score": 5,
+          "unique_prompts": 20,
+          "first_prompt": "Which ground-state electron configuration and principal shell occupancy belongs to Gold (Au, Z = 79)?"
+        }
+      ],
+      "focused_caps": [
+        4,
+        8
+      ],
+      "comparison_history": true,
+      "daily_save_inspect_next": true,
+      "policy_routes": true,
+      "page_errors": [],
+      "base44_requests": []
+    }
+  ],
+  "offline_reload_and_history_preserved": true,
+  "keyboard_clue_focus_and_drawer_bounds": true,
+  "asset_readback": {
+    "revision": "052d42996899d7f0cd27b276afd91a7bc2b18aa3",
+    "run": "43122202075",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "hash": "96ce30f8b7e619051790b93e72b1a0a678ef44481b16f7ece5dd42b533bfeb4b",
+        "source_hash_matches": true,
+        "note": "Cloudflare may inject delivery/measurement markup; content and actual browser journeys checked separately"
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "hash": "03c4224b00b2323b560b898f5724efaa7f5aa96c2d82e6da3a12ab6ff08553ff",
+        "source_hash_matches": false,
+        "note": "Cloudflare may inject delivery/measurement markup; content and actual browser journeys checked separately"
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "hash": "7ee77868f528e0b6ad7dd0d776c0c65c84cb3ebfbabba6a268fc68eb94bcb344",
+        "source_hash_matches": false,
+        "note": "Cloudflare may inject delivery/measurement markup; content and actual browser journeys checked separately"
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "hash": "7b2946e23fd698bd0c4d41d2e09e7c9062629ae28cd13850180097f789ca97e2",
+        "source_hash_matches": false,
+        "note": "Cloudflare may inject delivery/measurement markup; content and actual browser journeys checked separately"
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "hash": "fc41d5fe7d9fade1f5921bfa851fc7b63348e8ea677968a78c7cfdfaa809d179",
+        "source_hash_matches": true,
+        "note": "Cloudflare may inject delivery/measurement markup; content and actual browser journeys checked separately"
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "hash": "7b620142e5c369fbea386f59613a10105d4a37707f628a26ea73a12c91207562",
+        "source_hash_matches": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "hash": "8c2ac230bf209752ff5eedc4b1d44183e036d5e86fbb03f46a40fc1c72c8f9f8",
+        "source_hash_matches": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "hash": "105cdf32380b5fd0f8db59ff47522a3997d068a10f24101b20c948035417eaaa",
+        "source_hash_matches": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "e3cbe4135eaba3722b822978db42eb9e0e604f9fce047386cd5651e4437532dd",
+        "source_hash_matches": true,
+        "width": 180,
+        "height": 180,
+        "alpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "f25802b406c3adf116002871ad0cc08715f6931d7769e43f1a541e43efac7391",
+        "source_hash_matches": true,
+        "width": 192,
+        "height": 192,
+        "alpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "bd31eb8dd321572a939ac4b5e18f8569d9dd7f899fd599b222d1accf4d79733c",
+        "source_hash_matches": true,
+        "width": 512,
+        "height": 512,
+        "alpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "8f324c4cbaf92ac238e64993fe3fc2604a4558827e8b584dee2ac6ce6ad1ac57",
+        "source_hash_matches": true,
+        "width": 180,
+        "height": 180,
+        "alpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "8e602c356c0b9fc016674c21e79a13b527bf1fd6f72dbecae934d68f2461a198",
+        "source_hash_matches": true,
+        "width": 192,
+        "height": 192,
+        "alpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "dcc0b9c8dea414cd230936b8157304f1dcd33ef980c5345f3888a86e8e959fe8",
+        "source_hash_matches": true,
+        "width": 512,
+        "height": 512,
+        "alpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "360c7df47ed6361fb496394804d284b48a24095383ed3c208bef540d789f077f",
+        "source_hash_matches": true,
+        "width": 512,
+        "height": 512,
+        "alpha": false
+      },
+      {
+        "path": "og-default.png",
+        "status": 200,
+        "mime": "image/png",
+        "hash": "26835aa7f13b70fb554ffc2d1f8a569cee9a19a7ed368e0219ee7c492ba5396d",
+        "source_hash_matches": false,
+        "revision_query_hash": "60360fcba4562ef3f970239307427bb6850c0314d8098e46541ad9c38457c00f",
+        "note": "Unversioned CDN serves prior unchanged branded OG; revision-query current bytes match",
+        "width": 1200,
+        "height": 630,
+        "alpha": true
+      },
+      {
+        "path": "study/assets/index-Cd2DiqnQ.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "hash": "349c05ecf7a640aca66e945e12383b5f496e321fa132ffb29925a1d2cbec9db9",
+        "source_hash_matches": true
+      },
+      {
+        "path": "study/assets/index-D0lerOpA.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "hash": "bbe05810e26439910e98bdd689a3da39d921f774fbc2527c9ea8564c8db8dd05",
+        "source_hash_matches": true
+      }
+    ]
+  },
+  "limits": [
+    "Responsive desktop/phone browser tests, not physical mobile/native certification",
+    "Study progress is local; no Base44 service requests observed",
+    "Unversioned CDN OG remains prior identical-brand rendering; current revision-query bytes match source manifest"
+  ]
+}
