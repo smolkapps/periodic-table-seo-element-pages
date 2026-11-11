@@ -1,5 +1,11 @@
 # Worklog
 
+## November 11, 2026 — Automatic checked website releases
+
+Michael explicitly requested continuing Gemini Carbon improvements and automatic publication after fixes. This bounded work owns release scripts/CI only, preserving the root reference, auth-free study deployment and separate tutor. Fresh main was01a295c; other worktrees were preserved. Existing CI is routed to hosted Ubuntu by a repository variable, so adding existing private-mesh SSH to the hosted runner would require new credentials. Chosen path: checked static artifact from main CI, existing-auth Studio LaunchAgent polls every3minutes, existing ctdsu SSH publishes it atomically after checksum/source checks. No new account, deployment key, host, service cost or inbound port.
+
+Prepared required root type check and strict lockfile install in CI, trusted-main-only artifact/identity inventory, stale-main checks, atomic full-directory exchange, public readback/rollback, task-owned3-snapshot retention and500MiB free-space gate. Historical snapshots and shared Caddy/security configuration remain untouched. CTDSU initial free space1.7GiB/site12MiB. Full type check0errors/0warnings/0hints, reference+studybuild,124HTML/2797link finishing guard,146root+32studytests/0failed/0skipped, study lint/typecheck passed. Focused5Node selection/integrity tests passed;7Python filesystem cases cover promotion, public-readback rollback, corruption, failed rollback preservation, disk pressure, scoped retention and backup-maintenance reporting. Linux disposable-/tmp replay uses actual renameat2 and never touches live website paths. Actual worker/next-main release verification remains pending; no installation/publication claimed yet.
+
 ## 2026-10-16 — Studio CI migration
 
 Goal: run CI on the local Mac Studio with a simple hosted rollback.
