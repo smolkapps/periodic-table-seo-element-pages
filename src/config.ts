@@ -8,7 +8,7 @@ export const SITE = {
   shortName: "Elementa",
   title: "Elementa — Periodic Table & Chemistry Practice",
   description:
-    "Learn all 118 chemical elements with readable reference pages, electron-shell and orbital views, comparisons and practice quizzes. Save your study notes and progress on your device.",
+    "Explore an interactive periodic table with all 118 elements, comparisons, electron shells and orbitals, quizzes, and printable chemistry worksheets.",
   author: "Michael Smolkin",
   authorUrl: "https://www.smolkin.org",
   /** Leave blank to omit the analytics beacon. */
