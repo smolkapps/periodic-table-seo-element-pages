@@ -424,6 +424,7 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
       if (id === "react-router-dom") return fakeRouter;
       if (id === "@/components/Navbar") return { default: () => null };
       if (id === "@/components/Footer") return { default: () => null };
+      if (id === "@/components/ComparisonVisualLens") return { default: () => null };
       if (id === "@/data/elementsData") return elementsDataModule;
       if (id === "lucide-react") return { Share2: "i", BrainCircuit: "i", Sparkles: "i", Check: "i" };
       throw new Error(`Unexpected import in Compare: ${id}`);
@@ -487,6 +488,112 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     currentSearch = "";
     tree = renderAndFlush();
     assert.deepEqual(getSelectValues(tree), ["iron", "gold", "oxygen"]);
+  });
+
+  it("renders proportional covalent radii, unestablished superheavy placeholders, and inline AtomVisualizer toggle in ComparisonVisualLens", () => {
+    const source = fs.readFileSync(path.resolve("src/components/ComparisonVisualLens.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    let hookCursor = 0;
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+        const setState = (u) => {
+          hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+        };
+        return [hookStates[idx], setState];
+      },
+      useMemo: (fn) => {
+        hookCursor++;
+        return fn();
+      },
+    };
+    fakeReact.default = fakeReact;
+
+    const AtomVisualizerStub = ({ element }) =>
+      fakeReact.createElement("div", { "data-testid": "inline-atom-visualizer", "data-slug": element.slug });
+
+    const cjsModule = { exports: {} };
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "@/components/AtomVisualizer") return { default: AtomVisualizerStub };
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "lucide-react") return { Atom: "i", TrendingUp: "i", X: "i" };
+      throw new Error(`Unexpected import in ComparisonVisualLens: ${id}`);
+    };
+    new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const ComparisonVisualLens = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    const render = (slugs) => {
+      hookCursor = 0;
+      return ComparisonVisualLens({ elements: resolveComparisonSlugs(slugs) });
+    };
+
+    // 1. Default trio (Fe 132 pm, Au 136 pm, O 66 pm): scaled SVG circles reflect exact covalent radius ratios
+    let tree = render(["iron", "gold", "oxygen"]);
+    const scaledCircles = findNodes(tree, (n) => n.props?.["data-scaled-radius"] !== undefined);
+    assert.equal(scaledCircles.length, 3);
+    const [rFe, rAu, rO] = scaledCircles.map((c) => c.props["data-scaled-radius"]);
+    assert.equal(rAu, 44, "Largest element (Au 136 pm) scales to full reference radius 44");
+    assert.ok(Math.abs(rFe / rAu - 132 / 136) < 0.01, "Fe circle radius matches 132/136 of Au");
+    assert.ok(Math.abs(rO / rAu - 66 / 136) < 0.01, "O circle radius matches 66/136 of Au");
+
+    // 2. Toggle inline shell/orbital inspector on Oxygen, then switch comparison to Li/Na/K -> unavailable O inspector hides (parent remount is verified in the browser)
+    const inspectBtns = findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Shells & Orbitals"));
+    assert.equal(inspectBtns.length, 3);
+    inspectBtns[2].props.onClick();
+    tree = render(["iron", "gold", "oxygen"]);
+    const viz = findNodes(tree, (n) => n.type === AtomVisualizerStub);
+    assert.equal(viz.length, 1);
+    assert.equal(viz[0].props.element.slug, "oxygen");
+
+    tree = render(["lithium", "sodium", "potassium"]);
+    assert.equal(
+      findNodes(tree, (n) => n.type === AtomVisualizerStub).length,
+      0,
+      "The unavailable inspected element is hidden; browser journeys verify keyed parent resets"
+    );
+
+    // 3. Comparing Oxygen with superheavy Oganesson (atomicRadius === null) renders only 1 scaled radius circle and honest 'Radius not established'
+    tree = render(["oxygen", "oganesson"]);
+    assert.equal(findNodes(tree, (n) => n.props?.["data-scaled-radius"] !== undefined).length, 1);
+    assert.match(textOf(tree), /Radius not established/);
+
+    // Synthetic metric values enforce a zero-baseline ratio: small values must not be inflated for decoration.
+    hookCursor = 0;
+    tree = ComparisonVisualLens({ elements: [
+      { ...getElementBySlug("hydrogen"), electronegativity: 0.01 },
+      { ...getElementBySlug("fluorine"), electronegativity: 4 },
+    ] });
+    const bars = findNodes(tree, (n) => n.props?.style?.width !== undefined);
+    assert.equal(parseFloat(bars[0].props.style.width), 0.25, "0.01/4 must occupy 0.25%, not a decorative minimum width");
   });
 
   it("starts a real quiz immediately on empty deck, resets rounds when settings change, and preserves settings/scores/missed elements across reload", () => {

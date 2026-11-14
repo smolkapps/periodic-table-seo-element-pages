@@ -11,6 +11,7 @@ import {
   buildArticle,
   buildComparison,
   buildElementContrastSummary,
+  buildPeriodicTrendInsight,
   buildDeterministicQuiz,
   buildDailySpotlight,
   AUFBAU_NOTES,
@@ -287,6 +288,28 @@ describe("Elementa article and comparison generation", () => {
       fallback.map((element) => element.slug),
       ["iron", "gold", "oxygen"]
     );
+  });
+
+  it("compares known reference values and keeps missing metrics separate from element identity", () => {
+    const insight = (slugs) => buildPeriodicTrendInsight(resolveComparisonSlugs(slugs));
+    const life = insight(["carbon", "nitrogen", "oxygen"]);
+    assert.match(life.headline, /Across Period 2/);
+    assert.match(life.body, /half-filled 2p³/);
+    assert.match(life.body, /1402\.3 kJ\/mol/);
+    assert.match(insight(["magnesium", "aluminium"]).body, /first p electron/);
+    assert.match(insight(["copper", "silver", "gold"]).body, /145 pm/);
+    assert.match(insight(["lithium", "sodium", "potassium"]).headline, /Down Group 1/);
+    const mixed = insight(["carbon", "oganesson"]);
+    assert.match(mixed.body, /Carbon has a reference covalent radius of 76 pm/);
+    assert.doesNotMatch(mixed.body, /radioactive|short.*half|superheavy set/);
+    assert.match(mixed.body, /not established in this dataset for Oganesson/);
+    const raOg = insight(["radium", "oganesson"]);
+    assert.match(raOg.body, /Radium has a reference covalent radius of 221 pm/);
+    assert.match(raOg.body, /for Oganesson/);
+    const unknown = insight(["rutherfordium", "oganesson"]);
+    assert.match(unknown.body, /not established in this dataset/);
+    assert.doesNotMatch(unknown.body, /null|undefined|NaN|radioactive/);
+    assert.equal(buildPeriodicTrendInsight([]), null);
   });
 
   it("builds canonical public elementalearn.com share URLs for elements and comparisons", () => {

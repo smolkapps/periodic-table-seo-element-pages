@@ -764,6 +764,62 @@ export function buildElementContrastSummary(element, peerElements = []) {
   return `In Period ${element.period} (${element.group !== null ? `Group ${element.group}` : "f-block"}, ${element.block}-block), ${element.name} has ${shellSummary} (${trendParts}). ${meta.reactivity} In practice, it is ${element.highlight}.`;
 }
 
+/** Compare the known reference values without inferring properties from missing data. */
+export function buildPeriodicTrendInsight(elements) {
+  if (!Array.isArray(elements) || elements.length < 2) return null;
+  const sorted = [...elements].sort((a, b) => a.number - b.number);
+  const first = sorted[0];
+  const samePeriod = sorted.every((e) => e.period === first.period);
+  const sameGroup = first.group !== null && sorted.every((e) => e.group === first.group);
+  const parts = [];
+  const known = (key) => sorted.filter((e) => Number.isFinite(e[key]));
+  const radii = known("atomicRadius").sort((a, b) => a.atomicRadius - b.atomicRadius);
+  const energies = known("ionizationEnergy").sort((a, b) => a.ionizationEnergy - b.ionizationEnergy);
+
+  if (radii.length >= 2) {
+    const small = radii[0];
+    const large = radii[radii.length - 1];
+    parts.push(large.atomicRadius > small.atomicRadius
+      ? `${large.name} (${large.atomicRadius} pm) has ${(large.atomicRadius / small.atomicRadius).toFixed(1)}× the reference covalent radius of ${small.name} (${small.atomicRadius} pm).`
+      : `The known covalent radii in this selection are equal at ${small.atomicRadius} pm.`);
+  } else if (radii.length === 1) {
+    parts.push(`${radii[0].name} has a reference covalent radius of ${radii[0].atomicRadius} pm.`);
+  }
+  const missingRadii = sorted.filter((e) => !Number.isFinite(e.atomicRadius));
+  if (missingRadii.length) parts.push(`Covalent radius is not established in this dataset for ${missingRadii.map((e) => e.name).join(", ")}.`);
+
+  if (energies.length >= 2) {
+    const low = energies[0];
+    const high = energies[energies.length - 1];
+    parts.push(high.ionizationEnergy > low.ionizationEnergy
+      ? `Among the known values here, ${high.name} requires more energy to remove the first electron (${high.ionizationEnergy} kJ/mol) than ${low.name} (${low.ionizationEnergy} kJ/mol).`
+      : `The known first ionization energies here are equal at ${low.ionizationEnergy} kJ/mol.`);
+  } else if (energies.length === 1) {
+    parts.push(`${energies[0].name}'s first ionization energy is ${energies[0].ionizationEnergy} kJ/mol.`);
+  }
+  const missingIE = sorted.filter((e) => !Number.isFinite(e.ionizationEnergy));
+  if (missingIE.length) parts.push(`First ionization energy is not established in this dataset for ${missingIE.map((e) => e.name).join(", ")}.`);
+
+  const nitrogen = sorted.find((e) => e.slug === "nitrogen");
+  const oxygen = sorted.find((e) => e.slug === "oxygen");
+  if (nitrogen && oxygen && nitrogen.ionizationEnergy > oxygen.ionizationEnergy) {
+    parts.push("Nitrogen's half-filled 2p³ subshell helps explain why its first ionization energy exceeds oxygen's: oxygen's 2p⁴ subshell has a paired set of electrons, whose repulsion makes one easier to remove.");
+  }
+  for (const [leftSlug, rightSlug] of [["beryllium", "boron"], ["magnesium", "aluminium"]]) {
+    const left = sorted.find((e) => e.slug === leftSlug);
+    const right = sorted.find((e) => e.slug === rightSlug);
+    if (left && right && left.ionizationEnergy > right.ionizationEnergy) {
+      parts.push(`${right.name}'s first p electron is easier to remove than an electron in ${left.name}'s filled s subshell; ionization energy does not simply rise at every step across a period.`);
+    }
+  }
+  return {
+    headline: samePeriod ? `Across Period ${first.period}: Compare the Reference Values`
+      : sameGroup ? `Down Group ${first.group}: Compare the Reference Values`
+      : `Cross-Table Contrast: ${sorted.map((e) => e.symbol).join(" · ")}`,
+    body: parts.join(" "),
+  };
+}
+
 export function resolveComparisonSlugs(slugs) {
   const seen = new Set();
   const out = [];
