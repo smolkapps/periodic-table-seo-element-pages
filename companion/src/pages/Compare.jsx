@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ComparisonVisualLens from "@/components/ComparisonVisualLens";
 import {
   ELEMENTS,
   CATEGORY_META,
@@ -229,6 +230,8 @@ export default function Compare() {
             </div>
           ) : (
             <div className="space-y-6">
+              <ComparisonVisualLens key={comparison.elements.map((el) => el.slug).join(",")} elements={comparison.elements} />
+
               <div className="rounded-xl bg-[#131822] border border-[#242c38] overflow-x-auto shadow-lg">
                 <div className="sm:hidden px-4 py-1.5 bg-[#161c27] border-b border-[#242c38] text-[11px] text-[#8b98a9]">
                   Swipe table horizontally to compare all columns →
