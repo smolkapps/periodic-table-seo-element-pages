@@ -1,0 +1,203 @@
+{
+  "release": {
+    "status": "published",
+    "source_revision": "08d1136b3c5cf650a4d39de0e2479585f3590a8d",
+    "ci_run_id": "43538291459",
+    "backup": "/var/backups/elementa-auto-20261114T010655Z-08d1136b3c5c",
+    "warnings": [],
+    "verified_at": "2026-11-14T01:06:55.836Z",
+    "origin": "https://elementalearn.com"
+  },
+  "model": {
+    "message_id": "de463ef3-721d-4875-bfe1-3a5ee447c8a8",
+    "created_date": "2026-11-14T00:40:42.318000",
+    "turn_manual_model_choice": "gemini_4_carbon",
+    "effort_level": "max",
+    "turn_reasoning_effort": {
+      "model": "vertex_ai/gemini-4-carbon",
+      "effort": "max"
+    },
+    "branch": "Main"
+  },
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "radius_ratios": [
+        42.71,
+        44,
+        21.35
+      ],
+      "keyboard_open_close_focus": true,
+      "stale_inspector_reintroduction": false,
+      "missing_known_and_unknown": true,
+      "url_history_share": true,
+      "scoped_quiz_total": 12,
+      "quiz_save_reload": true,
+      "offline_inspection": true,
+      "page_errors": [],
+      "base44_requests": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 758,
+        "overflow": false
+      },
+      "radius_ratios": [
+        42.71,
+        44,
+        21.35
+      ],
+      "keyboard_open_close_focus": true,
+      "stale_inspector_reintroduction": false,
+      "missing_known_and_unknown": true,
+      "url_history_share": true,
+      "scoped_quiz_total": 12,
+      "quiz_save_reload": true,
+      "offline_inspection": true,
+      "page_errors": [],
+      "base44_requests": []
+    }
+  ],
+  "assets": {
+    "revision": "08d1136b3c5cf650a4d39de0e2479585f3590a8d",
+    "run_id": "43538291459",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "source_hash_match": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/assets/index-BQP9pkQx.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/assets/index-BlSz5JdF.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "source_hash_match": true
+      }
+    ],
+    "missing_page_status": 404
+  },
+  "limits": [
+    "Responsive browser tests, not physical/native devices",
+    "Local phone viewport390x844; public phone viewport390x758 as actually observed",
+    "HTML is checked by content/journeys; delivery can transform markup",
+    "No observed Base44 requests; learner progress stays local"
+  ]
+}
