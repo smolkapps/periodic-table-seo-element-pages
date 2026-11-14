@@ -11,3 +11,9 @@ Validation before merge: 148 root tests, 40 study tests and seven atomic-promoti
 Fresh owner UI before the pass: 91.18/250 message and 24.3/10,000 integration credits used. After: 108.9/250 message and 24.3/10,000 integration used, leaving 141.1 message and 9,975.7 integration credits; billed usage increased about 17.72 message credits. No new provider, renewal, top-up, account, analytics, tutor/store/social publication or outreach. Tutor stays separate. The daily loop retains its 60-credit start threshold, 25-credit reserve and November 22 stop boundary.
 
 Public release verification is recorded in WORKLOG-CARBON.md after the ordinary checked-main publisher runs. Raw CLI/model/browser receipts remain owner-only under `~/.config/elementa-carbon-20261113/`; no credentials or private session values belong in Git.
+
+## Public release
+
+[PR18](https://github.com/smolkapps/periodic-table-seo-element-pages/pull/18) merged `08d1136b3c5cf650a4d39de0e2479585f3590a8d`. Successful [main CI43538291459](https://github.com/smolkapps/periodic-table-seo-element-pages/actions/runs/43538291459) produced artifact14090282588. The ordinary publication timer released it **November14 at01:06:55UTC** (November13 locally); no manual deploy or warnings. Public release.json matches the source/run and276-file inventory.
+
+Actual public desktop1365×900 and phone390×758 journeys pass; the local phone check used390×844. Seventeen asset/page readbacks verify both study bundles and all seven opaque home-screen PNGs; the custom404returns404. These checks establish the shipped behavior, not learning gains or customer usage. [Verification](verification.json) and [live comparison screenshot](live-comparison.png) preserve evidence. The daily task continues with141.1message credits remaining, fresh balance required before the next pass, no paid continuation.
