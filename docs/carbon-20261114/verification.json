@@ -1,0 +1,255 @@
+{
+  "publication": {
+    "status": "published",
+    "source_revision": "58c51065daf3a6e3639994ba4d02e5481e318c39",
+    "ci_run_id": "43661046031",
+    "backup": "/var/backups/elementa-auto-20261115T010247Z-58c51065daf3",
+    "warnings": [],
+    "verified_at": "2026-11-15T01:02:47.943Z",
+    "origin": "https://elementalearn.com"
+  },
+  "ci": {
+    "conclusion": "success",
+    "createdAt": "2026-11-15T01:01:13Z",
+    "event": "push",
+    "headSha": "58c51065daf3a6e3639994ba4d02e5481e318c39",
+    "status": "completed",
+    "updatedAt": "2026-11-15T01:01:53Z",
+    "url": "https://github.com/smolkapps/periodic-table-seo-element-pages/actions/runs/43661046031"
+  },
+  "artifact": {
+    "id": 14139154892,
+    "name": "elementa-site-58c51065daf3a6e3639994ba4d02e5481e318c39",
+    "size_in_bytes": 7849175,
+    "expired": false
+  },
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "review_answers_explanations_compare": true,
+      "summary_focus": true,
+      "new_sets_and_reload": true,
+      "one_and_two_missed_retry_caps": [
+        4,
+        8
+      ],
+      "completed_lengths": [
+        5,
+        5,
+        4,
+        10,
+        20,
+        8
+      ],
+      "levels": [
+        "Easy",
+        "Standard",
+        "Hard"
+      ],
+      "clean_sweep_level_cta": true,
+      "same_url_new_set_then_external_scope_reset": true,
+      "worksheet_next_set": true,
+      "saved_history_offline_reload": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "review_answers_explanations_compare": true,
+      "summary_focus": true,
+      "new_sets_and_reload": true,
+      "one_and_two_missed_retry_caps": [
+        4,
+        8
+      ],
+      "completed_lengths": [
+        5,
+        5,
+        4,
+        10,
+        20,
+        8
+      ],
+      "levels": [
+        "Easy",
+        "Standard",
+        "Hard"
+      ],
+      "clean_sweep_level_cta": true,
+      "same_url_new_set_then_external_scope_reset": true,
+      "worksheet_next_set": true,
+      "saved_history_offline_reload": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "revision": "58c51065daf3a6e3639994ba4d02e5481e318c39",
+    "run_id": "43661046031",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "source_hash_match": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/assets/index-Dplz1bOf.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/assets/index-Cxv1-X_6.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "source_hash_match": true
+      }
+    ],
+    "missing_page_status": 404
+  },
+  "root_tests": 148,
+  "study_tests": 41,
+  "promotion_fixture_tests": 7,
+  "skipped_tests": 0,
+  "physical_device_verified": false,
+  "notes": [
+    "Ordinary timer released successful current-main artifact; no manual deploy or kickstart.",
+    "Cloudflare beacon script requests aborted during navigation; no failed application requests or observed learner failures.",
+    "Responsive browser evidence; no customer usage, learning gains or physical-device certification claim."
+  ]
+}
