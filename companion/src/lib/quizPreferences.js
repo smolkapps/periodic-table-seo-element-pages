@@ -8,6 +8,7 @@ export const DEFAULT_QUIZ_PREFS = Object.freeze({
   mode: null,
   difficulty: "standard",
   count: 5,
+  nextRound: 0,
 });
 
 function getDefaultStorage() {
@@ -28,7 +29,8 @@ export function sanitizeQuizPrefs(raw) {
     typeof raw.difficulty === "string" && QUIZ_DIFFICULTY_META[raw.difficulty] ? raw.difficulty : "standard";
   const countNum = Number(raw.count);
   const count = QUIZ_LENGTH_OPTIONS.includes(countNum) ? countNum : 5;
-  return { mode, difficulty, count };
+  const nextRound = Number.isSafeInteger(raw.nextRound) && raw.nextRound >= 0 ? raw.nextRound : 0;
+  return { mode, difficulty, count, nextRound };
 }
 
 export function readQuizPrefs(storage = getDefaultStorage()) {

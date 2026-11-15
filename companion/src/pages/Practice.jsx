@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import QuizRoundReview from "@/components/QuizRoundReview";
 import {
   ELEMENTS,
   CATEGORY_META,
@@ -118,19 +119,34 @@ export default function Practice() {
   const [questionCount, setQuestionCount] = useState(() =>
     QUIZ_LENGTH_OPTIONS.includes(countParam) ? countParam : savedPrefs.count
   );
+  const [roundOffset, setRoundOffset] = useState(() =>
+    focusedElement || comparedElements.length > 0 ? 0 : savedPrefs.nextRound || 0
+  );
   const [deckSnapshotSlugs, setDeckSnapshotSlugs] = useState(() => [...savedSlugs]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [completedSession, setCompletedSession] = useState(null);
+  const [completedReview, setCompletedReview] = useState([]);
   const [showWorksheet, setShowWorksheet] = useState(false);
 
   const firstOptionRef = useRef(null);
   const nextButtonRef = useRef(null);
+  const summaryHeadingRef = useRef(null);
   const shouldFocusQuestionRef = useRef(false);
+  const internalUrlSyncRef = useRef(null);
+  const routeKey = JSON.stringify([focusParam, focusElementSlug, focusIdsParam, difficultyParam, countParam]);
+  const hasMountedRouteEffectRef = useRef(false);
 
-  // Sync quiz mode, difficulty, and count if route search params change.
+  // Sync quiz mode, difficulty, and count if external route search params change after mount.
   useEffect(() => {
+    if (!hasMountedRouteEffectRef.current) {
+      hasMountedRouteEffectRef.current = true;
+      return;
+    }
+    const isInternalSync = internalUrlSyncRef.current === routeKey;
+    internalUrlSyncRef.current = null;
+    if (isInternalSync) return;
     const fallbackGeneralMode =
       savedPrefs.mode === "deck" && savedSlugs.length === 0
         ? "trends"
@@ -151,10 +167,12 @@ export default function Practice() {
     if (QUIZ_LENGTH_OPTIONS.includes(countParam)) {
       setQuestionCount(countParam);
     }
+    setRoundOffset(0);
     setCurrentIdx(0);
     setSelectedOption(null);
     setAnswers([]);
     setCompletedSession(null);
+    setCompletedReview([]);
   }, [focusParam, focusElementSlug, focusIdsParam, difficultyParam, countParam]);
 
   // Keep deckSnapshotSlugs synced whenever not actively mid-question in deck mode.
@@ -195,26 +213,31 @@ export default function Practice() {
   }, [quizMode, difficulty, focusedElement, comparedElements, deckElements]);
 
   const questions = useMemo(
-    () => buildDeterministicQuiz(pool, questionCount, quizMode, difficulty),
-    [pool, questionCount, quizMode, difficulty]
+    () => buildDeterministicQuiz(pool, questionCount, quizMode, difficulty, roundOffset),
+    [pool, questionCount, quizMode, difficulty, roundOffset]
   );
   const safeCurrentIdx = currentIdx < questions.length ? currentIdx : 0;
   const currentQ = questions[safeCurrentIdx];
 
   useEffect(() => {
-    if (selectedOption !== null) {
+    if (completedSession) {
+      summaryHeadingRef.current?.focus();
+    } else if (selectedOption !== null) {
       nextButtonRef.current?.focus();
-    } else if (shouldFocusQuestionRef.current && currentQ && !showWorksheet && !completedSession) {
+    } else if (shouldFocusQuestionRef.current && currentQ && !showWorksheet) {
       shouldFocusQuestionRef.current = false;
       firstOptionRef.current?.focus();
     }
-  }, [selectedOption, currentIdx, currentQ, showWorksheet, completedSession]);
+  }, [selectedOption, currentIdx, roundOffset, currentQ, showWorksheet, completedSession]);
 
   const handleSelectOption = (slug) => {
     if (selectedOption !== null) return;
     setSelectedOption(slug);
     const isCorrect = slug === currentQ.correctSlug;
-    setAnswers((prev) => [...prev, { slug: currentQ.target.slug, chosen: slug, isCorrect }]);
+    setAnswers((prev) => [
+      ...prev,
+      { index: safeCurrentIdx, question: currentQ, slug: currentQ.target.slug, chosen: slug, isCorrect },
+    ]);
   };
 
   const handleNext = () => {
@@ -233,7 +256,9 @@ export default function Practice() {
           : quizMode === "element" && focusedElement
           ? `Element Focus (${focusedElement.name})`
           : quizMode === "compare" && comparedElements.length > 0
-          ? `Comparison Focus (${comparedElements.map((e) => e.symbol).join(", ")})`
+          ? comparedElements.length === 1
+            ? `Element Review (${comparedElements[0].name})`
+            : `Comparison Focus (${comparedElements.map((e) => e.symbol).join(", ")})`
           : "Mixed Elements";
       const session = recordQuizResult({
         mode: `${baseModeLabel} · ${diffLabel}`,
@@ -242,25 +267,34 @@ export default function Practice() {
         perElementResults: answers,
       });
       setDeckSnapshotSlugs((prev) => Array.from(new Set([...prev, ...(session.missedSlugs || [])])));
+      writeQuizPrefs({ mode: quizMode, difficulty, count: questionCount, nextRound: roundOffset + 1 });
+      setCompletedReview(answers);
       setCompletedSession(session);
     }
   };
 
-  const resetQuiz = (newMode = quizMode, newDifficulty = difficulty, newCount = questionCount) => {
+  const resetQuiz = (
+    newMode = quizMode,
+    newDifficulty = difficulty,
+    newCount = questionCount,
+    nextRoundOffset = 0
+  ) => {
     shouldFocusQuestionRef.current = true;
     setDeckSnapshotSlugs([...savedSlugs]);
     setQuizMode(newMode);
     setDifficulty(newDifficulty);
     setQuestionCount(newCount);
+    setRoundOffset(nextRoundOffset);
     setCurrentIdx(0);
     setSelectedOption(null);
     setAnswers([]);
     setCompletedSession(null);
+    setCompletedReview([]);
     setShowWorksheet(false);
 
-    writeQuizPrefs({ mode: newMode, difficulty: newDifficulty, count: newCount });
+    writeQuizPrefs({ mode: newMode, difficulty: newDifficulty, count: newCount, nextRound: nextRoundOffset });
 
-    // Sync to URL to preserve settings across reload
+    // Sync to URL to preserve settings across reload without triggering external-URL reset
     const nextParams = new URLSearchParams(searchParams);
     if (newMode !== "element" && newMode !== "compare") {
       nextParams.set("focus", newMode);
@@ -269,6 +303,47 @@ export default function Practice() {
     }
     nextParams.set("difficulty", newDifficulty);
     nextParams.set("count", String(newCount));
+    const nextRouteKey = JSON.stringify([
+      nextParams.get("focus"), nextParams.get("element"), nextParams.get("ids"),
+      nextParams.get("difficulty"), Number(nextParams.get("count")),
+    ]);
+    internalUrlSyncRef.current = nextRouteKey !== routeKey ? nextRouteKey : null;
+    setSearchParams(nextParams, { replace: true });
+  };
+
+  const handlePracticeAgain = () => {
+    resetQuiz(quizMode, difficulty, questionCount, roundOffset + 1);
+  };
+
+  const handleRetryMissed = (missedSlugs) => {
+    if (!Array.isArray(missedSlugs) || missedSlugs.length === 0) return;
+    shouldFocusQuestionRef.current = true;
+    const targetMode = missedSlugs.length === 1 ? "element" : "compare";
+    setQuizMode(targetMode);
+    setRoundOffset((prev) => prev + 1);
+    setCurrentIdx(0);
+    setSelectedOption(null);
+    setAnswers([]);
+    setCompletedSession(null);
+    setCompletedReview([]);
+    setShowWorksheet(false);
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("focus");
+    if (missedSlugs.length === 1) {
+      nextParams.set("element", missedSlugs[0]);
+      nextParams.delete("ids");
+    } else {
+      nextParams.set("ids", missedSlugs.join(","));
+      nextParams.delete("element");
+    }
+    nextParams.set("difficulty", difficulty);
+    nextParams.set("count", String(questionCount));
+    const nextRouteKey = JSON.stringify([
+      nextParams.get("focus"), nextParams.get("element"), nextParams.get("ids"),
+      nextParams.get("difficulty"), Number(nextParams.get("count")),
+    ]);
+    internalUrlSyncRef.current = nextRouteKey !== routeKey ? nextRouteKey : null;
     setSearchParams(nextParams, { replace: true });
   };
 
@@ -320,7 +395,15 @@ export default function Practice() {
                 ? [{ id: "element", label: `Element Focus: ${focusedElement.name} (${focusedElement.symbol})` }]
                 : []),
               ...(comparedElements.length > 0
-                ? [{ id: "compare", label: `Comparison (${comparedElements.map((e) => e.symbol).join(", ")})` }]
+                ? [
+                    {
+                      id: "compare",
+                      label:
+                        comparedElements.length === 1
+                          ? `Focused Review (${comparedElements[0].symbol})`
+                          : `Comparison (${comparedElements.map((e) => e.symbol).join(", ")})`,
+                    },
+                  ]
                 : []),
             ].map((m) => (
               <button
@@ -362,8 +445,8 @@ export default function Practice() {
               ))}
             </div>
 
-            {/* Length Selector */}
-            <div className="flex items-center gap-1.5" role="group" aria-label="Number of questions">
+            {/* Length Selector + Set Cycling */}
+            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Number of questions">
               <span className="text-xs font-mono text-[#7a8694] mr-1">Length:</span>
               {QUIZ_LENGTH_OPTIONS.map((len) => (
                 <button
@@ -380,6 +463,21 @@ export default function Practice() {
                   {len} Qs
                 </button>
               ))}
+              {!isEmptyDeckMode && !completedSession && questions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const keepWorksheet = showWorksheet;
+                    resetQuiz(quizMode, difficulty, questionCount, roundOffset + 1);
+                    if (keepWorksheet) setShowWorksheet(true);
+                  }}
+                  aria-label={`New Set: load next question set (currently Set ${roundOffset + 1})`}
+                  className="min-h-[38px] ml-1 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#0e121a] border border-[#2a323d] text-[#7bb6ff] hover:border-[#4f9dff] hover:text-white inline-flex items-center gap-1.5 transition-colors motion-reduce:transition-none"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                  <span>New Set (#{roundOffset + 1})</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -465,14 +563,20 @@ export default function Practice() {
             </div>
           </div>
         ) : completedSession ? (
-          /* Quiz Summary & Saved Progress CTA */
+          /* Quiz Summary, Actionable Chemistry Review & Next-Set Progression */
           <div className="rounded-2xl bg-[#131822] border border-[#242c38] p-6 sm:p-8 text-center space-y-5">
             <div className="w-16 h-16 rounded-2xl bg-[#69db7c]/15 border border-[#69db7c] flex items-center justify-center mx-auto text-[#69db7c]">
               <Award className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <span className="text-xs font-mono uppercase text-[#69db7c]">Session Saved to Study Progress</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+              <span className="text-xs font-mono uppercase text-[#69db7c]">
+                Set #{roundOffset + 1} Saved to Study Progress
+              </span>
+              <h2
+                ref={summaryHeadingRef}
+                tabIndex={-1}
+                className="text-2xl sm:text-3xl font-extrabold text-white focus:outline-none"
+              >
                 You scored {completedSession.score} / {completedSession.total} ({completedSession.accuracy}%)
               </h2>
               <p className="text-sm text-[#aeb8c4]">
@@ -480,33 +584,55 @@ export default function Practice() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
               <button
                 type="button"
-                onClick={() => resetQuiz(quizMode)}
-                className="px-4 py-2.5 rounded-xl bg-[#1c232d] border border-[#2a323d] hover:border-[#4f9dff] text-xs sm:text-sm font-semibold text-white flex items-center gap-2"
+                onClick={handlePracticeAgain}
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs sm:text-sm font-semibold flex items-center gap-2 transition-colors motion-reduce:transition-none"
               >
-                <RotateCcw className="w-4 h-4" />
-                <span>Practice Again</span>
+                <RotateCcw className="w-4 h-4 shrink-0" />
+                <span>Practice Again (New Set)</span>
               </button>
+              {completedSession.missedSlugs?.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRetryMissed(completedSession.missedSlugs)}
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#ff6b6b]/15 border border-[#ff6b6b]/50 hover:bg-[#ff6b6b]/25 text-xs sm:text-sm font-semibold text-[#ffa8a8] flex items-center gap-2 transition-colors motion-reduce:transition-none"
+                >
+                  <BrainCircuit className="w-4 h-4 shrink-0" />
+                  <span>Retry Missed ({completedSession.missedSlugs.length})</span>
+                </button>
+              )}
+              {completedSession.missedSlugs?.length === 0 && difficulty !== "hard" && (
+                <button
+                  type="button"
+                  onClick={() => resetQuiz(quizMode, difficulty === "easy" ? "standard" : "hard", questionCount, 0)}
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#69db7c]/15 border border-[#69db7c]/50 hover:bg-[#69db7c]/25 text-xs sm:text-sm font-semibold text-[#8ce99a] flex items-center gap-2 transition-colors motion-reduce:transition-none"
+                >
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                  <span>Try {difficulty === "easy" ? "Standard" : "Hard"} Level</span>
+                </button>
+              )}
               {quizMode !== "deck" && savedSlugs.length > 0 && (
                 <button
                   type="button"
                   onClick={() => resetQuiz("deck")}
-                  className="px-4 py-2.5 rounded-xl bg-[#1a2436] border border-[#4f9dff] hover:bg-[#4f9dff]/20 text-xs sm:text-sm font-semibold text-[#7bb6ff] flex items-center gap-2"
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#1a2436] border border-[#4f9dff] hover:bg-[#4f9dff]/20 text-xs sm:text-sm font-semibold text-[#7bb6ff] flex items-center gap-2 transition-colors motion-reduce:transition-none"
                 >
-                  <BookmarkCheck className="w-4 h-4" />
+                  <BookmarkCheck className="w-4 h-4 shrink-0" />
                   <span>Practice My Study Deck ({savedSlugs.length})</span>
                 </button>
               )}
               <Link
                 to="/saved"
-                className="px-4 py-2.5 rounded-xl bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] text-xs sm:text-sm font-semibold flex items-center gap-2 no-underline"
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#1c232d] border border-[#2a323d] hover:border-white text-xs sm:text-sm font-semibold text-white flex items-center gap-2 no-underline transition-colors motion-reduce:transition-none"
               >
-                <BookmarkCheck className="w-4 h-4" />
-                <span>View Saved Progress & Mastery →</span>
+                <BookmarkCheck className="w-4 h-4 shrink-0" />
+                <span>View Saved Progress &amp; Mastery →</span>
               </Link>
             </div>
+
+            <QuizRoundReview items={completedReview} />
           </div>
         ) : (
           /* Active Question Card */

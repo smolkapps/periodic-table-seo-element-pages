@@ -943,7 +943,7 @@ export function buildDailySpotlight(dateKey = "2025-11-01", offset = 0) {
   return { target, clue, options };
 }
 
-export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty = "standard") {
+export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty = "standard", roundOffset = 0) {
   if (!Array.isArray(pool) || pool.length === 0) return [];
 
   // Preserve the learner-selected target pool strictly without padding unrelated elements.
@@ -967,16 +967,29 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
       ? [1, 2, 3, 0]
       : [0, 1, 2, 3];
   const conceptCount = conceptOrder.length;
+  const maxUniqueQuestions = uniqueTargets.length * conceptCount;
   const requestedCount = Math.max(0, Number(count) || 0);
-  const totalQuestions = Math.min(requestedCount, uniqueTargets.length * conceptCount);
+  const totalQuestions = Math.min(requestedCount, maxUniqueQuestions);
+  if (totalQuestions === 0) return [];
+
+  const safeRound = Math.max(0, Math.floor(Number(roundOffset) || 0));
+  // Advance by totalQuestions per round so consecutive rounds cover unseen elements and concepts first;
+  // when one round already spans all maxUniqueQuestions (e.g. a 1-element 4-question drill), rotate by 1.
+  const startSlot =
+    totalQuestions < maxUniqueQuestions
+      ? (safeRound * totalQuestions) % maxUniqueQuestions
+      : safeRound % maxUniqueQuestions;
   const questions = [];
 
   for (let i = 0; i < totalQuestions; i++) {
-    const targetIndex = i % uniqueTargets.length;
-    const pass = Math.floor(i / uniqueTargets.length);
+    const globalSlot = (startSlot + i) % maxUniqueQuestions;
+    const targetIndex = globalSlot % uniqueTargets.length;
+    const pass = Math.floor(globalSlot / uniqueTargets.length);
     const target = uniqueTargets[targetIndex];
-    const distractors = getNeighborDistractors(target, i, null, normDiff === "easy");
+    const seed = i + safeRound;
+    const distractors = getNeighborDistractors(target, seed, null, normDiff === "easy");
     const qType = conceptOrder[(targetIndex + pass) % conceptCount];
+    const qId = safeRound === 0 ? `q-${i}-${target.slug}-c${qType}` : `q-r${safeRound}-${i}-${target.slug}-c${qType}`;
 
     if (qType === 0) {
       const options = [target, ...distractors].map((el) => ({
@@ -985,12 +998,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
       }));
       const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which ground-state electron configuration and principal shell occupancy belongs to ${target.name} (${target.symbol}, Z = ${target.number})?`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `${target.name} has Z = ${target.number} protons and electrons, filling orbitals to ${target.electronConfig} across ${target.shells.length} occupied principal shell(s) (${target.shells.join("·")}).${aufbauNote}`,
       });
@@ -1000,7 +1013,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
       const trendDistractors = hasTrendData
         ? getNeighborDistractors(
             target,
-            i,
+            seed,
             (e) => e.electronegativity !== target.electronegativity || e.ionizationEnergy !== target.ionizationEnergy
           )
         : distractors;
@@ -1022,12 +1035,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         : `${target.name} (${target.symbol}, Z = ${target.number}) sits in Period ${target.period}, ${target.group !== null ? `Group ${target.group}` : "f-block"}; due to its short half-life, its Pauling electronegativity, ionization energy, and covalent radius are not experimentally established.`;
 
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation,
       });
@@ -1037,12 +1050,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         label: `${el.symbol} — ${el.name} (Z = ${el.number})`,
       }));
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which element is ${target.highlight}?`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `${target.name} (${target.symbol}, atomic number ${target.number}) is ${target.highlight}.`,
       });
@@ -1053,12 +1066,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         label: `${el.symbol}`,
       }));
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which chemical symbol represents ${target.name} (Period ${target.period} ${categoryLabel(target.category).toLowerCase()})?`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `${target.name} is represented by the chemical symbol ${target.symbol} (atomic number Z = ${target.number}, Period ${target.period}).`,
       });
@@ -1069,35 +1082,35 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         label: `${el.name}`,
       }));
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which element is represented by the chemical symbol “${target.symbol}”?`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `The symbol ${target.symbol} stands for ${target.name} (atomic number Z = ${target.number}, ${categoryLabel(target.category).toLowerCase()} in Period ${target.period}).`,
       });
     } else if (qType === 8) {
       // Easy: Atomic Number & Periodic Coordinates -> Name & Symbol
-      const nearDistractors = getNeighborDistractors(target, i, null, false);
+      const nearDistractors = getNeighborDistractors(target, seed, null, false);
       const options = [target, ...nearDistractors].map((el) => ({
         slug: el.slug,
         label: `${el.name} (${el.symbol})`,
       }));
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which element sits at atomic number Z = ${target.number} (${target.group !== null ? `Group ${target.group}` : "f-block"}, Period ${target.period})?`,
-        options: rotateQuizOptions(options, i + 1),
+        options: rotateQuizOptions(options, seed + 1),
         correctSlug: target.slug,
         explanation: `Atomic number Z = ${target.number} belongs to ${target.name} (${target.symbol}), located in ${target.group !== null ? `Group ${target.group}` : "the f-block"}, Period ${target.period}.`,
       });
     } else if (qType === 6) {
       // Hard: Ground-state electron configuration -> Element identity (without leaking Z in option labels)
-      const nearDistractors = getNeighborDistractors(target, i, null, false);
+      const nearDistractors = getNeighborDistractors(target, seed, null, false);
       const options = [target, ...nearDistractors].map((el) => ({
         slug: el.slug,
         label: `${el.name} (${el.symbol})`,
@@ -1107,18 +1120,18 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         : "";
       const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Which neutral element has the ground-state electron configuration ${target.electronConfig}?${aufbauHint}`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has the ground-state configuration ${target.electronConfig} with shell distribution ${target.shells.join("·")}.${aufbauNote}`,
       });
     } else if (qType === 7) {
       // Hard: Subshell / Aufbau shell occupancy -> Element identity (without leaking shell counts in options)
-      const nearDistractors = getNeighborDistractors(target, i + 1, null, false);
+      const nearDistractors = getNeighborDistractors(target, seed + 1, null, false);
       const options = [target, ...nearDistractors].map((el) => ({
         slug: el.slug,
         label: `${el.name} (${el.symbol}) — ${el.group !== null ? `Group ${el.group}` : "f-block"}`,
@@ -1132,18 +1145,18 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
         : `Which Period ${target.period} (${target.block}-block) element has principal shell occupancy ${target.shells.join("·")} and top subshells ${topSubs}?`;
       const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt,
-        options: rotateQuizOptions(options, i + 1),
+        options: rotateQuizOptions(options, seed + 1),
         correctSlug: target.slug,
         explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has ground-state configuration ${target.electronConfig} and shell occupancy ${target.shells.join("·")}.${aufbauNote}`,
       });
     } else if (qType === 10) {
       // Hard: Element -> Highest subshells & outer-shell distribution against immediate Z neighbours
-      const nearDistractors = getNeighborDistractors(target, i + 2, null, false);
+      const nearDistractors = getNeighborDistractors(target, seed + 2, null, false);
       const options = [target, ...nearDistractors].map((el) => {
         const subSummary = el.subshells
           .slice(-2)
@@ -1156,12 +1169,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
       });
       const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `For neutral ${target.name} (${target.symbol}, Z = ${target.number}), which option gives its displayed subshell occupancies and principal-shell occupancy?`,
-        options: rotateQuizOptions(options, i + 2),
+        options: rotateQuizOptions(options, seed + 2),
         correctSlug: target.slug,
         explanation: `${target.name} (${target.symbol}, Z = ${target.number}) has ground-state configuration ${target.electronConfig} across shells ${target.shells.join("·")}.${aufbauNote}`,
       });
@@ -1176,12 +1189,12 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
           : `with ${target.outerShellElectrons} valence electron(s) in its outermost principal shell (n=${target.shells.length}, ${target.electronConfig})`;
 
       questions.push({
-        id: `q-${i}-${target.slug}-c${qType}`,
+        id: qId,
         concept: qType,
         difficulty: normDiff,
         target,
         prompt: `Select the correct chemical family and outermost principal-shell electron count for atomic number Z = ${target.number}:`,
-        options: rotateQuizOptions(options, i),
+        options: rotateQuizOptions(options, seed),
         correctSlug: target.slug,
         explanation: `Element #${target.number} is ${target.name} (${target.symbol}), a ${categoryLabel(target.category).toLowerCase()} in the ${target.block}-block ${valenceDetail}.`,
       });

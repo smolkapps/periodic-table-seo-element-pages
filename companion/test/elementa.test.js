@@ -102,6 +102,45 @@ describe("Elementa 118-element dataset", () => {
     );
   });
 
+  it("advances across consecutive quiz rounds without repeating questions while preserving strict target scope", () => {
+    const trendPool = [
+      "fluorine", "oxygen", "caesium", "helium", "iron",
+      "lithium", "silicon", "gold", "sodium", "chlorine",
+      "carbon", "nitrogen", "magnesium", "aluminium", "phosphorus",
+      "sulfur", "potassium", "calcium", "copper", "zinc",
+    ].map((s) => getElementBySlug(s));
+
+    // Round 0 vs Round 1 (5 Qs Standard Trends): zero overlap in targets or prompts; Fluorine EN 3.98 does not repeat
+    const round0 = buildDeterministicQuiz(trendPool, 5, "trends", "standard", 0);
+    const round1 = buildDeterministicQuiz(trendPool, 5, "trends", "standard", 1);
+    assert.equal(round0[0].target.slug, "fluorine");
+    assert.notEqual(round1[0].target.slug, "fluorine");
+    assert.equal(
+      round1.some((q) => round0.some((prev) => prev.prompt === q.prompt)),
+      false,
+      "Practice Again (roundOffset=1) must not repeat any question from Round 0"
+    );
+
+    // 16 consecutive 5-question rounds cover all 80 unique (target, concept) pairs before cycling
+    const allSeenPairs = new Set();
+    for (let r = 0; r < 16; r++) {
+      const roundQs = buildDeterministicQuiz(trendPool, 5, "trends", "standard", r);
+      assert.equal(roundQs.length, 5);
+      for (const q of roundQs) {
+        allSeenPairs.add(`${q.target.slug}:${q.concept}`);
+      }
+    }
+    assert.equal(allSeenPairs.size, 80, "16 consecutive 5-Q rounds visit all 80 unique (element, concept) questions");
+
+    // 1-element scope (/practice?element=oxygen) rotates lead question and distractors on Practice Again without padding outside targets
+    const ox0 = buildDeterministicQuiz([getElementBySlug("oxygen")], 5, "element", "standard", 0);
+    const ox1 = buildDeterministicQuiz([getElementBySlug("oxygen")], 5, "element", "standard", 1);
+    assert.equal(ox0.length, 4);
+    assert.equal(ox1.length, 4);
+    assert.notEqual(ox0[0].concept, ox1[0].concept, "1-element Practice Again rotates starting concept");
+    assert.ok(ox1.every((q) => q.target.slug === "oxygen"), "1-element Practice Again stays strictly on oxygen");
+  });
+
   it("builds daily spotlights across all 118 elements with 4 distinct options without leaking element symbol or name", () => {
     const seenSlugs = new Set();
     for (let offset = 0; offset < 118; offset++) {

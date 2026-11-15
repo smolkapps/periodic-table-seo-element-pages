@@ -1,0 +1,83 @@
+{
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 814,
+        "overflow": false
+      },
+      "review_answers_explanations_compare": true,
+      "summary_focus": true,
+      "new_sets_and_reload": true,
+      "one_and_two_missed_retry_caps": [
+        4,
+        8
+      ],
+      "completed_lengths": [
+        5,
+        5,
+        4,
+        10,
+        20,
+        8
+      ],
+      "levels": [
+        "Easy",
+        "Standard",
+        "Hard"
+      ],
+      "clean_sweep_level_cta": true,
+      "same_url_new_set_then_external_scope_reset": true,
+      "worksheet_next_set": true,
+      "saved_history_offline_reload": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "review_answers_explanations_compare": true,
+      "summary_focus": true,
+      "new_sets_and_reload": true,
+      "one_and_two_missed_retry_caps": [
+        4,
+        8
+      ],
+      "completed_lengths": [
+        5,
+        5,
+        4,
+        10,
+        20,
+        8
+      ],
+      "levels": [
+        "Easy",
+        "Standard",
+        "Hard"
+      ],
+      "clean_sweep_level_cta": true,
+      "same_url_new_set_then_external_scope_reset": true,
+      "worksheet_next_set": true,
+      "saved_history_offline_reload": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 41,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "astro_errors": 0,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false
+}
