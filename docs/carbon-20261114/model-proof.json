@@ -1,0 +1,14 @@
+{
+  "turn_id": "a0d30e48-77c4-4d1f-abac-f6fb85a0cc1b",
+  "created_date": "2026-11-15T00:40:10.343000",
+  "branch": "Main",
+  "selected_model": "gemini_4_carbon",
+  "reasoning": {
+    "model": "vertex_ai/gemini-4-carbon",
+    "effort": "max"
+  },
+  "effort": "max",
+  "starting_source": "75a1651fd05ab63c510c9aafa95fad0c33c3ed21",
+  "message_credits_remaining_before": 141.1,
+  "integration_credits_remaining_before": 9975.7
+}

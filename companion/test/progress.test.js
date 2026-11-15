@@ -209,7 +209,7 @@ describe("progress import validation", () => {
     assert.deepEqual(readQuizPrefs(storage), DEFAULT_QUIZ_PREFS);
 
     assert.equal(writeQuizPrefs({ mode: "all", difficulty: "hard", count: 20 }, storage).ok, true);
-    assert.deepEqual(readQuizPrefs(storage), { mode: "all", difficulty: "hard", count: 20 });
+    assert.deepEqual(readQuizPrefs(storage), { mode: "all", difficulty: "hard", count: 20, nextRound: 0 });
     assert.equal(storage.getItem(QUIZ_PREFS_STORAGE_KEY) !== null, true);
 
     // Prior study progress remains completely intact after quiz preference updates and reload
@@ -222,5 +222,10 @@ describe("progress import validation", () => {
 
     // Invalid quiz preference shapes fall back safely
     assert.deepEqual(sanitizeQuizPrefs({ mode: "unknown", difficulty: "extreme", count: 99 }), DEFAULT_QUIZ_PREFS);
+    assert.equal(writeQuizPrefs({ difficulty: "standard", count: 5, nextRound: 26 }, storage).ok, true);
+    assert.equal(readQuizPrefs(storage).nextRound, 26, "Question-set cursor persists independently of capped quiz history");
+    for (const nextRound of [-1, 1.5, Infinity, "26"]) {
+      assert.equal(sanitizeQuizPrefs({ nextRound }).nextRound, 0, "Malformed cursors cannot corrupt question generation");
+    }
   });
 });

@@ -5,6 +5,7 @@ import path from "node:path";
 import vm from "node:vm";
 import ts from "typescript";
 import * as elementsDataModule from "../src/data/elementsData.js";
+import { readQuizPrefs, writeQuizPrefs } from "../src/lib/quizPreferences.js";
 
 const {
   ELEMENTS,
@@ -619,14 +620,8 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     );
 
     const quizPrefsMod = {
-      readQuizPrefs: () => {
-        const raw = storage.getItem("elementa_quiz_prefs_v1");
-        return raw ? JSON.parse(raw) : { mode: null, difficulty: "standard", count: 5 };
-      },
-      writeQuizPrefs: (prefs) => {
-        storage.setItem("elementa_quiz_prefs_v1", JSON.stringify(prefs));
-        return { ok: true, prefs };
-      },
+      readQuizPrefs: () => readQuizPrefs(storage),
+      writeQuizPrefs: (prefs) => writeQuizPrefs(prefs, storage),
     };
 
     let currentSearch = "";
@@ -641,10 +636,10 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
 
       const fakeReact = {
         Fragment: Symbol("Fragment"),
-        createElement: (type, props, ...children) => ({
-          type,
-          props: { ...(props || {}), children: children.flat() },
-        }),
+        createElement: (type, props, ...children) => {
+          const nextProps = { ...(props || {}), children: children.flat() };
+          return typeof type === "function" ? type(nextProps) : { type, props: nextProps };
+        },
         useState: (init) => {
           const idx = hookCursor++;
           if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
@@ -713,12 +708,23 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
         }),
       };
 
+      const reviewSource = fs.readFileSync(path.resolve("src/components/QuizRoundReview.jsx"), "utf8");
+      const { outputText: reviewCode } = ts.transpileModule(reviewSource, {
+        compilerOptions: {
+          module: ts.ModuleKind.CommonJS,
+          jsx: ts.JsxEmit.React,
+          target: ts.ScriptTarget.ES2020,
+        },
+      });
+      const reviewModule = { exports: {} };
+
       const cjsModule = { exports: {} };
       const customRequire = (id) => {
         if (id === "react") return fakeReact;
         if (id === "react-router-dom") return fakeRouter;
         if (id === "@/components/Navbar") return { default: () => null };
         if (id === "@/components/Footer") return { default: () => null };
+        if (id === "@/components/QuizRoundReview") return reviewModule.exports;
         if (id === "@/data/elementsData") return elementsDataModule;
         if (id === "@/lib/studyStore") return fakeStudyStore;
         if (id === "@/lib/quizPreferences") return quizPrefsMod;
@@ -731,11 +737,18 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
             BookmarkCheck: "i",
             Printer: "i",
             ArrowRight: "i",
+            ArrowLeftRight: "i",
             Award: "i",
           };
         }
         throw new Error(`Unexpected import in Practice: ${id}`);
       };
+      new Function("require", "module", "exports", "React", reviewCode)(
+        customRequire,
+        reviewModule,
+        reviewModule.exports,
+        fakeReact
+      );
       new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
       const Practice = cjsModule.exports.default;
 
@@ -825,17 +838,155 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     }
     assert.match(textOf(tree), /You scored 4 \/ 5 \(80%\)/);
 
-    // 4. Simulate full browser reload (even with bare search "") -> preserves Hard setting, missed element in deck, score, and prior notes/mastery
+    // 4. Verify Round Chemistry Review renders missed Gold question, explanation, and Compare link, then Practice Again advances to Set #2
+    const reviewBox = findNodes(tree, (n) => n.props?.["data-testid"] === "quiz-round-review")[0];
+    assert.ok(reviewBox, "Round Chemistry Review renders on completion screen");
+    assert.equal(findNodes(reviewBox, (n) => n.props?.["data-testid"] === "missed-question-card").length, 1);
+    const compareLinks = findNodes(
+      reviewBox,
+      (n) => n.type === "Link" && typeof n.props?.to === "string" && n.props.to.startsWith("/compare?ids=gold,")
+    );
+    assert.equal(compareLinks.length, 1, "Missed question review links directly to Compare target vs chosen distractor");
+
+    // 5. Simulate full browser reload (even with bare search "") -> preserves Hard setting, missed element in deck, score, and prior notes/mastery, and serves fresh Set #2
     currentSearch = "";
     progressState = readProgress(storage).progress;
     const appReloaded = mountPractice();
     const reloadedTree = appReloaded.render();
     const hardBtnReloaded = findNodes(reloadedTree, (n) => n.type === "button" && textOf(n).startsWith("Hard"))[0];
     assert.equal(hardBtnReloaded.props["aria-pressed"], true, "Chosen Hard difficulty persists across reload");
+    assert.doesNotMatch(
+      textOf(reloadedTree),
+      new RegExp(expectedQuestions[0].target.name),
+      "Reload after completing Set #1 advances to fresh Set #2 rather than repeating Q1"
+    );
     assert.deepEqual(progressState.savedSlugs, ["gold"], "Missed element (gold) was saved to study deck");
     assert.equal(progressState.quizHistory[0].score, 4);
     assert.equal(progressState.notesMap.helium, "Inert 1s2 shell.", "Prior study notes remain uncorrupted");
     assert.equal(progressState.masteryMap.helium.mastered, true, "Prior mastery remains uncorrupted");
+
+    // 6. Verify live Standard Periodic Trends journey: Round 1 (Fluorine EN 3.98) -> Practice Again -> fresh Set #2 (Lithium) + Retry Missed
+    currentSearch = "";
+    progressState = { savedSlugs: [], masteryMap: {}, notesMap: {}, quizHistory: [] };
+    writeProgress(progressState, storage);
+    quizPrefsMod.writeQuizPrefs({ mode: "trends", difficulty: "standard", count: 5 });
+
+    const stdApp = mountPractice();
+    let stdTree = stdApp.render();
+    assert.match(textOf(stdTree), /3\.98.*1681 kJ\/mol/, "Round 1 starts with Fluorine EN 3.98 / IE 1681");
+
+    const stdRound0 = buildDeterministicQuiz(
+      [
+        "fluorine", "oxygen", "caesium", "helium", "iron",
+        "lithium", "silicon", "gold", "sodium", "chlorine",
+        "carbon", "nitrogen", "magnesium", "aluminium", "phosphorus",
+        "sulfur", "potassium", "calcium", "copper", "zinc",
+      ].map((s) => getElementBySlug(s)),
+      5,
+      "trends",
+      "standard",
+      0
+    );
+
+    // Miss Q1 (Fluorine), answer Q2..Q5 accurately
+    for (let i = 0; i < 5; i++) {
+      const q = stdRound0[i];
+      const pickSlug = i === 0 ? q.options.find((o) => o.slug !== q.correctSlug).slug : q.correctSlug;
+      const ansBtns = getAnswerButtons(stdTree);
+      ansBtns[q.options.findIndex((o) => o.slug === pickSlug)].props.onClick();
+      stdTree = stdApp.render();
+      const proceed = findNodes(
+        stdTree,
+        (n) => n.type === "button" && (textOf(n).includes("Next Question") || textOf(n).includes("Finish & Save Progress"))
+      )[0];
+      proceed.props.onClick();
+      stdTree = stdApp.render();
+    }
+    assert.match(textOf(stdTree), /You scored 4 \/ 5 \(80%\)/);
+
+    // Click Practice Again -> starts Set #2 immediately with zero Fluorine repetition
+    const practiceAgainBtn = findNodes(
+      stdTree,
+      (n) => n.type === "button" && textOf(n).includes("Practice Again")
+    )[0];
+    practiceAgainBtn.props.onClick();
+    stdTree = stdApp.render();
+    assert.match(textOf(stdTree), /Question 1 of 5/);
+    assert.doesNotMatch(textOf(stdTree), /3\.98.*1681 kJ\/mol/, "Practice Again must not repeat Fluorine Q1");
+    assert.match(textOf(stdTree), /lithium-ion batteries/i, "Set #2 starts with Lithium's distinct question");
+
+    // Complete Set #2 with 1 miss, then click Retry Missed (1) -> focuses strictly on that missed element
+    const stdRound1 = buildDeterministicQuiz(
+      [
+        "fluorine", "oxygen", "caesium", "helium", "iron",
+        "lithium", "silicon", "gold", "sodium", "chlorine",
+        "carbon", "nitrogen", "magnesium", "aluminium", "phosphorus",
+        "sulfur", "potassium", "calcium", "copper", "zinc",
+      ].map((s) => getElementBySlug(s)),
+      5,
+      "trends",
+      "standard",
+      1
+    );
+    for (let i = 0; i < 5; i++) {
+      const q = stdRound1[i];
+      const pickSlug = i === 0 ? q.options.find((o) => o.slug !== q.correctSlug).slug : q.correctSlug;
+      const ansBtns = getAnswerButtons(stdTree);
+      ansBtns[q.options.findIndex((o) => o.slug === pickSlug)].props.onClick();
+      stdTree = stdApp.render();
+      const proceed = findNodes(
+        stdTree,
+        (n) => n.type === "button" && (textOf(n).includes("Next Question") || textOf(n).includes("Finish & Save Progress"))
+      )[0];
+      proceed.props.onClick();
+      stdTree = stdApp.render();
+    }
+    const retryMissedBtn = findNodes(
+      stdTree,
+      (n) => n.type === "button" && textOf(n).includes("Retry Missed (1)")
+    )[0];
+    assert.ok(retryMissedBtn, "Retry Missed (1) CTA appears on summary screen");
+    retryMissedBtn.props.onClick();
+    stdTree = stdApp.render();
+    assert.match(textOf(stdTree), /Question 1 of 4/, "1-element Retry Missed caps honestly at 4 unique concepts");
+    assert.equal(new URLSearchParams(currentSearch).get("element"), "lithium");
+
+    // A same-URL New Set must not suppress the next externally requested route reset.
+    const newSet = findNodes(stdTree, (n) => n.type === "button" && textOf(n).startsWith("New Set"))[0];
+    newSet.props.onClick();
+    stdTree = stdApp.render();
+    getAnswerButtons(stdTree)[0].props.onClick();
+    stdTree = stdApp.render();
+    currentSearch = "element=oxygen&difficulty=easy&count=10";
+    stdTree = stdApp.render();
+    assert.match(textOf(stdTree), /Question 1 of 4/);
+    assert.match(textOf(stdTree), /Element Focus: Oxygen/);
+    assert.match(textOf(stdTree), /Which chemical symbol represents Oxygen/);
+    assert.ok(getAnswerButtons(stdTree).every((n) => !n.props.disabled), "External scope clears the previous selected answer");
+
+    // Capped history must not pin every future reload to the same question set.
+    progressState.quizHistory = Array.from({ length: 25 }, (_, i) => ({ ...progressState.quizHistory[0], id: `old-${i}` }));
+    quizPrefsMod.writeQuizPrefs({ mode: "trends", difficulty: "standard", count: 5, nextRound: 26 });
+    currentSearch = "";
+    const afterHistoryCap = mountPractice();
+    let capTree = afterHistoryCap.render();
+    assert.match(textOf(capTree), /New Set \(#27\)/);
+    const capQuestions = buildDeterministicQuiz(
+      ["fluorine", "oxygen", "caesium", "helium", "iron", "lithium", "silicon", "gold", "sodium", "chlorine",
+        "carbon", "nitrogen", "magnesium", "aluminium", "phosphorus", "sulfur", "potassium", "calcium", "copper", "zinc"].map(getElementBySlug),
+      5, "trends", "standard", 26
+    );
+    for (const q of capQuestions) {
+      getAnswerButtons(capTree)[q.options.findIndex((o) => o.slug === q.correctSlug)].props.onClick();
+      capTree = afterHistoryCap.render();
+      findNodes(capTree, (n) => n.type === "button" && /Next Question|Finish & Save Progress/.test(textOf(n)))[0].props.onClick();
+      capTree = afterHistoryCap.render();
+    }
+    progressState.quizHistory = progressState.quizHistory.slice(0, 25);
+    assert.equal(quizPrefsMod.readQuizPrefs().nextRound, 27);
+    currentSearch = "";
+    assert.match(textOf(mountPractice().render()), /New Set \(#28\)/, "Reload continues beyond the bounded history length");
+
   });
 
   it("exercises DailyElementSpotlight clue -> neighbor guess -> feedback -> inspect/save -> next clue flow", () => {
