@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import StudyDeckFlashcards from "@/components/StudyDeckFlashcards";
 import { ELEMENTS, CATEGORY_META, getElementBySlug, formatMass } from "@/data/elementsData";
 import { useStudyProgress } from "@/lib/studyStore";
 import {
@@ -11,6 +13,8 @@ import {
   Trash2,
   Plus,
   Award,
+  BookOpen,
+  BrainCircuit,
 } from "lucide-react";
 
 export default function SavedProgress() {
@@ -27,6 +31,7 @@ export default function SavedProgress() {
   } = useStudyProgress();
 
   const [addSlugInput, setAddSlugInput] = useState("carbon");
+  const [deckView, setDeckView] = useState("cards");
   const [statusMsg, setStatusMsg] = useState("");
   const [statusKind, setStatusKind] = useState("info");
 
@@ -117,12 +122,12 @@ export default function SavedProgress() {
             <button
               type="button"
               onClick={handleExportJson}
-              className="px-3 py-1.5 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-medium text-white flex items-center gap-1.5"
+              className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-medium text-white flex items-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export JSON</span>
             </button>
-            <label className="px-3 py-1.5 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-medium text-white flex items-center gap-1.5 cursor-pointer">
+            <label className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#161b22] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-medium text-white flex items-center gap-1.5 cursor-pointer">
               <Upload className="w-3.5 h-3.5" />
               <span>Import JSON</span>
               <input type="file" accept="application/json" onChange={handleImportJson} className="hidden" />
@@ -172,11 +177,14 @@ export default function SavedProgress() {
 
         {/* Add Element to Study Deck Quick Bar */}
         <div className="flex flex-wrap items-center gap-2 bg-[#131822] border border-[#242c38] rounded-xl p-3.5">
-          <span className="text-xs font-medium text-[#aeb8c4]">Quick-add element to Study Deck:</span>
+          <label htmlFor="quick-add-element" className="text-xs font-medium text-[#aeb8c4]">
+            Quick-add element to Study Deck:
+          </label>
           <select
+            id="quick-add-element"
             value={addSlugInput}
             onChange={(e) => setAddSlugInput(e.target.value)}
-            className="px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-xs text-white"
+            className="min-h-[44px] px-3 py-2 rounded-lg bg-[#1c232d] border border-[#2a323d] text-xs text-white"
           >
             {ELEMENTS.map((el) => (
               <option key={el.slug} value={el.slug}>
@@ -191,7 +199,7 @@ export default function SavedProgress() {
                 toggleSavedSlug(addSlugInput);
               }
             }}
-            className="px-3 py-1.5 rounded-lg bg-[#4f9dff] text-[#07121f] font-semibold text-xs flex items-center gap-1"
+            className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#4f9dff] text-[#07121f] font-semibold text-xs flex items-center gap-1"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add to Deck</span>
@@ -202,7 +210,7 @@ export default function SavedProgress() {
                 .slice(0, 3)
                 .map((e) => e.slug)
                 .join(",")}`}
-              className="ml-auto px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] hover:border-[#4f9dff] text-xs text-[#7bb6ff] flex items-center gap-1.5 no-underline"
+              className="sm:ml-auto min-h-[44px] px-3.5 py-2 rounded-lg bg-[#1c232d] border border-[#2a323d] hover:border-[#4f9dff] text-xs text-[#7bb6ff] flex items-center gap-1.5 no-underline"
             >
               <ArrowLeftRight className="w-3.5 h-3.5" />
               <span>Compare Top Saved Elements</span>
@@ -210,9 +218,54 @@ export default function SavedProgress() {
           )}
         </div>
 
-        {/* Saved Elements Grid */}
+        {/* Saved Elements Grid & Active-Recall Flashcards */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white">Bookmarked Study Deck ({savedElements.length})</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <h2 className="text-lg font-bold text-white">Bookmarked Study Deck ({savedElements.length})</h2>
+              {savedElements.length > 0 && (
+                <p className="text-xs text-[#8b98a9]">
+                  Self-test configurations, trends, and your personal notes with flashcards before taking a quiz.
+                </p>
+              )}
+            </div>
+
+            {savedElements.length > 0 && (
+              <div
+                role="group"
+                aria-label="Study deck view mode"
+                className="grid grid-cols-2 sm:inline-flex items-center gap-1 bg-[#131822] p-1 rounded-xl border border-[#242c38] w-full sm:w-auto"
+              >
+                <button
+                  type="button"
+                  aria-pressed={deckView === "cards"}
+                  onClick={() => setDeckView("cards")}
+                  className={`min-h-[42px] px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors motion-reduce:transition-none ${
+                    deckView === "cards"
+                      ? "bg-[#4f9dff] text-[#07121f]"
+                      : "text-[#aeb8c4] hover:text-white"
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                  <span>Cards &amp; Notes ({savedElements.length})</span>
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={deckView === "flashcards"}
+                  onClick={() => setDeckView("flashcards")}
+                  className={`min-h-[42px] px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors motion-reduce:transition-none ${
+                    deckView === "flashcards"
+                      ? "bg-[#4f9dff] text-[#07121f]"
+                      : "text-[#aeb8c4] hover:text-white"
+                  }`}
+                >
+                  <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
+                  <span>Flashcard Recall ({savedElements.length})</span>
+                </button>
+              </div>
+            )}
+          </div>
+
           {savedElements.length === 0 ? (
             <div className="p-8 rounded-xl bg-[#131822] border border-[#242c38] text-center space-y-2">
               <p className="text-sm text-[#aeb8c4]">Your Study Deck is currently empty.</p>
@@ -220,8 +273,16 @@ export default function SavedProgress() {
                 Explore the periodic table to bookmark elements →
               </Link>
             </div>
+          ) : deckView === "flashcards" ? (
+            <StudyDeckFlashcards
+              key={savedSlugs.join(",")}
+              elements={savedElements}
+              notesMap={notesMap}
+              masteryMap={masteryMap}
+              onSaveNote={saveElementNote}
+            />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div data-testid="saved-reference-cards" className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {savedElements.map((el) => {
                 const meta = CATEGORY_META[el.category];
                 const stats = masteryMap[el.slug];
@@ -232,7 +293,7 @@ export default function SavedProgress() {
                     className="rounded-xl bg-[#131822] border border-[#242c38] p-4 flex flex-col justify-between gap-3"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <Link to={`/element/${el.slug}`} className="flex items-center gap-3 no-underline group">
+                      <Link to={`/element/${el.slug}`} className="flex items-center gap-3 no-underline group min-w-0">
                         <div
                           className="w-12 h-12 rounded-lg bg-[#1c232d] border border-[#2a323d] border-l-4 flex flex-col items-center justify-center shrink-0"
                           style={{ borderLeftColor: meta.hex }}
@@ -240,23 +301,22 @@ export default function SavedProgress() {
                           <span className="text-[10px] font-mono text-[#7a8694]">{el.number}</span>
                           <span className="text-lg font-extrabold text-white">{el.symbol}</span>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <h3 className="text-base font-bold text-white group-hover:text-[#7bb6ff] flex items-center gap-1.5">
                             <span>{el.name}</span>
                             {stats?.mastered && <CheckCircle2 className="w-4 h-4 text-[#69db7c]" />}
                           </h3>
-                          <p className="text-xs font-mono text-[#8b98a9]">
-                            {meta.label} · {formatMass(el)}
-                            {el.synthetic ? "" : " u"} · {el.electronConfig}
+                          <p className="text-xs font-mono text-[#8b98a9] break-words">
+                            {meta.label} · {formatMass(el)} · {el.electronConfig}
                           </p>
                         </div>
                       </Link>
 
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
                           onClick={() => toggleMasteredManual(el.slug)}
-                          className={`px-2 py-1 rounded text-[11px] font-medium border ${
+                          className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-[11px] font-medium border ${
                             stats?.mastered
                               ? "bg-[#69db7c]/20 border-[#69db7c] text-[#69db7c]"
                               : "bg-[#1c232d] border-[#2a323d] text-[#aeb8c4] hover:text-white"
@@ -268,7 +328,7 @@ export default function SavedProgress() {
                           type="button"
                           onClick={() => toggleSavedSlug(el.slug)}
                           aria-label={`Remove ${el.name} from saved`}
-                          className="p-1.5 rounded bg-[#1c232d] border border-[#2a323d] text-[#8b98a9] hover:text-[#ff6b6b]"
+                          className="min-h-[40px] min-w-[40px] p-2 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#8b98a9] hover:text-[#ff6b6b] flex items-center justify-center"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -282,10 +342,11 @@ export default function SavedProgress() {
                     <div className="space-y-1.5">
                       <input
                         type="text"
+                        aria-label={`Study note for ${el.name}`}
                         value={note}
                         onChange={(e) => saveElementNote(el.slug, e.target.value)}
                         placeholder={`Add study note for ${el.name}…`}
-                        className="w-full px-2.5 py-1.5 rounded bg-[#0e121a] border border-[#242c38] text-xs text-white placeholder-[#7a8694] focus:outline-none focus:border-[#4f9dff]"
+                        className="w-full min-h-[44px] px-3 py-2 rounded-lg bg-[#0e121a] border border-[#242c38] text-xs text-white placeholder-[#7a8694] focus:outline-none focus:border-[#4f9dff]"
                       />
                     </div>
                   </div>
@@ -335,6 +396,8 @@ export default function SavedProgress() {
           )}
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 }

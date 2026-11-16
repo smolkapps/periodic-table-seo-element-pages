@@ -1,0 +1,63 @@
+{
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "empty_and_saved_deck": true,
+      "spoiler_free_three_lenses": true,
+      "reveal_next_summary_keyboard_focus": true,
+      "skip_first_wraps_until_all_rated": true,
+      "flagged_rehearsal": true,
+      "deck_add_and_import_reorder_reset": true,
+      "note_edit_does_not_reset_and_persists": true,
+      "self_checks_leave_scores_and_mastery_unchanged": true,
+      "predictions_and_palladium": true,
+      "actual_compare_and_scoped_quiz_score_total": [
+        4,
+        4
+      ],
+      "export_import_offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 758,
+        "overflow": false
+      },
+      "empty_and_saved_deck": true,
+      "spoiler_free_three_lenses": true,
+      "reveal_next_summary_keyboard_focus": true,
+      "skip_first_wraps_until_all_rated": true,
+      "flagged_rehearsal": true,
+      "deck_add_and_import_reorder_reset": true,
+      "note_edit_does_not_reset_and_persists": true,
+      "self_checks_leave_scores_and_mastery_unchanged": true,
+      "predictions_and_palladium": true,
+      "actual_compare_and_scoped_quiz_score_total": [
+        4,
+        4
+      ],
+      "export_import_offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 43,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "astro_errors": 0,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false
+}

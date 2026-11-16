@@ -1224,4 +1224,321 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
       [false, false, false]
     );
   });
+
+  it("rehearses saved Carbon & Oxygen via Active-Recall Flashcards on SavedProgress, hides spoiler cards, surfaces and saves personal notes on reveal, drills flagged cards, and links to Compare and scoped Quiz", () => {
+    const savedSource = fs.readFileSync(path.resolve("src/pages/SavedProgress.jsx"), "utf8");
+    const flashcardsSource = fs.readFileSync(path.resolve("src/components/StudyDeckFlashcards.jsx"), "utf8");
+    const transpileOpts = {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    };
+    const { outputText: savedCode } = ts.transpileModule(savedSource, transpileOpts);
+    const { outputText: flashcardsCode } = ts.transpileModule(flashcardsSource, transpileOpts);
+
+    const storage = createMemoryStorage();
+    let progressState = readProgress(storage).progress;
+
+    const mountSavedProgress = () => {
+      const hookStates = [];
+      const effectDeps = [];
+      const refs = [];
+      let pendingEffects = [];
+      let hookCursor = 0;
+
+      const fakeReact = {
+        Fragment: Symbol("Fragment"),
+        createElement: (type, props, ...children) => {
+          const nextProps = { ...(props || {}), children: children.flat() };
+          return typeof type === "function" ? type(nextProps) : { type, props: nextProps };
+        },
+        useState: (init) => {
+          const idx = hookCursor++;
+          if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+          const setState = (u) => {
+            hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+          };
+          return [hookStates[idx], setState];
+        },
+        useMemo: (factory) => {
+          hookCursor++;
+          return factory();
+        },
+        useRef: (initial) => {
+          const idx = hookCursor++;
+          if (!(idx in refs)) refs[idx] = { current: initial };
+          return refs[idx];
+        },
+        useEffect: (fn, deps) => {
+          const idx = hookCursor++;
+          const prev = effectDeps[idx];
+          const changed = !prev || !deps || deps.some((d, i) => !Object.is(d, prev[i]));
+          if (changed) {
+            effectDeps[idx] = deps;
+            pendingEffects.push(fn);
+          }
+        },
+      };
+      fakeReact.default = fakeReact;
+
+      const fakeStudyStore = {
+        useStudyProgress: () => ({
+          savedSlugs: progressState.savedSlugs,
+          masteryMap: progressState.masteryMap,
+          notesMap: progressState.notesMap,
+          quizHistory: progressState.quizHistory,
+          toggleSavedSlug: (slug) => {
+            const exists = progressState.savedSlugs.includes(slug);
+            progressState = {
+              ...progressState,
+              savedSlugs: exists
+                ? progressState.savedSlugs.filter((s) => s !== slug)
+                : [...progressState.savedSlugs, slug],
+            };
+            writeProgress(progressState, storage);
+            return !exists;
+          },
+          saveElementNote: (slug, text) => {
+            const notesMap = { ...progressState.notesMap };
+            if (String(text ?? "").trim().length === 0) delete notesMap[slug];
+            else notesMap[slug] = String(text);
+            progressState = { ...progressState, notesMap };
+            writeProgress(progressState, storage);
+          },
+          toggleMasteredManual: (slug) => {
+            const prev = progressState.masteryMap[slug] || { attempts: 1, correct: 0, mastered: false };
+            progressState = {
+              ...progressState,
+              masteryMap: {
+                ...progressState.masteryMap,
+                [slug]: { ...prev, mastered: !prev.mastered },
+              },
+            };
+            writeProgress(progressState, storage);
+          },
+          importStudyData: validateImport,
+          exportStudyData: () => buildExportPayload(progressState),
+        }),
+      };
+
+      const flashcardsModule = { exports: {} };
+      const savedModule = { exports: {} };
+
+      const customRequire = (id) => {
+        if (id === "react") return fakeReact;
+        if (id === "react-router-dom") return { Link: "Link" };
+        if (id === "@/components/Navbar") return { default: () => null };
+        if (id === "@/components/Footer") return { default: () => null };
+        if (id === "@/components/StudyDeckFlashcards") return flashcardsModule.exports;
+        if (id === "@/data/elementsData") return elementsDataModule;
+        if (id === "@/lib/studyStore") return fakeStudyStore;
+        if (id === "lucide-react") {
+          return {
+            CheckCircle2: "i",
+            ArrowLeftRight: "i",
+            Download: "i",
+            Upload: "i",
+            Trash2: "i",
+            Plus: "i",
+            Award: "i",
+            BookOpen: "i",
+            BrainCircuit: "i",
+            Eye: "i",
+            RotateCcw: "i",
+            ArrowLeft: "i",
+            ArrowRight: "i",
+            FileText: "i",
+            Sparkles: "i",
+          };
+        }
+        throw new Error(`Unexpected import in SavedProgress/StudyDeckFlashcards: ${id}`);
+      };
+
+      new Function("require", "module", "exports", "React", flashcardsCode)(
+        customRequire,
+        flashcardsModule,
+        flashcardsModule.exports,
+        fakeReact
+      );
+      new Function("require", "module", "exports", "React", savedCode)(
+        customRequire,
+        savedModule,
+        savedModule.exports,
+        fakeReact
+      );
+      const SavedProgress = savedModule.exports.default;
+
+      const render = () => {
+        let tree;
+        for (let pass = 0; pass < 3; pass++) {
+          hookCursor = 0;
+          pendingEffects = [];
+          tree = SavedProgress({});
+          if (pendingEffects.length === 0) break;
+          for (const eff of pendingEffects) eff();
+        }
+        return tree;
+      };
+      return { render };
+    };
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    // 1. Honest zero start: empty deck shows empty message and no flashcard studio
+    const emptyApp = mountSavedProgress();
+    let tree = emptyApp.render();
+    assert.match(textOf(tree), /Your Study Deck is currently empty/);
+    assert.equal(findNodes(tree, (n) => n.props?.["data-testid"] === "study-deck-flashcards").length, 0);
+
+    // 2. Save Carbon & Oxygen, write a Carbon study note, mark Carbon mastered, and reload
+    writeProgress(
+      {
+        savedSlugs: ["carbon", "oxygen"],
+        masteryMap: { carbon: { attempts: 2, correct: 2, mastered: true, lastPracticed: "2026-11-15" } },
+        notesMap: { carbon: "Forms 4 covalent bonds; graphite & diamond" },
+        quizHistory: [],
+      },
+      storage
+    );
+    progressState = readProgress(storage).progress;
+    const app = mountSavedProgress();
+    tree = app.render();
+
+    // 3. Reference Cards & Notes view shows dimensionless atomic weights, persisted note, and Compare link
+    assert.equal(findNodes(tree, (n) => n.props?.["data-testid"] === "saved-reference-cards").length, 1);
+    assert.doesNotMatch(textOf(tree), /12\.011 u/, "Standard atomic weight on saved cards must be dimensionless");
+    assert.match(textOf(tree), /Reactive nonmetal · 12\.011 · \[He\] 2s2 2p2/);
+    const carbonNoteInput = findNodes(tree, (n) => n.type === "input" && n.props?.["aria-label"] === "Study note for Carbon")[0];
+    assert.equal(carbonNoteInput.props.value, "Forms 4 covalent bonds; graphite & diamond");
+    const compareTopLink = findNodes(
+      tree,
+      (n) => n.type === "Link" && textOf(n).includes("Compare Top Saved Elements")
+    )[0];
+    assert.equal(compareTopLink.props.to, "/compare?ids=carbon,oxygen");
+
+    const masteryBeforeRecall = JSON.stringify(progressState.masteryMap);
+
+    // 4. Switch to Flashcard Recall (2): spoiler reference cards hide and unrevealed front hides configuration & note text
+    const flashcardModeBtn = findNodes(
+      tree,
+      (n) => n.type === "button" && textOf(n).includes("Flashcard Recall (2)")
+    )[0];
+    flashcardModeBtn.props.onClick();
+    tree = app.render();
+
+    assert.equal(
+      findNodes(tree, (n) => n.props?.["data-testid"] === "saved-reference-cards").length,
+      0,
+      "Reference cards hide while rehearsing flashcards so answers are not spoiled on screen"
+    );
+    const flashcardsBox = findNodes(tree, (n) => n.props?.["data-testid"] === "study-deck-flashcards")[0];
+    assert.ok(flashcardsBox);
+    assert.match(textOf(flashcardsBox), /Card 1 of 2/);
+    assert.match(textOf(flashcardsBox), /Personal study note saved — revealed with answer/);
+    assert.doesNotMatch(textOf(flashcardsBox), /\[He\] 2s2 2p2/, "Unrevealed card must not spoil configuration");
+    assert.doesNotMatch(textOf(flashcardsBox), /Forms 4 covalent bonds/, "Unrevealed card must not spoil personal note");
+
+    // 5. Reveal Carbon -> displays configuration, active valence subshells, and Carbon's personal study note
+    const revealBtn = findNodes(
+      flashcardsBox,
+      (n) => n.type === "button" && textOf(n).includes("Reveal Chemistry Answer")
+    )[0];
+    revealBtn.props.onClick();
+    tree = app.render();
+
+    const answerPanel = findNodes(tree, (n) => n.props?.["data-testid"] === "flashcard-answer")[0];
+    assert.ok(answerPanel);
+    assert.match(textOf(answerPanel), /\[He\] 2s2 2p2/);
+    assert.match(textOf(answerPanel), /2s² 2p² — 4 valence electrons in outermost shell n=2/);
+    const revealedCarbonNoteInput = findNodes(answerPanel, (n) => n.type === "input")[0];
+    assert.equal(revealedCarbonNoteInput.props.value, "Forms 4 covalent bonds; graphite & diamond");
+
+    // 6. Rate Carbon "Needs Another Look", then reveal Oxygen, jot an Oxygen note right on the card back, and rate "Recalled Cleanly"
+    const needsLookBtn = findNodes(
+      answerPanel,
+      (n) => n.type === "button" && textOf(n).includes("Needs Another Look")
+    )[0];
+    needsLookBtn.props.onClick();
+    tree = app.render();
+    assert.match(textOf(tree), /Card 2 of 2/);
+    assert.match(textOf(tree), /Oxygen \(O\)/);
+
+    findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Reveal Chemistry Answer"))[0].props.onClick();
+    tree = app.render();
+    const oxAnswerPanel = findNodes(tree, (n) => n.props?.["data-testid"] === "flashcard-answer")[0];
+    const oxNoteInput = findNodes(oxAnswerPanel, (n) => n.type === "input")[0];
+    oxNoteInput.props.onChange({ target: { value: "2p4 paired electron lowers IE1 below N" } });
+    assert.equal(
+      readProgress(storage).progress.notesMap.oxygen,
+      "2p4 paired electron lowers IE1 below N",
+      "Note written on revealed flashcard persists immediately to device storage"
+    );
+
+    findNodes(oxAnswerPanel, (n) => n.type === "button" && textOf(n).includes("Recalled Cleanly"))[0].props.onClick();
+    tree = app.render();
+
+    // 7. Pass summary links to Flagged Quiz, Full Deck Quiz, Compare, and Rehearse Flagged subset
+    const summaryBox = findNodes(tree, (n) => n.props?.["data-testid"] === "flashcard-pass-summary")[0];
+    assert.ok(summaryBox);
+    assert.match(textOf(summaryBox), /Recalled 1 of 2 Elements from Memory/);
+    assert.match(textOf(summaryBox), /Flagged for another look: Carbon \(C\)/);
+    assert.equal(
+      findNodes(summaryBox, (n) => n.type === "Link" && n.props?.to === "/practice?element=carbon").length,
+      1,
+      "Single flagged element links directly to scoped element quiz"
+    );
+    assert.equal(
+      findNodes(summaryBox, (n) => n.type === "Link" && n.props?.to === "/practice?focus=deck").length,
+      1,
+      "Deck quiz link bridges rehearsal to graded multiple-choice practice"
+    );
+    assert.equal(
+      findNodes(summaryBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=carbon,oxygen").length,
+      1,
+      "Compare link opens side-by-side visual contrast for saved elements"
+    );
+
+    // 8. Rehearse Flagged (1) narrows strictly to Carbon, and Clue -> Element lens hides Carbon's name/symbol/Mastered badge before reveal
+    findNodes(summaryBox, (n) => n.type === "button" && textOf(n).includes("Rehearse Flagged (1)"))[0].props.onClick();
+    tree = app.render();
+    assert.match(textOf(tree), /Card 1 of 1/);
+    assert.match(textOf(tree), /Carbon \(C\)/);
+
+    findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Show all 2"))[0].props.onClick();
+    tree = app.render();
+    findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Clue → Element"))[0].props.onClick();
+    tree = app.render();
+    const clueFlashcard = findNodes(tree, (n) => n.props?.["data-testid"] === "study-deck-flashcards")[0];
+    assert.doesNotMatch(textOf(clueFlashcard), /\bCarbon\b/, "Unrevealed Clue card hides element name");
+    assert.doesNotMatch(textOf(clueFlashcard), /Mastered ✓/, "Unrevealed Clue card hides Mastered badge to prevent spoilers");
+
+    // Browsing past an unrated card must not manufacture a completed/clean pass.
+    findNodes(tree, (n) => n.type === "button" && textOf(n).trim() === "Next")[0].props.onClick();
+    tree = app.render();
+    findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Reveal Chemistry Answer"))[0].props.onClick();
+    tree = app.render();
+    findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Recalled Cleanly"))[0].props.onClick();
+    tree = app.render();
+    assert.equal(findNodes(tree, (n) => n.props?.["data-testid"] === "flashcard-pass-summary").length, 0,
+      "A pass remains active until every card has a self-check rating");
+    assert.match(textOf(tree), /Card 1 of 2/, "Rating the last card wraps to an earlier unchecked card");
+    assert.doesNotMatch(textOf(tree), /Every card in this pass was recalled cleanly/);
+    assert.equal(progressState.quizHistory.length, 0, "Flashcard self-checks must not fabricate graded quiz sessions");
+    assert.equal(JSON.stringify(progressState.masteryMap), masteryBeforeRecall, "Flashcard self-checks must preserve prior mastery exactly");
+
+  });
 });
