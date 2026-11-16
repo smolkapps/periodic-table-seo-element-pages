@@ -1,0 +1,247 @@
+{
+  "publication": {
+    "status": "published",
+    "source_revision": "cb36563a5e187455cd3f76be552f5a6c1ef30544",
+    "ci_run_id": "43784189148",
+    "backup": "/var/backups/elementa-auto-20261116T010740Z-cb36563a5e18",
+    "warnings": [],
+    "verified_at": "2026-11-16T01:07:40.292Z",
+    "origin": "https://elementalearn.com"
+  },
+  "ci": {
+    "conclusion": "success",
+    "createdAt": "2026-11-16T01:05:37Z",
+    "event": "push",
+    "headSha": "cb36563a5e187455cd3f76be552f5a6c1ef30544",
+    "status": "completed",
+    "updatedAt": "2026-11-16T01:06:35Z",
+    "url": "https://github.com/smolkapps/periodic-table-seo-element-pages/actions/runs/43784189148"
+  },
+  "artifact": {
+    "id": 14189577955,
+    "name": "elementa-site-cb36563a5e187455cd3f76be552f5a6c1ef30544",
+    "size_in_bytes": 7852883,
+    "expired": false
+  },
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "empty_and_saved_deck": true,
+      "spoiler_free_three_lenses": true,
+      "reveal_next_summary_keyboard_focus": true,
+      "skip_first_wraps_until_all_rated": true,
+      "flagged_rehearsal": true,
+      "deck_add_and_import_reorder_reset": true,
+      "note_edit_does_not_reset_and_persists": true,
+      "self_checks_leave_scores_and_mastery_unchanged": true,
+      "predictions_and_palladium": true,
+      "actual_compare_and_scoped_quiz_score_total": [
+        4,
+        4
+      ],
+      "export_import_offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "empty_and_saved_deck": true,
+      "spoiler_free_three_lenses": true,
+      "reveal_next_summary_keyboard_focus": true,
+      "skip_first_wraps_until_all_rated": true,
+      "flagged_rehearsal": true,
+      "deck_add_and_import_reorder_reset": true,
+      "note_edit_does_not_reset_and_persists": true,
+      "self_checks_leave_scores_and_mastery_unchanged": true,
+      "predictions_and_palladium": true,
+      "actual_compare_and_scoped_quiz_score_total": [
+        4,
+        4
+      ],
+      "export_import_offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "revision": "cb36563a5e187455cd3f76be552f5a6c1ef30544",
+    "run_id": "43784189148",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "source_hash_match": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/assets/index-Ca4uy2mx.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/assets/index-DI_5tDPq.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "source_hash_match": true
+      }
+    ],
+    "missing_page_status": 404
+  },
+  "root_tests": 148,
+  "study_tests": 43,
+  "promotion_fixture_tests": 7,
+  "skipped_tests": 0,
+  "physical_device_verified": false,
+  "notes": [
+    "Ordinary checked-main timer released the successful artifact; no manual deploy/kickstart.",
+    "Cloudflare RUM/beacon requests aborted during navigation; no observed application-request failures.",
+    "Responsive browser and disposable local study data only; no customer demand or learning-gain claim."
+  ]
+}
