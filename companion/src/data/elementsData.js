@@ -909,6 +909,191 @@ export function getNeighborDistractors(target, shift = 0, extraFilter = null, sy
   return picks;
 }
 
+const SUPERSCRIPT_DIGITS = {
+  "0": "⁰",
+  "1": "¹",
+  "2": "²",
+  "3": "³",
+  "4": "⁴",
+  "5": "⁵",
+  "6": "⁶",
+  "7": "⁷",
+  "8": "⁸",
+  "9": "⁹",
+};
+
+function toSuperscript(num) {
+  return String(num)
+    .split("")
+    .map((ch) => SUPERSCRIPT_DIGITS[ch] || ch)
+    .join("");
+}
+
+function redactElementClueText(element) {
+  return element.highlight
+    .replace(new RegExp(element.name, "gi"), "___")
+    .replace(new RegExp(`[⁰¹²³⁴⁵⁶⁷⁸⁹]+${element.symbol}\\b`, "g"), "a long-lived isotope")
+    .replace(new RegExp(`\\b${element.symbol}\\b`, "g"), "___");
+}
+
+export function describeValenceSummary(element) {
+  const active = element.subshells.filter((sub) => isValenceSubshell(element, sub));
+  const chosen = active.length > 0 ? active : element.subshells.slice(-1);
+  const activeLabels = chosen.map((sub) => `${sub.label}${toSuperscript(sub.count)}`).join(" ");
+
+  if (element.symbol === "Pd") {
+    return `${activeLabels} — closed n=4 d-subshell with 0 electrons in n=5`;
+  }
+  if (element.category === "noble gas") {
+    if (element.number === 2) {
+      return `${activeLabels} — closed n=1 valence shell (2 e⁻)`;
+    }
+    if (element.number >= 104) {
+      return `${activeLabels} — nominal closed n=${element.period} shell (${element.outerShellElectrons} outer-shell e⁻; relativistic Period 7 behavior predicted)`;
+    }
+    return `${activeLabels} — closed n=${element.period} valence octet (${element.outerShellElectrons} outer-shell e⁻)`;
+  }
+  if (element.block === "s" || element.block === "p") {
+    return `${activeLabels} — ${element.outerShellElectrons} valence electron${
+      element.outerShellElectrons === 1 ? "" : "s"
+    } in outermost shell n=${element.shells.length}`;
+  }
+  if (element.block === "d") {
+    const innerD = element.subshells.find((s) => s.n === element.period - 1 && s.l === "d");
+    if (innerD && innerD.count < 10) {
+      return `${activeLabels} — ${element.outerShellElectrons} outer-shell e⁻ in n=${
+        element.shells.length
+      } plus partially filled inner ${innerD.label}${toSuperscript(innerD.count)} subshell`;
+    }
+    const filledLabel = innerD ? `${innerD.label}${toSuperscript(innerD.count)}` : `n=${element.period - 1} d-subshell`;
+    return `${activeLabels} with filled inner ${filledLabel} — ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length}`;
+  }
+  const innerF = element.subshells.find((s) => s.n === element.period - 2 && s.l === "f");
+  const filledFClause = innerF && innerF.count === 14 ? ` over filled ${innerF.label}¹⁴` : "";
+  return `${activeLabels}${filledFClause} — ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length} (${element.category} f-block series)`;
+}
+
+export const FLASHCARD_MODES = Object.freeze({
+  structure: {
+    id: "structure",
+    label: "Structure & Valence",
+  },
+  trends: {
+    id: "trends",
+    label: "Trends & Reactivity",
+  },
+  clue: {
+    id: "clue",
+    label: "Clue → Element",
+  },
+});
+
+export function buildDeckFlashcard(element, mode = "structure", personalNote = "") {
+  if (!element) return null;
+  const resolvedMode = mode === "trends" || mode === "clue" ? mode : "structure";
+  const trimmedNote = typeof personalNote === "string" ? personalNote.trim() : "";
+  const catMeta = CATEGORY_META[element.category];
+  const mass = formatMass(element);
+  const weightDetail = element.synthetic
+    ? `${mass} (reference isotope mass number A; no CIAAW weight)`
+    : `${mass} (CIAAW standard atomic weight)`;
+  const groupText = element.group !== null ? `Group ${element.group}` : "f-block";
+  const enText = element.electronegativity !== null ? String(element.electronegativity) : "Not established";
+  const ieText = element.ionizationEnergy !== null ? `${element.ionizationEnergy} kJ/mol` : "Not established";
+  const radText = element.atomicRadius !== null ? `${element.atomicRadius} pm` : "Not established";
+  const capPhase = element.phase.charAt(0).toUpperCase() + element.phase.slice(1);
+  const phaseText = element.number >= 104 ? `${capPhase} (predicted at STP)` : `${capPhase} at STP`;
+  const valenceSummary = describeValenceSummary(element);
+  const aufbauNote = AUFBAU_NOTES[element.symbol] || null;
+  const referenceNote = element.number >= 104
+    ? "Superheavy reference model: shell/valence descriptions and STP phase include theoretical predictions. Family labels do not establish measured bulk reactivity."
+    : null;
+  const familyTakeaway = referenceNote || catMeta.reactivity;
+
+  if (resolvedMode === "trends") {
+    return {
+      slug: element.slug,
+      mode: resolvedMode,
+      frontBadge: `Element #${element.number} · Period ${element.period} · ${groupText} (${element.block}-block)`,
+      frontTitle: `${element.name} (${element.symbol})`,
+      frontPrompt: `Recall ${element.name}'s chemical family, STP phase, and reference periodic trends (Pauling electronegativity, 1st ionization energy, and covalent radius).`,
+      hasPersonalNote: trimmedNote.length > 0,
+      answerHeadline: `${catMeta.label} · ${phaseText}`,
+      answerSubline: `EN ${enText} · IE₁ ${ieText} · r_cov ${radText}`,
+      details: [
+        { label: "Pauling electronegativity", value: enText },
+        { label: "1st Ionization energy", value: ieText },
+        { label: "Covalent radius", value: radText },
+        { label: "Atomic weight / mass number", value: weightDetail },
+      ],
+      takeaway: `${familyTakeaway} Notable as ${element.highlight}.`,
+      aufbauNote,
+      referenceNote,
+      personalNote: trimmedNote,
+    };
+  }
+
+  if (resolvedMode === "clue") {
+    const sanitizedHighlight = redactElementClueText(element);
+    const outerBrief =
+      element.symbol === "Pd"
+        ? "a filled 4d¹⁰ subshell (0 e⁻ in n=5)"
+        : `${element.outerShellElectrons} outer-shell e⁻`;
+    const trendBrief =
+      element.electronegativity !== null
+        ? `Pauling EN ${element.electronegativity}`
+        : element.ionizationEnergy !== null
+        ? `1st ionization energy ${element.ionizationEnergy} kJ/mol`
+        : "unestablished Pauling EN and ionization energy";
+
+    return {
+      slug: element.slug,
+      mode: resolvedMode,
+      frontBadge: `Period ${element.period} · ${element.block}-block · ${element.shells.length} occupied ${
+        element.shells.length === 1 ? "shell" : "shells"
+      }`,
+      frontTitle: "Identify This Saved Element",
+      frontPrompt: `Notable as ${sanitizedHighlight} — a ${catMeta.label.toLowerCase()} with ${outerBrief} (${trendBrief}). Which element in your Study Deck is this?`,
+      hasPersonalNote: trimmedNote.length > 0,
+      answerHeadline: `#${element.number} ${element.name} (${element.symbol})`,
+      answerSubline: `${catMeta.label} · ${element.electronConfig} · Shells ${element.shells.join(" · ")}`,
+      details: [
+        { label: "Periodic placement", value: `${groupText} · Period ${element.period} · ${element.block}-block` },
+        { label: "Valence subshells", value: valenceSummary },
+        { label: "Reference trends", value: `EN ${enText} · IE₁ ${ieText} · r_cov ${radText}` },
+        { label: "Atomic weight / mass number", value: weightDetail },
+      ],
+      takeaway: `Notable as ${element.highlight}.`,
+      aufbauNote,
+      referenceNote,
+      personalNote: trimmedNote,
+    };
+  }
+
+  return {
+    slug: element.slug,
+    mode: resolvedMode,
+    frontBadge: `Element #${element.number} · Period ${element.period} · ${groupText}`,
+    frontTitle: `${element.name} (${element.symbol})`,
+    frontPrompt: `Recall ${element.name}'s ground-state electron configuration, occupied shell distribution, and active valence subshells from memory.`,
+    hasPersonalNote: trimmedNote.length > 0,
+    answerHeadline: element.electronConfig,
+    answerSubline: `${element.shells.length} occupied ${element.shells.length === 1 ? "shell" : "shells"} (${element.shells.join(
+      " · "
+    )}) · ${element.block}-block`,
+    details: [
+      { label: "Valence subshells", value: valenceSummary },
+      { label: "Chemical family & STP phase", value: `${catMeta.label} · ${phaseText}` },
+      { label: "Reference trends", value: `EN ${enText} · IE₁ ${ieText} · r_cov ${radText}` },
+      { label: "Atomic weight / mass number", value: weightDetail },
+    ],
+    takeaway: familyTakeaway,
+    aufbauNote,
+    referenceNote,
+    personalNote: trimmedNote,
+  };
+}
+
 export function buildDailySpotlight(dateKey = "2025-11-01", offset = 0) {
   const str = String(dateKey || "2025-11-01");
   let hash = 2166136261;
@@ -930,11 +1115,7 @@ export function buildDailySpotlight(dateKey = "2025-11-01", offset = 0) {
       ? `1st ionization energy ${target.ionizationEnergy} kJ/mol`
       : `${target.shells.length} occupied electron shells`;
 
-  // Redact any direct mention of the element's name or isotope symbol inside its highlight
-  const sanitizedHighlight = target.highlight
-    .replace(new RegExp(target.name, "gi"), "___")
-    .replace(new RegExp(`[⁰¹²³⁴⁵⁶⁷⁸⁹]+${target.symbol}\\b`, "g"), "a long-lived isotope")
-    .replace(new RegExp(`\\b${target.symbol}\\b`, "g"), "___");
+  const sanitizedHighlight = redactElementClueText(target);
 
   const clue = `Known as ${sanitizedHighlight} — a ${categoryLabel(target.category).toLowerCase()} with ${
     target.outerShellElectrons

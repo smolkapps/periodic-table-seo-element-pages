@@ -14,6 +14,9 @@ import {
   buildPeriodicTrendInsight,
   buildDeterministicQuiz,
   buildDailySpotlight,
+  FLASHCARD_MODES,
+  buildDeckFlashcard,
+  describeValenceSummary,
   AUFBAU_NOTES,
   getShellRoleLabel,
   isValenceSubshell,
@@ -162,6 +165,69 @@ describe("Elementa 118-element dataset", () => {
       );
     }
     assert.equal(seenSlugs.size, 118, "Cycling 118 offsets visits all 118 elements");
+  });
+
+  it("builds active-recall flashcards across all 118 elements without leaking answers or misstating valence/units", () => {
+    assert.deepEqual(Object.keys(FLASHCARD_MODES), ["structure", "trends", "clue"]);
+
+    for (const el of ELEMENTS) {
+      const secretNote = `Personal mnemonic for Z=${el.number}`;
+
+      const structureCard = buildDeckFlashcard(el, "structure", secretNote);
+      const structureFront = `${structureCard.frontBadge} ${structureCard.frontTitle} ${structureCard.frontPrompt}`;
+      assert.equal(structureCard.hasPersonalNote, true);
+      assert.equal(structureCard.personalNote, secretNote);
+      assert.equal(structureFront.includes(secretNote), false, "Structure front must never leak personal note");
+      assert.equal(structureFront.includes(el.electronConfig), false, "Structure front must never leak configuration");
+      assert.equal(structureCard.answerHeadline, el.electronConfig);
+      if (el.number >= 104) {
+        assert.match(structureCard.referenceNote, /theoretical predictions/);
+        assert.doesNotMatch(structureCard.takeaway, /near-complete chemical inertness/);
+      }
+      for (const detail of structureCard.details) {
+        if (detail.label === "Atomic weight / mass number") {
+          assert.doesNotMatch(detail.value, /\bu\b/, `Flashcard atomic weight must be dimensionless on ${el.name}`);
+        }
+      }
+
+      const trendsCard = buildDeckFlashcard(el, "trends", secretNote);
+      const trendsFront = `${trendsCard.frontBadge} ${trendsCard.frontTitle} ${trendsCard.frontPrompt}`;
+      assert.equal(trendsFront.includes(secretNote), false, "Trends front must never leak personal note");
+      assert.equal(
+        trendsFront.toLowerCase().includes(CATEGORY_META[el.category].label.toLowerCase()),
+        false,
+        `Trends front must not leak family label for ${el.name}`
+      );
+
+      const clueCard = buildDeckFlashcard(el, "clue", secretNote);
+      const clueFront = `${clueCard.frontBadge} ${clueCard.frontTitle} ${clueCard.frontPrompt}`;
+      assert.equal(clueFront.includes(secretNote), false, "Clue front must never leak personal note");
+      assert.doesNotMatch(
+        clueFront.toLowerCase(),
+        new RegExp(`\\b${el.name.toLowerCase()}\\b`),
+        `Flashcard clue leaks element name for ${el.name}`
+      );
+      assert.doesNotMatch(
+        clueFront,
+        new RegExp(`\\b${el.symbol}\\b`),
+        `Flashcard clue leaks element symbol for ${el.symbol}`
+      );
+      assert.doesNotMatch(clueFront, new RegExp(`#${el.number}\\b|Z\\s*=\\s*${el.number}\\b`));
+    }
+
+    assert.equal(describeValenceSummary(getElementBySlug("carbon")), "2s² 2p² — 4 valence electrons in outermost shell n=2");
+    assert.equal(describeValenceSummary(getElementBySlug("helium")), "1s² — closed n=1 valence shell (2 e⁻)");
+    assert.match(describeValenceSummary(getElementBySlug("neon")), /2s² 2p⁶ — closed n=2 valence octet/);
+    assert.match(describeValenceSummary(getElementBySlug("chromium")), /3d⁵ 4s¹.*partially filled inner 3d⁵/);
+    assert.match(describeValenceSummary(getElementBySlug("copper")), /4s¹ with filled inner 3d¹⁰/);
+    assert.equal(describeValenceSummary(getElementBySlug("palladium")), "4d¹⁰ — closed n=4 d-subshell with 0 electrons in n=5");
+    assert.match(describeValenceSummary(getElementBySlug("ytterbium")), /6s² over filled 4f¹⁴/);
+    assert.match(describeValenceSummary(getElementBySlug("lawrencium")), /7s² 7p¹ over filled 5f¹⁴/);
+
+    const ogTrends = buildDeckFlashcard(getElementBySlug("oganesson"), "trends");
+    assert.match(ogTrends.answerHeadline, /predicted at STP/);
+    assert.match(ogTrends.answerSubline, /EN Not established · IE₁ Not established · r_cov Not established/);
+    assert.ok(buildDeckFlashcard(getElementBySlug("chromium"), "structure").aufbauNote);
   });
 });
 
