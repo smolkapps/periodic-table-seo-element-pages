@@ -1,54 +1,39 @@
 import React, { useState, useMemo } from "react";
-import { ELEMENTS, CATEGORY_META } from "@/data/elementsData";
-import { TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CATEGORY_META } from "@/data/elementsData";
+import {
+  TREND_EXPLORER_METRICS,
+  getTrendMetricValue,
+  getTrendExplorerPeers,
+  buildTrendExplorerAnalysis,
+} from "@/data/trendReasoning";
+import { TrendingUp, ArrowLeftRight } from "lucide-react";
 
-const METRICS = [
-  {
-    key: "electronegativity",
-    label: "Pauling Electronegativity",
-    unit: "",
-    why: "Increases across a period as nuclear charge (Z) rises while valence electrons enter the same principal shell (minimal shielding). Decreases down a group as outer electrons sit farther from the nucleus.",
-  },
-  {
-    key: "ionizationEnergy",
-    label: "1st Ionization Energy",
-    unit: "kJ/mol",
-    why: "Energy needed to remove one mole of valence electrons (NIST). Generally rises across a period (peaking at closed-shell Noble Gases) with small dips at group 13 (np¹ penetration) and group 16 (np⁴ spin-pair repulsion).",
-  },
-  {
-    key: "atomicRadius",
-    label: "Empirical Covalent Radius",
-    unit: "pm",
-    why: "Contracts left-to-right across a period because higher effective nuclear charge (Z_eff) pulls the electron cloud inward. Expands down a group as new principal quantum shells (n) are added.",
-  },
-];
-
+/**
+ * @param {{
+ *   element: any,
+ *   onSelectElement?: (slug: string) => void
+ * }} props
+ */
 export default function TrendExplorerCard({ element, onSelectElement }) {
   const [metricKey, setMetricKey] = useState("electronegativity");
   const [axisMode, setAxisMode] = useState("period"); // 'period' | 'group'
 
-  const activeMetric = METRICS.find((m) => m.key === metricKey) || METRICS[0];
+  const activeMetric = TREND_EXPLORER_METRICS.find((m) => m.key === metricKey) || TREND_EXPLORER_METRICS[0];
 
-  const peerElements = useMemo(() => {
-    if (axisMode === "period") {
-      if (element.ypos > 7) {
-        return ELEMENTS.filter((e) => e.category === element.category).sort((a, b) => a.number - b.number);
-      }
-      return ELEMENTS.filter((e) => e.period === element.period && e.ypos <= 7).sort((a, b) => a.number - b.number);
-    }
-    if (element.group !== null) {
-      return ELEMENTS.filter((e) => e.group === element.group).sort((a, b) => a.period - b.period);
-    }
-    // f-block series compared against Period main-body peers + current element
-    return ELEMENTS.filter((e) => e.period === element.period && (e.ypos <= 7 || e.slug === element.slug)).sort(
-      (a, b) => a.number - b.number
-    );
-  }, [element, axisMode]);
+  const peerElements = useMemo(() => getTrendExplorerPeers(element, axisMode).peers, [element, axisMode]);
 
   const maxVal = useMemo(() => {
-    const vals = peerElements.map((e) => e[metricKey]).filter((v) => v !== null && Number.isFinite(v));
-    return vals.length > 0 ? Math.max(...vals) : 1;
-  }, [peerElements, metricKey]);
+    const vals = peerElements
+      .map((e) => getTrendMetricValue(e, activeMetric.key))
+      .filter((v) => v !== null && Number.isFinite(v));
+    return vals.length > 0 ? Math.max(.../** @type {number[]} */ (vals)) : 0;
+  }, [peerElements, activeMetric.key]);
+
+  const analysis = useMemo(
+    () => buildTrendExplorerAnalysis(element, activeMetric.key, axisMode),
+    [element, activeMetric.key, axisMode]
+  );
 
   return (
     <div className="rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3.5">
@@ -92,13 +77,13 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
 
       {/* Metric Tabs */}
       <div role="group" aria-label="Periodic trend metric" className="flex flex-wrap gap-1.5">
-        {METRICS.map((m) => (
+        {TREND_EXPLORER_METRICS.map((m) => (
           <button
             key={m.key}
             type="button"
             aria-pressed={metricKey === m.key}
             onClick={() => setMetricKey(m.key)}
-            className={`min-h-[40px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+            className={`min-h-[40px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors motion-reduce:transition-none ${
               metricKey === m.key
                 ? "bg-[#4f9dff]/20 border-[#4f9dff] text-white"
                 : "bg-[#141a24] border-[#242c38] text-[#aeb8c4] hover:text-white"
@@ -109,15 +94,20 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
         ))}
       </div>
 
+      <p className="text-[11px] text-[#8b98a9]">
+        Zero-baseline scale relative to the highest known value shown; tap any bar to inspect that element with the same metric selected.
+      </p>
+
       {/* Bar chart comparison across Period or Group */}
-      <div className="pt-2 pb-1 overflow-x-auto">
-        <div className="flex items-end gap-2 min-h-[130px] pt-6 px-1">
+      <div className="pt-1 pb-1 overflow-x-auto">
+        <div className="flex items-end gap-2 min-h-[130px] pt-5 px-1">
           {peerElements.map((peer) => {
-            const val = peer[metricKey];
+            const val = getTrendMetricValue(peer, activeMetric.key);
+            const hasVal = val !== null;
             const isCurrent = peer.slug === element.slug;
-            const heightPct = val !== null ? Math.max(12, Math.round((val / maxVal) * 84)) : 8;
+            const heightPct = hasVal && maxVal > 0 ? Number(((val / maxVal) * 100).toFixed(1)) : 0;
             const color = CATEGORY_META[peer.category]?.hex || "#4f9dff";
-            const metricValueText = val !== null ? `${val}${activeMetric.unit ? ` ${activeMetric.unit}` : ""}` : "Not established";
+            const metricValueText = hasVal ? `${val}${activeMetric.unit ? ` ${activeMetric.unit}` : ""}` : "Not established";
 
             return (
               <button
@@ -127,23 +117,39 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
                 aria-current={isCurrent ? "true" : undefined}
                 onClick={() => onSelectElement && onSelectElement(peer.slug)}
                 title={`${peer.name} (${peer.symbol}): ${metricValueText}`}
-                className={`flex flex-col items-center flex-1 min-w-[44px] py-1 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4f9dff] rounded ${
-                  isCurrent ? "scale-105" : "opacity-80 hover:opacity-100"
+                className={`flex flex-col items-center flex-1 min-w-[44px] py-1 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4f9dff] rounded transition-opacity motion-reduce:transition-none ${
+                  isCurrent ? "opacity-100" : "opacity-80 hover:opacity-100"
                 }`}
               >
-                <span className="text-[10px] font-mono text-[#aeb8c4] mb-1">
-                  {val !== null ? val : "—"}
+                <span className={`text-[10px] font-mono mb-1 ${isCurrent ? "text-white font-bold" : "text-[#aeb8c4]"}`}>
+                  {hasVal ? val : "—"}
                 </span>
-                <div className="w-full h-24 bg-[#141a24] rounded-t flex items-end p-0.5 border border-[#242c38]">
-                  <div
-                    style={{
-                      height: `${heightPct}%`,
-                      backgroundColor: val !== null ? color : "#2a323d",
-                    }}
-                    className={`w-full rounded-t transition-all ${
-                      isCurrent ? "ring-2 ring-white" : ""
-                    }`}
-                  />
+                <div
+                  className={`w-full h-24 bg-[#141a24] rounded-t flex items-end justify-center p-0.5 border ${
+                    isCurrent ? "border-[#4f9dff]" : "border-[#242c38]"
+                  }`}
+                >
+                  {hasVal ? (
+                    <div
+                      data-bar-slug={peer.slug}
+                      data-bar-height-pct={heightPct}
+                      style={{
+                        height: `${heightPct}%`,
+                        backgroundColor: color,
+                      }}
+                      className={`w-full rounded-t transition-all motion-reduce:transition-none ${
+                        isCurrent ? "ring-2 ring-white" : ""
+                      }`}
+                    />
+                  ) : (
+                    <span
+                      data-bar-slug={peer.slug}
+                      data-bar-height-pct={0}
+                      className="text-[9px] font-mono text-[#7a8694] self-center"
+                    >
+                      n/a
+                    </span>
+                  )}
                 </div>
                 <span
                   className={`text-xs font-mono mt-1 px-1.5 py-0.5 rounded ${
@@ -159,9 +165,40 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
         </div>
       </div>
 
-      <p className="text-xs text-[#aeb8c4] bg-[#141a24] p-2.5 rounded-lg border border-[#242c38] leading-relaxed">
-        <strong className="text-white">Physical Chemistry Principle:</strong> {activeMetric.why}
-      </p>
+      {/* Selected-Element Numeric Worked Example & Reference Note */}
+      <div
+        data-testid="trend-worked-example"
+        aria-live="polite"
+        className="rounded-lg bg-[#141a24] border border-[#242c38] border-l-[3px] border-l-[#4f9dff] p-3.5 space-y-2"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs sm:text-sm font-bold text-white">{analysis.headline}</p>
+          {analysis.seriesSpanLabel && (
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#0e121a] border border-[#242c38] text-[#7bb6ff]">
+              {analysis.seriesSpanLabel}
+            </span>
+          )}
+        </div>
+
+        <p className="text-xs text-[#cbd5e1] leading-relaxed">{analysis.summary}</p>
+        {analysis.sourceUrl && <a href={analysis.sourceUrl} target="_blank" rel="noopener noreferrer"
+          className="text-xs text-[#7bb6ff] underline">Explanation source: OpenStax Chemistry 2e</a>}
+
+        <div className="pt-2 border-t border-[#1f2836] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px] text-[#8b98a9]">
+          <p className="leading-relaxed">
+            <strong className="text-[#aeb8c4]">Reference note:</strong> {analysis.principle}
+          </p>
+          {analysis.compareSlugs.length >= 2 && (
+            <Link
+              to={`/compare?ids=${analysis.compareSlugs.join(",")}`}
+              className="min-h-[40px] shrink-0 px-3 py-1.5 rounded-lg bg-[#0e121a] border border-[#2a323d] hover:border-[#4f9dff] text-xs font-semibold text-[#7bb6ff] inline-flex items-center justify-center gap-1.5 no-underline transition-colors motion-reduce:transition-none"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 shrink-0" />
+              <span>Compare {analysis.compareLabel}</span>
+            </Link>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
