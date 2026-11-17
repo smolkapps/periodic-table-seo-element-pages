@@ -30,6 +30,12 @@ import {
   nextCellIndex,
   firstVisibleIndex,
 } from "../src/data/elementsData.js";
+import {
+  TREND_EXPLORER_METRICS,
+  getTrendMetricValue,
+  getTrendExplorerPeers,
+  buildTrendExplorerAnalysis,
+} from "../src/data/trendReasoning.js";
 
 describe("Elementa 118-element dataset", () => {
   it("contains all 118 elements in strict atomic number order 1..118", () => {
@@ -415,6 +421,97 @@ describe("Elementa article and comparison generation", () => {
     assert.match(unknown.body, /not established in this dataset/);
     assert.doesNotMatch(unknown.body, /null|undefined|NaN|radioactive/);
     assert.equal(buildPeriodicTrendInsight([]), null);
+  });
+
+  it("keeps selected values, signed comparisons, missing entries and peer scope consistent across 708 trend states", () => {
+    assert.deepEqual(
+      TREND_EXPLORER_METRICS.map((m) => m.key),
+      ["electronegativity", "ionizationEnergy", "atomicRadius"]
+    );
+
+    // 1. Exhaustive audit across all 118 elements x 3 metrics x 2 axes = 708 states
+    for (const el of ELEMENTS) {
+      for (const metric of TREND_EXPLORER_METRICS) {
+        for (const axisMode of ["period", "group"]) {
+          const res = buildTrendExplorerAnalysis(el, metric.key, axisMode);
+          const combined = `${res.headline} ${res.seriesSpanLabel} ${res.summary} ${res.principle}`;
+          assert.doesNotMatch(
+            combined,
+            /\bundefined\b|\bnull\b|\bNaN\b|\d+\.\d{4,}/,
+            `Malformed or unrounded text for ${el.slug}/${metric.key}/${axisMode}: ${combined}`
+          );
+          assert.doesNotMatch(
+            combined,
+            /remove one mole of valence electrons/i,
+            "Avoid sloppy multi-electron phrasing for first ionization energy"
+          );
+          assert.ok(
+            res.compareSlugs.includes(el.slug),
+            `Compare window must always include active element ${el.slug} (${metric.key}/${axisMode})`
+          );
+
+          const val = getTrendMetricValue(el, metric.key);
+          if (val === null) {
+            assert.match(res.headline, /not established/i);
+            assert.match(res.summary, /not established|no stable standard covalent|no established/i);
+          } else {
+            assert.ok(
+              res.headline.includes(String(val)) && res.summary.length > 30,
+              `Expected exact value ${val} in headline for ${el.slug}/${metric.key}/${axisMode}`
+            );
+          }
+
+          // f-block elements in axisMode="group" compare Period main-body + element, never a vertical group
+          if (el.group === null && axisMode === "group") {
+            assert.doesNotMatch(res.summary, /^Down Group|^Moving down Group|^At the top of Group/);
+          }
+        }
+      }
+    }
+
+    // The worked example must use the selected values and only narrowly sourced explanations.
+    const oxygen = getElementBySlug("oxygen");
+    const oxIE = buildTrendExplorerAnalysis(oxygen, "ionizationEnergy", "period");
+    assert.match(oxIE.headline, /1313\.9 kJ\/mol.*88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/);
+    assert.match(oxIE.summary, /2p³.*2p⁴/);
+    assert.match(oxIE.sourceUrl, /openstax/);
+    assert.deepEqual(oxIE.compareSlugs, ["nitrogen", "oxygen", "fluorine"]);
+    const nIE = buildTrendExplorerAnalysis(getElementBySlug("nitrogen"), "ionizationEnergy", "period");
+    assert.match(nIE.headline, /88\.4 kJ\/mol higher than Oxygen/);
+    assert.match(nIE.summary, /half-filled 2p³/);
+    assert.deepEqual(nIE.compareSlugs, ["carbon", "nitrogen", "oxygen"]);
+    assert.match(buildTrendExplorerAnalysis(oxygen, "electronegativity").headline, /0\.4 higher than Nitrogen/);
+    assert.match(buildTrendExplorerAnalysis(getElementBySlug("boron"), "ionizationEnergy").headline, /98\.9 kJ\/mol lower than Beryllium/);
+    assert.match(buildTrendExplorerAnalysis(getElementBySlug("aluminium"), "ionizationEnergy").summary, /first p electron/);
+
+    // Absolute magnitudes must never reverse lower/higher comparisons.
+    for (const [slug, key, expected] of [
+      ["vanadium", "ionizationEnergy", /1\.2 kJ\/mol lower than Niobium/],
+      ["nickel", "ionizationEnergy", /67\.3 kJ\/mol lower than Palladium/],
+      ["chromium", "electronegativity", /0\.5 lower than Molybdenum/],
+      ["gold", "ionizationEnergy", /159\.1 kJ\/mol higher than Silver/],
+      ["gold", "atomicRadius", /9 pm lower than Silver/],
+    ]) assert.match(buildTrendExplorerAnalysis(getElementBySlug(slug), key, "group").headline, expected);
+
+    // Displayed adjacency can skip many atomic numbers; differences do not establish causes.
+    const hf = buildTrendExplorerAnalysis(getElementBySlug("hafnium"), "atomicRadius");
+    assert.match(hf.headline, /40 pm lower than Barium/);
+    assert.doesNotMatch(hf.summary, /\+1 proton|because/);
+    const pd = buildTrendExplorerAnalysis(getElementBySlug("palladium"), "atomicRadius", "group");
+    assert.doesNotMatch(pd.summary, /adding.*n=5|extra.*shell|filled f/);
+    const ne = buildTrendExplorerAnalysis(getElementBySlug("neon"), "electronegativity");
+    assert.match(ne.headline, /not established/);
+    assert.doesNotMatch(ne.summary, /radioisotope|synthesis|half-life/);
+    const h = buildTrendExplorerAnalysis(getElementBySlug("hydrogen"), "electronegativity");
+    assert.match(h.summary, /1 of 2 entries/);
+    assert.match(h.seriesSpanLabel, /Known: H 2\.2/);
+    assert.equal(getTrendExplorerPeers(oxygen, "group").peers[1].slug, "sulfur");
+
+    const tie = ELEMENTS.map((el) => buildTrendExplorerAnalysis(el, "atomicRadius"))
+      .find((res) => res.headline.includes("equal to"));
+    assert.ok(tie, "Dataset ties must remain explicitly equal");
+    assert.doesNotMatch(tie.summary, /because|shielding balances/);
+
   });
 
   it("builds canonical public elementalearn.com share URLs for elements and comparisons", () => {

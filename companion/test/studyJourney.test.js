@@ -5,6 +5,7 @@ import path from "node:path";
 import vm from "node:vm";
 import ts from "typescript";
 import * as elementsDataModule from "../src/data/elementsData.js";
+import * as trendReasoningModule from "../src/data/trendReasoning.js";
 import { readQuizPrefs, writeQuizPrefs } from "../src/lib/quizPreferences.js";
 
 const {
@@ -1540,5 +1541,139 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     assert.equal(progressState.quizHistory.length, 0, "Flashcard self-checks must not fabricate graded quiz sessions");
     assert.equal(JSON.stringify(progressState.masteryMap), masteryBeforeRecall, "Flashcard self-checks must preserve prior mastery exactly");
 
+  });
+
+  it("walks through Oxygen -> 1st Ionization Energy -> Nitrogen bar inspection -> Down Group 15 reasoning and zero-baseline bar heights in TrendExplorerCard", () => {
+    const source = fs.readFileSync(path.resolve("src/components/TrendExplorerCard.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    let hookCursor = 0;
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+        const setState = (u) => {
+          hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+        };
+        return [hookStates[idx], setState];
+      },
+      useMemo: (fn) => {
+        hookCursor++;
+        return fn();
+      },
+    };
+    fakeReact.default = fakeReact;
+
+    const cjsModule = { exports: {} };
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "react-router-dom") return { Link: "Link" };
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "@/data/trendReasoning") return trendReasoningModule;
+      if (id === "lucide-react") return { TrendingUp: "i", ArrowLeftRight: "i" };
+      throw new Error(`Unexpected import in TrendExplorerCard: ${id}`);
+    };
+    new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const TrendExplorerCard = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    let activeSlug = "oxygen";
+    const render = () => {
+      hookCursor = 0;
+      return TrendExplorerCard({
+        element: getElementBySlug(activeSlug),
+        onSelectElement: (nextSlug) => {
+          activeSlug = nextSlug;
+        },
+      });
+    };
+
+    // 1. Open Oxygen: default Pauling Electronegativity shows O (3.44), Neon unestablished at 0% height (n/a), and Period 2 Compare link
+    let tree = render();
+    const neBarOnEN = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "neon")[0];
+    assert.equal(neBarOnEN.props["data-bar-height-pct"], 0, "Unestablished Neon EN must have 0% bar height, not a stub bar");
+    assert.match(textOf(tree), /Oxygen in Period 2: 3\.44/);
+
+    // 2. Select 1st Ionization Energy -> worked example explains N (1402.3) vs O (1313.9) 2p3/2p4 spin-pair dip with zero-baseline bars
+    const ieTabBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).trim() === "1st Ionization Energy")[0];
+    ieTabBtn.props.onClick();
+    tree = render();
+
+    const workedBox = findNodes(tree, (n) => n.props?.["data-testid"] === "trend-worked-example")[0];
+    assert.ok(workedBox);
+    assert.match(textOf(workedBox), /Oxygen in Period 2: 1313\.9 kJ\/mol — 88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/);
+    assert.match(textOf(workedBox), /2p³.*2p⁴/);
+    assert.equal(
+      findNodes(workedBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=nitrogen,oxygen,fluorine").length,
+      1
+    );
+
+    const oBarHeight = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "oxygen")[0].props["data-bar-height-pct"];
+    const nBarHeight = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "nitrogen")[0].props["data-bar-height-pct"];
+    const neBarHeight = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "neon")[0].props["data-bar-height-pct"];
+    assert.equal(neBarHeight, 100);
+    assert.equal(oBarHeight, Number(((1313.9 / 2080.7) * 100).toFixed(1)));
+    assert.equal(nBarHeight, Number(((1402.3 / 2080.7) * 100).toFixed(1)));
+
+    // 3. Tap Nitrogen's bar -> navigates active element to nitrogen, retains 1st Ionization Energy, and updates worked example to N's 2p3 peak
+    const nitrogenBarBtn = findNodes(
+      tree,
+      (n) => n.type === "button" && typeof n.props?.["aria-label"] === "string" && n.props["aria-label"].startsWith("Inspect Nitrogen (N)")
+    )[0];
+    nitrogenBarBtn.props.onClick();
+    assert.equal(activeSlug, "nitrogen");
+    tree = render();
+
+    const retainedIeTab = findNodes(tree, (n) => n.type === "button" && textOf(n).trim() === "1st Ionization Energy")[0];
+    assert.equal(retainedIeTab.props["aria-pressed"], true, "1st Ionization Energy metric stays retained across bar navigation");
+    const currentBars = findNodes(tree, (n) => n.type === "button" && n.props?.["aria-current"] === "true");
+    assert.equal(currentBars.length, 1);
+    assert.match(currentBars[0].props["aria-label"], /Inspect Nitrogen \(N\)/);
+
+    const nWorkedBox = findNodes(tree, (n) => n.props?.["data-testid"] === "trend-worked-example")[0];
+    assert.match(textOf(nWorkedBox), /Nitrogen in Period 2: 1402\.3 kJ\/mol — 88\.4 kJ\/mol higher than Oxygen/);
+    assert.equal(
+      findNodes(nWorkedBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=carbon,nitrogen,oxygen").length,
+      1
+    );
+
+    // 4. Switch to Down Group 15 -> updates to vertical Group 15 reasoning and contextual Compare N · P · As link
+    const groupAxisBtn = findNodes(tree, (n) => n.type === "button" && textOf(n).includes("Down Group 15"))[0];
+    groupAxisBtn.props.onClick();
+    tree = render();
+    const groupWorkedBox = findNodes(tree, (n) => n.props?.["data-testid"] === "trend-worked-example")[0];
+    assert.match(textOf(groupWorkedBox), /Nitrogen in Group 15: 1402\.3 kJ\/mol/);
+    assert.match(textOf(groupWorkedBox), /Phosphorus \(1011\.8 kJ\/mol\)/);
+    assert.equal(
+      findNodes(groupWorkedBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=nitrogen,phosphorus,arsenic").length,
+      1
+    );
+    const mcBarOnGroupIE = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "moscovium")[0];
+    assert.equal(mcBarOnGroupIE.props["data-bar-height-pct"], 0, "Unestablished Moscovium IE1 renders 0% height");
   });
 });

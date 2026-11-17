@@ -765,6 +765,23 @@ export function buildElementContrastSummary(element, peerElements = []) {
 }
 
 /** Compare the known reference values without inferring properties from missing data. */
+export function getIonizationExceptionExplanation(elements) {
+  const parts = [];
+  const nitrogen = elements.find((e) => e.slug === "nitrogen");
+  const oxygen = elements.find((e) => e.slug === "oxygen");
+  if (nitrogen && oxygen && nitrogen.ionizationEnergy > oxygen.ionizationEnergy) {
+    parts.push("Nitrogen's half-filled 2p³ subshell helps explain why its first ionization energy exceeds oxygen's: oxygen's 2p⁴ subshell has a paired set of electrons, whose repulsion makes one easier to remove.");
+  }
+  for (const [leftSlug, rightSlug] of [["beryllium", "boron"], ["magnesium", "aluminium"]]) {
+    const left = elements.find((e) => e.slug === leftSlug);
+    const right = elements.find((e) => e.slug === rightSlug);
+    if (left && right && left.ionizationEnergy > right.ionizationEnergy) {
+      parts.push(`${right.name}'s first p electron is easier to remove than an electron in ${left.name}'s filled s subshell; ionization energy does not simply rise at every step across a period.`);
+    }
+  }
+  return parts.join(" ");
+}
+
 export function buildPeriodicTrendInsight(elements) {
   if (!Array.isArray(elements) || elements.length < 2) return null;
   const sorted = [...elements].sort((a, b) => a.number - b.number);
@@ -800,18 +817,9 @@ export function buildPeriodicTrendInsight(elements) {
   const missingIE = sorted.filter((e) => !Number.isFinite(e.ionizationEnergy));
   if (missingIE.length) parts.push(`First ionization energy is not established in this dataset for ${missingIE.map((e) => e.name).join(", ")}.`);
 
-  const nitrogen = sorted.find((e) => e.slug === "nitrogen");
-  const oxygen = sorted.find((e) => e.slug === "oxygen");
-  if (nitrogen && oxygen && nitrogen.ionizationEnergy > oxygen.ionizationEnergy) {
-    parts.push("Nitrogen's half-filled 2p³ subshell helps explain why its first ionization energy exceeds oxygen's: oxygen's 2p⁴ subshell has a paired set of electrons, whose repulsion makes one easier to remove.");
-  }
-  for (const [leftSlug, rightSlug] of [["beryllium", "boron"], ["magnesium", "aluminium"]]) {
-    const left = sorted.find((e) => e.slug === leftSlug);
-    const right = sorted.find((e) => e.slug === rightSlug);
-    if (left && right && left.ionizationEnergy > right.ionizationEnergy) {
-      parts.push(`${right.name}'s first p electron is easier to remove than an electron in ${left.name}'s filled s subshell; ionization energy does not simply rise at every step across a period.`);
-    }
-  }
+  const exception = getIonizationExceptionExplanation(sorted);
+  if (exception) parts.push(exception);
+
   return {
     headline: samePeriod ? `Across Period ${first.period}: Compare the Reference Values`
       : sameGroup ? `Down Group ${first.group}: Compare the Reference Values`
