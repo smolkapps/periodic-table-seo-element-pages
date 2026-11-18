@@ -1,0 +1,338 @@
+{
+  "browser_journeys": [
+    {
+      "initial_viewport": {
+        "width": 1365,
+        "height": 900
+      },
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    },
+    {
+      "initial_viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "viewport": {
+        "width": 768,
+        "height": 900,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    },
+    {
+      "initial_viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 47,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false,
+  "notes": [
+    "Public responsive viewports verified1365x900,768x900,390x844 at both start and offline return.",
+    "No physical-device certification or learning-gain claim.",
+    "Only Cloudflare beacon navigation aborts; no observed core application failures.",
+    "about/privacy/terms HTML edge transformations checked by content; bundles/icons match exact release hashes.",
+    "Builder full typecheck fails in untouched template MFA/UI; canonical full typecheck passes."
+  ],
+  "live_assets": {
+    "revision": "e89864c306bdfdcb642c5ace7db1d4dc09cbf952",
+    "run_id": "44211297190",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "source_hash_match": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/assets/index-B3VDw-GV.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/assets/index-D2ylRQQ8.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "source_hash_match": true
+      }
+    ],
+    "missing_page_status": 404
+  },
+  "main_ci": {
+    "conclusion": "success",
+    "createdAt": "2026-11-18T00:52:00Z",
+    "headSha": "e89864c306bdfdcb642c5ace7db1d4dc09cbf952",
+    "status": "completed",
+    "updatedAt": "2026-11-18T00:53:03Z",
+    "url": "https://github.com/smolkapps/periodic-table-seo-element-pages/actions/runs/44211297190"
+  },
+  "artifact": {
+    "id": 14386246788,
+    "node_id": "MDg6QXJ0aWZhY3QxNDM4NjI0Njc4OA==",
+    "name": "elementa-site-e89864c306bdfdcb642c5ace7db1d4dc09cbf952",
+    "size_in_bytes": 7856029,
+    "url": "https://api.github.com/repos/smolkapps/periodic-table-seo-element-pages/actions/artifacts/14386246788",
+    "archive_download_url": "https://api.github.com/repos/smolkapps/periodic-table-seo-element-pages/actions/artifacts/14386246788/zip",
+    "expired": false,
+    "digest": "sha256:ec2d7f5d383957c5ddc2d16271835764128d74fa3121b76161b62becb20d781c",
+    "created_at": "2026-11-18T00:52:59Z",
+    "updated_at": "2026-11-18T00:52:59Z",
+    "expires_at": "2026-11-25T00:52:57Z",
+    "workflow_run": {
+      "id": 44211297190,
+      "repository_id": 1276362495,
+      "head_repository_id": 1276362495,
+      "head_branch": "main",
+      "head_sha": "e89864c306bdfdcb642c5ace7db1d4dc09cbf952"
+    }
+  },
+  "source_revision": "e89864c306bdfdcb642c5ace7db1d4dc09cbf952",
+  "pull_request": "https://github.com/smolkapps/periodic-table-seo-element-pages/pull/26",
+  "automatic_publication": {
+    "status": "published",
+    "source_revision": "e89864c306bdfdcb642c5ace7db1d4dc09cbf952",
+    "ci_run_id": "44211297190",
+    "backup": "/var/backups/elementa-auto-20261118T005446Z-e89864c306bd",
+    "warnings": [],
+    "verified_at": "2026-11-18T00:54:46.280Z",
+    "origin": "https://elementalearn.com",
+    "ordinary_three_minute_timer": true,
+    "manual_deploy_or_kickstart": false
+  },
+  "remaining_credits": {
+    "message": 70.23,
+    "integration": 9975.7,
+    "start_minimum": 60,
+    "reserve": 25,
+    "stop_new_builder_work_on": "2026-11-22"
+  }
+}
