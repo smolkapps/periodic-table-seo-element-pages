@@ -1,0 +1,106 @@
+{
+  "browser_journeys": [
+    {
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 900,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 758,
+        "overflow": false
+      },
+      "aliases_and_structured_queries": [
+        "aluminum",
+        "aluminium",
+        "CESIUM",
+        "caesium",
+        "sulphur",
+        "sulfur",
+        "oxygen",
+        "#26",
+        "Z = 26",
+        "2p4"
+      ],
+      "quick_chips": true,
+      "typo_recovery": true,
+      "clear_escape_focus": true,
+      "long_query_and_markup_safe": true,
+      "table_category_phase_composition": true,
+      "saved_deck_note_reload_offline": true,
+      "progress_before_saving": "{}",
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 47,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false,
+  "notes": [
+    "Phone capture390x844; final offline return reports390x758; both are responsive browser evidence.",
+    "Initial local browser raced a rebuild and loaded no app; rerun only after completed build.",
+    "Harness button names corrected against actual Save Note/gas labels; no product bypass or skipped journey."
+  ]
+}

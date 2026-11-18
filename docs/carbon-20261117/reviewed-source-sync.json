@@ -1,0 +1,91 @@
+{
+  "paths": [
+    {
+      "path": "src/components/AtomVisualizer.jsx",
+      "sha256": "39216f90166f5edb7567f4448b36003e911320a985b927c3b4a76cd47e2e81d9"
+    },
+    {
+      "path": "src/components/ComparisonVisualLens.jsx",
+      "sha256": "8f2a0f9f2887766bbab232f9753e10c0a4fd35cfbaf6be10ae7b9bc548d4dde9"
+    },
+    {
+      "path": "src/components/DailyElementSpotlight.jsx",
+      "sha256": "75acb5e2f9c33c02919746bd6cc6bc6b4f0274063e70aca6a6554bd78b856a49"
+    },
+    {
+      "path": "src/components/QuizRoundReview.jsx",
+      "sha256": "d995eee0f8aa98ea14373e8e228c47f16379e6d768243d0cafa4d14d2979cd0f"
+    },
+    {
+      "path": "src/components/StudyDeckFlashcards.jsx",
+      "sha256": "875a016ee0e327a622d83c941c75ce53a8a786c97c3879aedeb474c6a0ac3bbc"
+    },
+    {
+      "path": "src/components/TrendExplorerCard.jsx",
+      "sha256": "dfd6cffe6816ca10552297286350a7c272059f13af6619f8a9c48e3b88fd0592"
+    },
+    {
+      "path": "src/data/elementSearch.js",
+      "sha256": "0e66898a92098456f1ed023aef5dc91232ed9c6837d9b419fb6cc74f49f2e19a"
+    },
+    {
+      "path": "src/data/elementsData.js",
+      "sha256": "5ed4808a772263ecb4036d5be4bcf5033f80d0fb2b64d65ece13c339bf103c13"
+    },
+    {
+      "path": "src/data/trendReasoning.js",
+      "sha256": "5370a4f274a999667c444a5c6eae22b968faf818a784a16371d24a0eb2b29036"
+    },
+    {
+      "path": "src/lib/quizPreferences.js",
+      "sha256": "9fddd2884d6beabebfae1d0122b856bb10c5d94b5642475e14b847ce0645ffaa"
+    },
+    {
+      "path": "src/pages/About.jsx",
+      "sha256": "1d5451af9400571c0b88bce88df620a37d2aad4c1b52a725d32b5829b8aa3ce2"
+    },
+    {
+      "path": "src/pages/AllElements.jsx",
+      "sha256": "49ecb80c5edd859c3b750d3608c7a5abde4b09849284e558595314a624fee11d"
+    },
+    {
+      "path": "src/pages/Compare.jsx",
+      "sha256": "3b4ddc4e63a4176daaa4dcf447d5a2266ddd408649279932875322713d39b589"
+    },
+    {
+      "path": "src/pages/Home.jsx",
+      "sha256": "1349fedfe48be41fa9aa122e637b2ee6175adb577e0a7d69fd62b365d1b5a77f"
+    },
+    {
+      "path": "src/pages/Practice.jsx",
+      "sha256": "d60498635664fb6fad3a11612f738f90b0ff75f1d408d37ceebc87cad9f298de"
+    },
+    {
+      "path": "src/pages/Privacy.jsx",
+      "sha256": "ecc1bcd1eac899e458c6db7a357468940cb69f5167d8b99fa819ed8dbbadcecb"
+    },
+    {
+      "path": "src/pages/SavedProgress.jsx",
+      "sha256": "3a0028180e0eaf34e97d5d8e682eb759377343c8fd3473ef55320e799a9d602f"
+    },
+    {
+      "path": "src/pages/Terms.jsx",
+      "sha256": "7cbb541bd161cebec101194d273fff9276f50fad5d53957ef02ba23786fb79e4"
+    },
+    {
+      "path": "test/elementa.test.js",
+      "sha256": "a8f8976891bf0edc36bb7738670f1f70a62bf742b70567e8a498767042bc90f9"
+    },
+    {
+      "path": "test/progress.test.js",
+      "sha256": "c1d64669b92418135f3287f726dedf9bf2ff3046f7ee77c0710660352d308f87"
+    },
+    {
+      "path": "test/studyJourney.test.js",
+      "sha256": "8002f6a4f5bb391f986dcca8d32056338a3442dba3553c7acd06018076857693"
+    }
+  ],
+  "export_sha256": "18ada4cd0d34643cc648ee214897a96999cf95e3750cb48888f4e6766496fede",
+  "builder_prompt_count": 1,
+  "backend_deployed": false
+}

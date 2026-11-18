@@ -6,6 +6,7 @@ import vm from "node:vm";
 import ts from "typescript";
 import * as elementsDataModule from "../src/data/elementsData.js";
 import * as trendReasoningModule from "../src/data/trendReasoning.js";
+import * as elementSearchModule from "../src/data/elementSearch.js";
 import { readQuizPrefs, writeQuizPrefs } from "../src/lib/quizPreferences.js";
 
 const {
@@ -1675,5 +1676,147 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     );
     const mcBarOnGroupIE = findNodes(tree, (n) => n.props?.["data-bar-slug"] === "moscovium")[0];
     assert.equal(mcBarOnGroupIE.props["data-bar-height-pct"], 0, "Unestablished Moscovium IE1 renders 0% height");
+  });
+
+  it("searches aluminum, cesium, oxygen, quick chips, and recovers from typos or zero-match queries in AllElements directory", () => {
+    const source = fs.readFileSync(path.resolve("src/pages/AllElements.jsx"), "utf8");
+    const { outputText: code } = ts.transpileModule(source, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        jsx: ts.JsxEmit.React,
+        target: ts.ScriptTarget.ES2020,
+      },
+    });
+
+    const hookStates = [];
+    const refs = [];
+    let hookCursor = 0;
+    let savedSlugs = [];
+
+    const fakeReact = {
+      Fragment: Symbol("Fragment"),
+      createElement: (type, props, ...children) => ({
+        type,
+        props: { ...(props || {}), children: children.flat() },
+      }),
+      useState: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in hookStates)) hookStates[idx] = typeof init === "function" ? init() : init;
+        const setState = (u) => {
+          hookStates[idx] = typeof u === "function" ? u(hookStates[idx]) : u;
+        };
+        return [hookStates[idx], setState];
+      },
+      useMemo: (fn) => {
+        hookCursor++;
+        return fn();
+      },
+      useRef: (init) => {
+        const idx = hookCursor++;
+        if (!(idx in refs)) refs[idx] = { current: init };
+        return refs[idx];
+      },
+    };
+    fakeReact.default = fakeReact;
+
+    const fakeStudyStore = {
+      useStudyProgress: () => ({
+        savedSlugs,
+        masteryMap: { oxygen: { mastered: true } },
+        toggleSavedSlug: (slug) => {
+          savedSlugs = savedSlugs.includes(slug) ? savedSlugs.filter((s) => s !== slug) : [...savedSlugs, slug];
+        },
+      }),
+    };
+
+    const cjsModule = { exports: {} };
+    const customRequire = (id) => {
+      if (id === "react") return fakeReact;
+      if (id === "react-router-dom") return { Link: "Link" };
+      if (id === "@/components/Navbar") return { default: () => null };
+      if (id === "@/components/Footer") return { default: () => null };
+      if (id === "@/data/elementsData") return elementsDataModule;
+      if (id === "@/data/elementSearch") return elementSearchModule;
+      if (id === "@/lib/studyStore") return fakeStudyStore;
+      if (id === "lucide-react") return { Search: "i", BookmarkCheck: "i", CheckCircle2: "i", X: "i", RotateCcw: "i" };
+      throw new Error(`Unexpected import in AllElements: ${id}`);
+    };
+    new Function("require", "module", "exports", "React", code)(customRequire, cjsModule, cjsModule.exports, fakeReact);
+    const AllElements = cjsModule.exports.default;
+
+    const findNodes = (node, predicate, acc = []) => {
+      if (!node || typeof node !== "object") return acc;
+      if (predicate(node)) acc.push(node);
+      const children = node.props?.children || [];
+      for (const child of Array.isArray(children) ? children : [children]) findNodes(child, predicate, acc);
+      return acc;
+    };
+    const textOf = (node) => {
+      if (node === null || node === undefined || typeof node === "boolean") return "";
+      if (typeof node === "string" || typeof node === "number") return String(node);
+      const children = node.props?.children || [];
+      return (Array.isArray(children) ? children : [children]).map(textOf).join("");
+    };
+
+    const render = () => {
+      hookCursor = 0;
+      return AllElements({});
+    };
+
+    // 1. Initial directory render shows all 118 elements across 10 families with dimensionless standard atomic weights
+    let tree = render();
+    assert.match(textOf(tree), /Showing all 118 elements across 10 families/);
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 118);
+    assert.doesNotMatch(textOf(tree), /26\.982 u|12\.011 u/, "CIAAW standard atomic weights must remain dimensionless");
+
+    const getSearchInput = (t) => findNodes(t, (n) => n.type === "input" && n.props?.["aria-label"] === "Filter 118 elements")[0];
+
+    // 2. Search "aluminum" -> finds Aluminium (Al) with explicit spelling-alias badge and allows saving to Study Deck
+    getSearchInput(tree).props.onChange({ target: { value: "aluminum" } });
+    tree = render();
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 1);
+    assert.match(textOf(tree), /1 of 118 elements shown in 1 family/);
+    assert.match(textOf(tree), /Aluminium/);
+    assert.match(textOf(tree), /Also spelled: Aluminum/);
+    findNodes(tree, (n) => n.type === "button" && n.props?.["aria-label"] === "Save Aluminium to Study Deck")[0].props.onClick();
+    assert.deepEqual(savedSlugs, ["aluminium"]);
+
+    // 3. Search "cesium" and "oxygen" -> find Caesium (with alias note) and Oxygen
+    getSearchInput(tree).props.onChange({ target: { value: "cesium" } });
+    tree = render();
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 1);
+    assert.match(textOf(tree), /Caesium/);
+    assert.match(textOf(tree), /Also spelled: Cesium/);
+
+    getSearchInput(tree).props.onChange({ target: { value: "oxygen" } });
+    tree = render();
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 1);
+    assert.match(textOf(tree), /Oxygen/);
+
+    // 4. Typo "alumnium" -> renders empty-state recovery card with "Did you mean" link to /element/aluminium + Clear recovery
+    getSearchInput(tree).props.onChange({ target: { value: "alumnium" } });
+    tree = render();
+    const emptyBox = findNodes(tree, (n) => n.props?.["data-testid"] === "directory-empty-state")[0];
+    assert.ok(emptyBox, "Zero-match search renders recovery state rather than a blank area");
+    assert.match(textOf(emptyBox), /No elements match “alumnium”/);
+    assert.equal(
+      findNodes(emptyBox, (n) => n.type === "Link" && n.props?.to === "/element/aluminium").length,
+      1,
+      "Typo recovery offers direct link to Aluminium"
+    );
+
+    // 5. Tapping "Clear search & show all 118 elements" restores all 118 elements; Escape also clears unrelated zero-match query
+    findNodes(emptyBox, (n) => n.type === "button" && textOf(n).includes("Clear search"))[0].props.onClick();
+    tree = render();
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 118);
+
+    getSearchInput(tree).props.onChange({ target: { value: "vibranium" } });
+    tree = render();
+    const unrelatedEmpty = findNodes(tree, (n) => n.props?.["data-testid"] === "directory-empty-state")[0];
+    assert.ok(unrelatedEmpty);
+    assert.doesNotMatch(textOf(unrelatedEmpty), /Did you mean:/, "Unrelated queries must not invent false suggestions");
+    getSearchInput(tree).props.onKeyDown({ key: "Escape", preventDefault: () => {} });
+    tree = render();
+    assert.equal(findNodes(tree, (n) => n.type === "li").length, 118);
   });
 });
