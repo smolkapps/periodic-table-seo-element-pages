@@ -7,7 +7,6 @@ import DailyElementSpotlight from "@/components/DailyElementSpotlight";
 import {
   ELEMENTS,
   CATEGORY_META,
-  ELEMENT_SEARCH_ALIASES,
   categoryLabel,
   formatMass,
   buildArticle,
@@ -17,6 +16,7 @@ import {
   nextCellIndex,
   firstVisibleIndex,
 } from "@/data/elementsData";
+import { matchesElementQuery } from "@/data/elementSearch";
 import { useStudyProgress } from "@/lib/studyStore";
 import {
   Search,
@@ -139,14 +139,10 @@ export default function Home() {
     showToast(added ? `Saved ${slug} to study deck` : `Removed ${slug} from study deck`);
   };
 
-  // Filter logic matching canonical table-ui.ts + category/phase filters + US/UK spelling aliases
+  // Filter logic shared with All 118 directory + category/phase filters + US/UK spelling aliases
   const filteredFlags = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
     return ELEMENTS.map((el) => {
-      const catText = CATEGORY_META[el.category].label.toLowerCase();
-      const alias = ELEMENT_SEARCH_ALIASES[el.slug] || "";
-      const hay = `${el.name} ${alias} ${el.symbol} ${el.number} ${catText} ${el.electronConfig}`.toLowerCase();
-      const matchesQuery = q.length === 0 || hay.includes(q);
+      const matchesQuery = matchesElementQuery(el, searchQuery);
       const matchesCat = selectedCategory === "all" || el.category === selectedCategory;
       const matchesPhase = selectedPhase === "all" || el.phase === selectedPhase;
       return !(matchesQuery && matchesCat && matchesPhase); // true = hidden

@@ -36,6 +36,12 @@ import {
   getTrendExplorerPeers,
   buildTrendExplorerAnalysis,
 } from "../src/data/trendReasoning.js";
+import {
+  matchesElementQuery,
+  getMatchedSpellingAlias,
+  filterElementsByQuery,
+  findClosestElementMatches,
+} from "../src/data/elementSearch.js";
 
 describe("Elementa 118-element dataset", () => {
   it("contains all 118 elements in strict atomic number order 1..118", () => {
@@ -85,6 +91,50 @@ describe("Elementa 118-element dataset", () => {
       buildElementPageTitle(getElementBySlug("iron")),
       "Iron (Fe): Electron Configuration, Properties & Quiz — Elementa"
     );
+  });
+
+  it("shares consistent search matching, US/UK spelling aliases, structured Period/Group/Block queries, and typo recovery", () => {
+    assert.deepEqual(
+      filterElementsByQuery("aluminum").map((e) => e.slug),
+      ["aluminium"]
+    );
+    assert.deepEqual(
+      filterElementsByQuery("CESIUM").map((e) => e.slug),
+      ["caesium"]
+    );
+    assert.deepEqual(
+      filterElementsByQuery("sulphur").map((e) => e.slug),
+      ["sulfur"]
+    );
+    assert.equal(getMatchedSpellingAlias(getElementBySlug("aluminium"), "aluminum"), "Aluminum");
+    assert.equal(getMatchedSpellingAlias(getElementBySlug("caesium"), "cesium"), "Cesium");
+    assert.equal(getMatchedSpellingAlias(getElementBySlug("sulfur"), "sulphur"), "Sulphur");
+    assert.equal(getMatchedSpellingAlias(getElementBySlug("aluminium"), "aluminium"), null);
+
+    assert.deepEqual(
+      filterElementsByQuery("#1").map((e) => e.slug),
+      ["hydrogen"]
+    );
+    assert.deepEqual(
+      filterElementsByQuery("Z = 26").map((e) => e.slug),
+      ["iron"]
+    );
+    assert.equal(filterElementsByQuery("Group 1").length, 7, "Group 1 must not match Group 10..18");
+    assert.equal(filterElementsByQuery("Group 17").length, 6);
+    assert.equal(filterElementsByQuery("Period 2").length, 8);
+    assert.equal(filterElementsByQuery("f-block").length, 30);
+    assert.deepEqual(
+      filterElementsByQuery("2p4").map((e) => e.slug),
+      ["oxygen"]
+    );
+    assert.equal(matchesElementQuery(getElementBySlug("lithium"), "b"), false, "'-block' must not pollute single-letter 'b'");
+
+    assert.equal(findClosestElementMatches("alumnium")[0]?.slug, "aluminium");
+    assert.equal(findClosestElementMatches("cesuim")[0]?.slug, "caesium");
+    assert.equal(findClosestElementMatches("phosphorous")[0]?.slug, "phosphorus");
+    assert.equal(findClosestElementMatches("nickle")[0]?.slug, "nickel");
+    assert.deepEqual(findClosestElementMatches("vibranium"), []);
+    assert.deepEqual(findClosestElementMatches("zzzzzz"), []);
   });
 
   it("supports 5, 10, and 20 question quizzes across Easy, Standard, and Hard levels with neighboring-element distractors", () => {
