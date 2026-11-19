@@ -1,0 +1,73 @@
+{
+  "browser_journeys": [
+    {
+      "initial_viewport": {
+        "width": 1365,
+        "height": 900
+      },
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "drawer_peer_focus_scroll_metric_subshell_history": true,
+      "axis_retention": true,
+      "close_and_alias_focus": true,
+      "share_named_and_clicked": true,
+      "saved_label_and_reload": true,
+      "keyboard_modal_trap": true,
+      "comparison_quiz_score_total": [
+        12,
+        12
+      ],
+      "heatmap_initial_metric_and_unknowns": true,
+      "f_block_scopes": true,
+      "offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    },
+    {
+      "initial_viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "drawer_peer_focus_scroll_metric_subshell_history": true,
+      "axis_retention": true,
+      "close_and_alias_focus": true,
+      "share_named_and_clicked": true,
+      "saved_label_and_reload": true,
+      "keyboard_modal_trap": true,
+      "comparison_quiz_score_total": [
+        12,
+        12
+      ],
+      "heatmap_initial_metric_and_unknowns": true,
+      "f_block_scopes": true,
+      "offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": []
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 48,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false,
+  "notes": [
+    "Actual initial/final viewports1365x900 and390x844 verified; browser viewport explicitly reset before interpreting captures.",
+    "Harness corrected to actual link semantics and comparison-mode quiz seed; no product bypass or skipped journeys.",
+    "Sharing control actually clicked and specific-element URL/feedback checked; no social publication or native share-sheet claim."
+  ]
+}
