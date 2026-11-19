@@ -3,10 +3,12 @@ import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AtomVisualizer from "@/components/AtomVisualizer";
+import TrendExplorerCard from "@/components/TrendExplorerCard";
 import DailyElementSpotlight from "@/components/DailyElementSpotlight";
 import {
   ELEMENTS,
   CATEGORY_META,
+  getElementBySlug,
   categoryLabel,
   formatMass,
   buildArticle,
@@ -102,7 +104,7 @@ export default function Home() {
   };
 
   const closeDrawer = () => {
-    const previousSlug = drawerSlug;
+    const previousSlug = getElementBySlug(drawerSlug)?.slug || drawerSlug;
     setDrawerSlug(null);
     requestAnimationFrame(() => {
       const trigger = drawerTriggerRef.current;
@@ -173,17 +175,25 @@ export default function Home() {
   };
 
   const drawerElement = useMemo(
-    () => (drawerSlug ? ELEMENTS.find((e) => e.slug === drawerSlug) || null : null),
+    () => (drawerSlug ? getElementBySlug(drawerSlug) || null : null),
     [drawerSlug]
   );
 
   const drawerArticle = useMemo(() => (drawerElement ? buildArticle(drawerElement) : null), [drawerElement]);
+  const isDrawerOpen = Boolean(drawerElement);
 
+  // Move initial focus to the close button only when opening the drawer from closed,
+  // so in-drawer peer selection in TrendExplorerCard preserves keyboard focus and scroll position.
   useEffect(() => {
-    if (!drawerSlug) return;
+    if (!isDrawerOpen) return;
     const raf = requestAnimationFrame(() => {
       drawerCloseRef.current?.focus();
     });
+    return () => cancelAnimationFrame(raf);
+  }, [isDrawerOpen]);
+
+  useEffect(() => {
+    if (!isDrawerOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         e.preventDefault();
@@ -208,10 +218,9 @@ export default function Home() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
-      cancelAnimationFrame(raf);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [drawerSlug]);
+  }, [isDrawerOpen, drawerElement?.slug]);
 
   const handleShareElement = async (element) => {
     const url = buildElementShareUrl(element);
@@ -616,31 +625,39 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                 <button
                   type="button"
+                  aria-pressed={savedSlugs.includes(drawerElement.slug)}
+                  aria-label={
+                    savedSlugs.includes(drawerElement.slug)
+                      ? `Saved — remove ${drawerElement.name} from Study Deck`
+                      : `Save ${drawerElement.name} to Study Deck`
+                  }
                   onClick={() => toggleSaveElement(drawerElement.slug)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1 transition-colors ${
+                  className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1 transition-colors motion-reduce:transition-none ${
                     savedSlugs.includes(drawerElement.slug)
                       ? "bg-[#4f9dff]/20 border-[#4f9dff] text-[#7bb6ff]"
                       : "bg-[#1c232d] border-[#2a323d] text-[#e9edf2] hover:border-[#4f9dff]"
                   }`}
                 >
-                  <BookmarkCheck className="w-3.5 h-3.5" />
+                  <BookmarkCheck className="w-3.5 h-3.5 shrink-0" />
                   <span>{savedSlugs.includes(drawerElement.slug) ? "Saved" : "Save"}</span>
                 </button>
                 <button
                   type="button"
                   data-share-url={buildElementShareUrl(drawerElement)}
+                  aria-label={`Copy shareable link for ${drawerElement.name}`}
+                  title={`Copy shareable link for ${drawerElement.name}`}
                   onClick={() => handleShareElement(drawerElement)}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#1c232d] border border-[#2a323d] text-[#e9edf2] hover:border-[#4f9dff] flex items-center gap-1"
+                  className="min-h-[40px] min-w-[40px] px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#1c232d] border border-[#2a323d] text-[#e9edf2] hover:border-[#4f9dff] flex items-center justify-center gap-1"
                 >
-                  <Share2 className="w-3.5 h-3.5" />
+                  <Share2 className="w-3.5 h-3.5 shrink-0" />
                   <span className="hidden sm:inline">Share</span>
                 </button>
                 <Link
                   to={`/element/${drawerElement.slug}`}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] transition-colors flex items-center gap-1 no-underline"
+                  className="min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#4f9dff] text-[#07121f] hover:bg-[#7bb6ff] transition-colors motion-reduce:transition-none flex items-center gap-1 no-underline"
                 >
                   <span>Show more →</span>
                 </Link>
@@ -649,7 +666,7 @@ export default function Home() {
                   type="button"
                   onClick={() => closeDrawer()}
                   aria-label="Close panel"
-                  className="p-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#aeb8c4] hover:text-white"
+                  className="min-h-[40px] min-w-[40px] p-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#aeb8c4] hover:text-white flex items-center justify-center"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -657,7 +674,7 @@ export default function Home() {
             </div>
 
             {/* Drawer Body */}
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-5">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-w-0 space-y-5">
               {/* Quick Actions Bar */}
               <div className="flex flex-wrap gap-2">
                 <Link
@@ -668,21 +685,27 @@ export default function Home() {
                   ]
                     .filter(Boolean)
                     .join(",")}`}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#7bb6ff] hover:border-[#4f9dff] flex items-center gap-1.5 no-underline"
+                  className="min-h-[40px] text-xs px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#7bb6ff] hover:border-[#4f9dff] flex items-center gap-1.5 no-underline"
                 >
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  <ArrowLeftRight className="w-3.5 h-3.5 shrink-0" />
                   <span>Compare with neighbours</span>
                 </Link>
                 <Link
                   to={`/practice?element=${drawerElement.slug}`}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#69db7c] hover:border-[#69db7c] flex items-center gap-1.5 no-underline"
+                  className="min-h-[40px] text-xs px-3 py-1.5 rounded-lg bg-[#1c232d] border border-[#2a323d] text-[#69db7c] hover:border-[#69db7c] flex items-center gap-1.5 no-underline"
                 >
-                  <BrainCircuit className="w-3.5 h-3.5" />
+                  <BrainCircuit className="w-3.5 h-3.5 shrink-0" />
                   <span>Quiz on {drawerElement.name}</span>
                 </Link>
               </div>
 
               <AtomVisualizer element={drawerElement} compact={true} />
+
+              <TrendExplorerCard
+                element={drawerElement}
+                initialMetricKey={trendMode !== "category" ? trendMode : "electronegativity"}
+                onSelectElement={(nextSlug) => setDrawerSlug(nextSlug)}
+              />
 
               {/* Non-repetitive Article Prose */}
               <div className="article space-y-4">

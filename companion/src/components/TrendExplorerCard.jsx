@@ -12,11 +12,18 @@ import { TrendingUp, ArrowLeftRight } from "lucide-react";
 /**
  * @param {{
  *   element: any,
- *   onSelectElement?: (slug: string) => void
+ *   onSelectElement?: (slug: string) => void,
+ *   initialMetricKey?: string
  * }} props
  */
-export default function TrendExplorerCard({ element, onSelectElement }) {
-  const [metricKey, setMetricKey] = useState("electronegativity");
+export default function TrendExplorerCard({
+  element,
+  onSelectElement,
+  initialMetricKey = "electronegativity",
+}) {
+  const [metricKey, setMetricKey] = useState(() =>
+    TREND_EXPLORER_METRICS.some((m) => m.key === initialMetricKey) ? initialMetricKey : "electronegativity"
+  );
   const [axisMode, setAxisMode] = useState("period"); // 'period' | 'group'
 
   const activeMetric = TREND_EXPLORER_METRICS.find((m) => m.key === metricKey) || TREND_EXPLORER_METRICS[0];
@@ -36,7 +43,7 @@ export default function TrendExplorerCard({ element, onSelectElement }) {
   );
 
   return (
-    <div className="rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3.5">
+    <div className="min-w-0 rounded-xl bg-[#0e121a] border border-[#242c38] p-4 space-y-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-[#ffa94d]" />
