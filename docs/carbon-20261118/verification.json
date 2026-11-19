@@ -1,0 +1,314 @@
+{
+  "browser_journeys": [
+    {
+      "initial_viewport": {
+        "width": 1365,
+        "height": 900
+      },
+      "viewport": {
+        "width": 1365,
+        "height": 900,
+        "overflow": false
+      },
+      "drawer_peer_focus_scroll_metric_subshell_history": true,
+      "axis_retention": true,
+      "close_and_alias_focus": true,
+      "share_named_and_clicked": true,
+      "saved_label_and_reload": true,
+      "keyboard_modal_trap": true,
+      "comparison_quiz_score_total": [
+        12,
+        12
+      ],
+      "heatmap_initial_metric_and_unknowns": true,
+      "f_block_scopes": true,
+      "offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://elementalearn.com/cdn-cgi/rum?",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    },
+    {
+      "initial_viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "overflow": false
+      },
+      "drawer_peer_focus_scroll_metric_subshell_history": true,
+      "axis_retention": true,
+      "close_and_alias_focus": true,
+      "share_named_and_clicked": true,
+      "saved_label_and_reload": true,
+      "keyboard_modal_trap": true,
+      "comparison_quiz_score_total": [
+        12,
+        12
+      ],
+      "heatmap_initial_metric_and_unknowns": true,
+      "f_block_scopes": true,
+      "offline_return": true,
+      "page_errors": [],
+      "base44_requests": [],
+      "failed_requests": [
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        },
+        {
+          "url": "https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092",
+          "failure": "NS_ERROR_ABORT"
+        }
+      ]
+    }
+  ],
+  "root_tests": 148,
+  "study_tests": 48,
+  "promotion_fixture_tests": 7,
+  "skipped": 0,
+  "astro_files": 51,
+  "typecheck": "pass",
+  "lint": "pass",
+  "build": "pass",
+  "finishing": "127 HTML / 3222 internal links",
+  "physical_device_verified": false,
+  "notes": [
+    "Public initial/final1365x900 and390x844 verified; responsive browsers, not physical-device or learning-gain evidence.",
+    "A no-op Firefox resize protocol request stalled; owned run interrupted/closed, later run checks dimensions before resizing and passes all journeys. No product change or skipped check.",
+    "Only Cloudflare RUM/beacon navigation aborts recorded; no observed core application failure.",
+    "HTML edge transformations checked by brand content; study bundles/home-screen PNGs match exact release hashes.",
+    "Builder full typecheck fails in untouched MFA/UI templates; canonical full typecheck passes."
+  ],
+  "live_assets": {
+    "revision": "cd93ce9d65b19ea7314e4debc1ac81884a621936",
+    "run_id": "44433522193",
+    "files": 276,
+    "checks": [
+      {
+        "path": "index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "about/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "privacy/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "terms/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": false
+      },
+      {
+        "path": "study/index.html",
+        "status": 200,
+        "mime": "text/html; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/sw.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "site.webmanifest",
+        "status": 200,
+        "mime": "application/manifest+json",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/manifest.json",
+        "status": 200,
+        "mime": "application/json",
+        "source_hash_match": true
+      },
+      {
+        "path": "apple-touch-icon.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/apple-touch-icon-180.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 180,
+        "height": 180,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-192.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 192,
+        "height": 192,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/icons/icon-512-maskable.png",
+        "status": 200,
+        "mime": "image/png",
+        "source_hash_match": true,
+        "width": 512,
+        "height": 512,
+        "hasAlpha": false
+      },
+      {
+        "path": "study/assets/index-DJoh3HEF.js",
+        "status": 200,
+        "mime": "text/javascript; charset=utf-8",
+        "source_hash_match": true
+      },
+      {
+        "path": "study/assets/index-D2ylRQQ8.css",
+        "status": 200,
+        "mime": "text/css; charset=utf-8",
+        "source_hash_match": true
+      }
+    ],
+    "missing_page_status": 404
+  },
+  "main_ci": {
+    "conclusion": "success",
+    "createdAt": "2026-11-19T01:00:27Z",
+    "headSha": "cd93ce9d65b19ea7314e4debc1ac81884a621936",
+    "status": "completed",
+    "updatedAt": "2026-11-19T01:01:25Z",
+    "url": "https://github.com/smolkapps/periodic-table-seo-element-pages/actions/runs/44433522193"
+  },
+  "artifact": {
+    "id": 14487304296,
+    "node_id": "MDg6QXJ0aWZhY3QxNDQ4NzMwNDI5Ng==",
+    "name": "elementa-site-cd93ce9d65b19ea7314e4debc1ac81884a621936",
+    "size_in_bytes": 7855996,
+    "url": "https://api.github.com/repos/smolkapps/periodic-table-seo-element-pages/actions/artifacts/14487304296",
+    "archive_download_url": "https://api.github.com/repos/smolkapps/periodic-table-seo-element-pages/actions/artifacts/14487304296/zip",
+    "expired": false,
+    "digest": "sha256:894664e0d1c02e3044419b17d252014cd718760b9d19d9825f0007bb1aae5067",
+    "created_at": "2026-11-19T01:01:23Z",
+    "updated_at": "2026-11-19T01:01:23Z",
+    "expires_at": "2026-11-26T01:01:22Z",
+    "workflow_run": {
+      "id": 44433522193,
+      "repository_id": 1276362495,
+      "head_repository_id": 1276362495,
+      "head_branch": "main",
+      "head_sha": "cd93ce9d65b19ea7314e4debc1ac81884a621936"
+    }
+  },
+  "source_revision": "cd93ce9d65b19ea7314e4debc1ac81884a621936",
+  "pull_request": "https://github.com/smolkapps/periodic-table-seo-element-pages/pull/28",
+  "automatic_publication": {
+    "status": "published",
+    "source_revision": "cd93ce9d65b19ea7314e4debc1ac81884a621936",
+    "ci_run_id": "44433522193",
+    "backup": "/var/backups/elementa-auto-20261119T010200Z-cd93ce9d65b1",
+    "warnings": [],
+    "verified_at": "2026-11-19T01:02:00.784Z",
+    "origin": "https://elementalearn.com",
+    "ordinary_three_minute_timer": true,
+    "manual_deploy_or_kickstart": false
+  },
+  "remaining_credits": {
+    "message": 52.51,
+    "integration": 9975.7,
+    "start_minimum": 60,
+    "reserve": 25,
+    "no_renewal_or_top_up": true
+  },
+  "recurring_builder_task": {
+    "id": "watch-elementa-quiz-release",
+    "action": "deleted",
+    "reason": "Remaining52.51message credits below60start threshold; preserve25reserve and no-renewal instruction",
+    "independent_site_and_release_worker_preserved": true
+  }
+}
