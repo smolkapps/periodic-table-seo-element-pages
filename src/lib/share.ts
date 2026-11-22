@@ -59,6 +59,6 @@ export function shareFeedback(outcome: ShareOutcome): string {
     case "copied":
       return "Link copied to clipboard";
     case "unavailable":
-      return "Couldn't share — copy the URL from the address bar";
+      return "Couldn't share. Copy the URL from the address bar";
   }
 }

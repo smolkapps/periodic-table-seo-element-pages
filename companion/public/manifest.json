@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Elementa — Interactive Periodic Table & Chemistry Study Lab",
-  "short_name": "Elementa",
+  "name": "ElementaLearn: Interactive Periodic Table and Chemistry Study Lab",
+  "short_name": "ElementaLearn",
   "description": "Explore all 118 chemical elements with atomic structure, periodic trends, comparisons and quizzes. Works offline; study progress stays on your device.",
   "start_url": "./",
   "scope": "./",

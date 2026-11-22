@@ -1,16 +1,24 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import { SITE, absUrl } from "../config";
+import { breadcrumbList } from "../lib/breadcrumbs";
 
 interface Props {
   title: string;
   description: string;
 }
 const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const breadcrumbs = breadcrumbList([
+  { name: "Home", url: absUrl() },
+  { name: title, url: canonical },
+]);
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} jsonLd={breadcrumbs}>
   <article class="container information-page">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › {title}</nav>
+    <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: title }]} />
     <h1>{title}</h1>
     <slot />
   </article>

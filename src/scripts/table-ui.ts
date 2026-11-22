@@ -19,6 +19,7 @@
  * ../lib/grid-nav.ts, which are unit-tested. This file is the thin DOM layer.
  */
 
+import { SITE } from "../config";
 import { shareOrCopy, shareFeedback, type SharePayload } from "../lib/share";
 import {
   isNavKey,
@@ -251,7 +252,7 @@ export function initInteractiveTable(): void {
   panelShare?.addEventListener("click", async () => {
     if (!current) return;
     const payload: SharePayload = {
-      title: `${current.name} (${current.symbol}) — Elementa`,
+      title: `${current.name} (${current.symbol}): Electron Configuration, Properties & Quiz | ${SITE.name}`,
       text: `${current.name}: element ${current.number} on the periodic table.`,
       // import.meta.env.BASE_URL (= the Astro `base`, e.g. /apps/periodic-table/)
       // is inlined at build time; include it so the shared link keeps the

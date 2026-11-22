@@ -24,14 +24,14 @@ const defaultNames = defaults.map((e) => e.name).join(", ");
 
 <BaseLayout
   title="Compare elements"
-  description={`Compare chemical elements side by side — atomic mass, category, group, period, electron configuration, and discovery. Choose any two or three of the 118 elements. Defaults to ${defaultNames}.`}
+  description={`Compare chemical elements side by side: atomic mass, category, group, period, electron configuration, and discovery. Choose any two or three of the 118 elements. Defaults to ${defaultNames}.`}
 >
   <div class="container">
     <div class="hero-copy">
       <h1>Compare elements</h1>
       <p>
         Put any two or three elements side by side and see how their core
-        properties line up — atomic mass, category, group and period, electron
+        properties line up: atomic mass, category, group and period, electron
         configuration, and when each was discovered. The greatest value in each
         numeric row is highlighted.
       </p>
@@ -49,7 +49,7 @@ const defaultNames = defaults.map((e) => e.name).join(", ");
               {p.index >= 2 && <option value="">None</option>}
               {COMPARE_OPTIONS.map((el) => (
                 <option value={el.slug} selected={el.slug === p.selected}>
-                  {el.number} · {el.symbol} — {el.name}
+                  {el.number} · {el.symbol} · {el.name}
                 </option>
               ))}
             </select>

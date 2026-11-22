@@ -60,7 +60,7 @@ const ROW_SPECS: RowSpec[] = [
   // Group and Period are positional coordinates in the table, not "greater is
   // better" quantities, so neither is highlighted. Keeping them consistent
   // avoids implying that a higher period/group is somehow the "winning" value.
-  { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "—"), numeric: null },
+  { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "f-block"), numeric: null },
   { label: "Period", value: (e) => String(e.period), numeric: null },
   { label: "Phase at STP", value: (e) => capitalize(e.phase), numeric: null },
   { label: "Electron configuration", value: (e) => e.electronConfig, numeric: null },

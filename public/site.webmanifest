@@ -1,8 +1,8 @@
 {
   "id": "/",
   "scope": "/",
-  "name": "Elementa \u2014 Interactive Periodic Table",
-  "short_name": "Elementa",
+  "name": "ElementaLearn: Interactive Periodic Table",
+  "short_name": "ElementaLearn",
   "description": "Explore and compare all 118 chemical elements.",
   "start_url": "/",
   "display": "standalone",

@@ -263,7 +263,7 @@ export const HIGHLIGHTS = {
 };
 
 // Standard Pauling electronegativity (CRC / IUPAC reference; null where not experimentally established)
-const ELECTRONEGATIVITY_BY_Z = {
+export const ELECTRONEGATIVITY_BY_Z = {
   1: 2.20, 3: 0.98, 4: 1.57, 5: 2.04, 6: 2.55, 7: 3.04, 8: 3.44, 9: 3.98,
   11: 0.93, 12: 1.31, 13: 1.61, 14: 1.90, 15: 2.19, 16: 2.58, 17: 3.16,
   19: 0.82, 20: 1.00, 21: 1.36, 22: 1.54, 23: 1.63, 24: 1.66, 25: 1.55, 26: 1.83, 27: 1.88, 28: 1.91, 29: 1.90, 30: 1.65, 31: 1.81, 32: 2.01, 33: 2.18, 34: 2.55, 35: 2.96, 36: 3.00,
@@ -274,7 +274,7 @@ const ELECTRONEGATIVITY_BY_Z = {
 };
 
 // First Ionization Energy in kJ/mol (NIST Atomic Spectra Database reference)
-const IONIZATION_ENERGY_BY_Z = {
+export const IONIZATION_ENERGY_BY_Z = {
   1: 1312.0, 2: 2372.3, 3: 520.2, 4: 899.5, 5: 800.6, 6: 1086.5, 7: 1402.3, 8: 1313.9, 9: 1681.0, 10: 2080.7,
   11: 495.8, 12: 737.7, 13: 577.5, 14: 786.5, 15: 1011.8, 16: 999.6, 17: 1251.2, 18: 1520.6,
   19: 418.8, 20: 589.8, 21: 633.1, 22: 658.8, 23: 650.9, 24: 652.9, 25: 717.3, 26: 762.5, 27: 760.4, 28: 737.1, 29: 745.5, 30: 906.4, 31: 578.8, 32: 762.0, 33: 947.0, 34: 941.0, 35: 1139.9, 36: 1350.8,
@@ -285,7 +285,7 @@ const IONIZATION_ENERGY_BY_Z = {
 };
 
 // Covalent atomic radius in pm (Cordero et al. / Cambridge Structural Database reference)
-const ATOMIC_RADIUS_BY_Z = {
+export const ATOMIC_RADIUS_BY_Z = {
   1: 31, 2: 28, 3: 128, 4: 96, 5: 84, 6: 76, 7: 71, 8: 66, 9: 57, 10: 58,
   11: 166, 12: 141, 13: 121, 14: 111, 15: 107, 16: 105, 17: 102, 18: 106,
   19: 203, 20: 176, 21: 170, 22: 160, 23: 153, 24: 139, 25: 139, 26: 132, 27: 126, 28: 124, 29: 132, 30: 122, 31: 122, 32: 120, 33: 119, 34: 120, 35: 120, 36: 116,
@@ -511,8 +511,8 @@ export function getElementBySlug(slug) {
 }
 
 export function buildElementPageTitle(element) {
-  if (!element) return "Element not found — Elementa";
-  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz — Elementa`;
+  if (!element) return "Element not found | ElementaLearn";
+  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz | ElementaLearn`;
 }
 
 export function getElementBySymbol(symbol) {
@@ -659,7 +659,7 @@ export function buildArticle(element) {
   const citations = [
     {
       source: "PubChem (NCBI / NIH)",
-      title: `${element.name} — Atomic & Physical Properties`,
+      title: `${element.name}: atomic and physical properties`,
       url: `https://pubchem.ncbi.nlm.nih.gov/element/${element.number}`,
     },
     {

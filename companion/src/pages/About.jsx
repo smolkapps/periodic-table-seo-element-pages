@@ -30,7 +30,7 @@ const DATA_SOURCES = [
 export default function About() {
   useEffect(() => {
     const previousTitle = document.title;
-    document.title = "About Elementa — Interactive Periodic Table & Chemistry Study Lab";
+    document.title = "About ElementaLearn: Interactive Periodic Table and Chemistry Study Lab";
     return () => { document.title = previousTitle; };
   }, []);
 
@@ -40,9 +40,9 @@ export default function About() {
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
         <header className="space-y-2 border-b border-[#242c38] pb-5">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">About Elementa</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">About ElementaLearn</h1>
           <p className="text-sm text-[#aeb8c4] leading-relaxed">
-            Elementa is a fast, classroom-ready periodic table and chemistry study companion built for high-school,
+            ElementaLearn is a fast, classroom-ready periodic table and chemistry study companion built for high-school,
             AP/IB, A-Level, and introductory college chemistry students and teachers.
           </p>
         </header>
@@ -67,7 +67,7 @@ export default function About() {
             <span>Scientific accuracy and reference data</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#aeb8c4] leading-relaxed">
-            Elementa compiles published reference values and distinguishes between dimensionless
+            ElementaLearn compiles published reference values and distinguishes between dimensionless
             IUPAC standard atomic weights, primordial radioelements (Bi, Th, U), radiogenic decay-chain elements (Pa),
             and bracketed reference radioisotope mass numbers <code>[A]</code> for synthetic elements. Where a property
             is not experimentally established, the app reports “Not established” rather than an invented figure.
@@ -94,7 +94,7 @@ export default function About() {
         <section className="rounded-xl bg-[#131822] border border-[#242c38] p-5 space-y-2.5">
           <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#ffd43b] shrink-0" />
-            <span>Private by design — no accounts, works offline</span>
+            <span>Private by design: no accounts, works offline</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#aeb8c4] leading-relaxed">
             Students never need to sign up, log in, or share personal data. Study decks, mastery progress, personal
@@ -117,7 +117,7 @@ export default function About() {
             <span>Creator &amp; contact</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#aeb8c4] leading-relaxed">
-            Elementa is created by{" "}
+            ElementaLearn is created by{" "}
             <a
               href="https://www.smolkin.org"
               target="_blank"

@@ -21,7 +21,7 @@ const el = (slug: string) => getElementBySlug(slug)!;
 /** Build the same markup the Astro page ships: MAX_COMPARE pickers + result. */
 function buildDom(defaults: string[]): void {
   const options = COMPARE_OPTIONS.map(
-    (o) => `<option value="${o.slug}">${o.number} · ${o.symbol} — ${o.name}</option>`,
+    (o) => `<option value="${o.slug}">${o.number} · ${o.symbol} · ${o.name}</option>`,
   ).join("");
 
   const pickers = Array.from({ length: MAX_COMPARE }, (_, i) => {

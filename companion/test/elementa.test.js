@@ -89,7 +89,7 @@ describe("Elementa 118-element dataset", () => {
     assert.equal(getElementBySlug("unobtanium"), undefined);
     assert.equal(
       buildElementPageTitle(getElementBySlug("iron")),
-      "Iron (Fe): Electron Configuration, Properties & Quiz — Elementa"
+      "Iron (Fe): Electron Configuration, Properties & Quiz | ElementaLearn"
     );
   });
 

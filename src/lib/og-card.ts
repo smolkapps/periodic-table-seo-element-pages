@@ -110,6 +110,6 @@ export function ogCardSvg(element: Element): string {
   ${highlightTspans}
 
   <!-- Footer -->
-  <text x="520" y="566" font-family="DejaVu Sans, sans-serif" font-size="27" fill="#4f9dff">${escapeXml(host)} — ${escapeXml(SITE.name)}</text>
+  <text x="520" y="566" font-family="DejaVu Sans, sans-serif" font-size="27" fill="#4f9dff">${escapeXml(host)} | ${escapeXml(SITE.name)}</text>
 </svg>`;
 }

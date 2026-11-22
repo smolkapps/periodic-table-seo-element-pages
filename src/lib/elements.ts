@@ -6,6 +6,7 @@
  * by unit tests without a browser.
  */
 
+import { SITE } from "../config";
 import { ELEMENT_TUPLES, type Category, type Phase } from "../data/elements";
 
 export type { Category, Phase };
@@ -34,11 +35,15 @@ export interface Element {
   synthetic: boolean;
 }
 
-/** Synthetic elements: those with no stable isotope (Tc, Pm, and everything ≥ 84 except none). */
+/**
+ * Elements with no CIAAW standard atomic weight (Tc, Pm, and Z >= 84, except
+ * Th, Pa, and U). Those three have standard weights despite having no stable
+ * isotope, matching the study dataset.
+ */
 const SYNTHETIC_NUMBERS = new Set<number>([
-  43, 61, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
-  101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115,
-  116, 117, 118,
+  43, 61, 84, 85, 86, 87, 88, 89, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102,
+  103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117,
+  118,
 ]);
 
 /**
@@ -210,7 +215,7 @@ export interface ShareData {
  */
 export function buildShareData(element: Element, origin: string): ShareData {
   return {
-    title: `${element.name} (${element.symbol}) — Periodic Table`,
+    title: `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz | ${SITE.name}`,
     text: `${element.name}: element ${element.number}, ${categoryLabel(
       element.category,
     ).toLowerCase()}, atomic mass ${element.atomicMass}.`,
@@ -239,4 +244,26 @@ export function adjacentElements(n: number): {
   next: Element | undefined;
 } {
   return { prev: getElementByNumber(n - 1), next: getElementByNumber(n + 1) };
+}
+
+/**
+ * Other elements that share this element's group, or, for the f-block, its
+ * series. Ordered by atomic number. Used for crawlable links on each page.
+ */
+export function sameGroupElements(element: Element): Element[] {
+  if (element.group !== null) {
+    return ELEMENTS.filter(
+      (other) => other.group === element.group && other.number !== element.number,
+    );
+  }
+  return ELEMENTS.filter(
+    (other) => other.category === element.category && other.number !== element.number,
+  );
+}
+
+/** Heading for the same-group (or same-series) link list. */
+export function sameGroupLabel(element: Element): string {
+  if (element.group !== null) return `Other elements in group ${element.group}`;
+  if (element.category === "lanthanide") return "Other lanthanides";
+  return "Other actinides";
 }

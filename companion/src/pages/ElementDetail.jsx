@@ -12,6 +12,7 @@ import {
   getRadioactiveBadgeLabel,
   buildArticle,
   adjacentElements,
+  buildElementPageTitle,
   buildElementShareUrl,
 } from "@/data/elementsData";
 import { useStudyProgress } from "@/lib/studyStore";
@@ -41,9 +42,9 @@ export default function ElementDetail() {
   useEffect(() => {
     if (element) {
       setNoteInput(notesMap[element.slug] || "");
-      document.title = `${element.name} (${element.symbol}) — Elementa`;
+      document.title = buildElementPageTitle(element);
     } else {
-      document.title = "Element not found — Elementa";
+      document.title = buildElementPageTitle(null);
       const meta = document.createElement("meta");
       meta.name = "prerender-status-code";
       meta.content = "404";
@@ -67,7 +68,7 @@ export default function ElementDetail() {
           <div className="w-16 h-16 rounded-2xl bg-[#161b22] border border-[#ff6b6b] flex items-center justify-center mx-auto text-2xl font-mono font-bold text-[#ff6b6b]">
             404
           </div>
-          <h1 className="text-3xl font-extrabold text-white">404 — Off the table</h1>
+          <h1 className="text-3xl font-extrabold text-white">404: Off the table</h1>
           <p className="text-sm text-[#aeb8c4]">
             No element matches <code className="font-mono text-white">“{slug}”</code>. Maybe it hasn&apos;t been
             synthesized yet.
@@ -174,7 +175,7 @@ export default function ElementDetail() {
                 {element.name}
               </h1>
               <p className="text-xs sm:text-sm text-[#aeb8c4] font-mono break-words">
-                Group {element.group ?? "— (f-block)"} · Period {element.period} · {element.block}-block · Config:{" "}
+                Group {element.group ?? "f-block"} · Period {element.period} · {element.block}-block · Config:{" "}
                 <strong className="text-white">{element.electronConfig}</strong>
               </p>
             </div>
