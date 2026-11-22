@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Elementa — Interactive Periodic Table",
+  "name": "Elementa: Interactive Periodic Table",
   "short_name": "Elementa",
   "description": "Study all 118 chemical elements: atomic structure, periodic trends, comparisons and quizzes. Works offline; progress stays on your device.",
   "version": "1.0.0",

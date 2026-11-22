@@ -495,7 +495,7 @@ export default function Practice() {
               <h2 className="text-xl font-bold text-white">Your Study Deck is currently empty</h2>
               <p className="text-sm text-[#aeb8c4] leading-relaxed">
                 You haven&apos;t saved any elements to your Study Deck on this device yet. Bookmark elements from the
-                periodic table to build a custom deck, or start a general quiz below — any elements you miss are
+                periodic table to build a custom deck, or start a general quiz below. Any elements you miss are
                 automatically added to your Study Deck for review.
               </p>
             </div>
@@ -556,7 +556,7 @@ export default function Practice() {
                     ))}
                   </ul>
                   <p className="text-xs font-mono text-[#69db7c] pt-1 border-t border-[#1c232d]">
-                    Answer Key: {q.target.name} ({q.target.symbol}) — {q.explanation}
+                    Answer Key: {q.target.name} ({q.target.symbol}): {q.explanation}
                   </p>
                 </div>
               ))}

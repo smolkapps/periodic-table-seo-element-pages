@@ -10,6 +10,8 @@ Verified: `astro check` clean; root tests 152 passed; `verify-build` 127 HTML pa
 
 Next: merge to main is what publishes the site. This branch does not deploy by itself.
 
+Follow-up: replaced remaining em dashes in study-lab quiz strings, trend headlines, compare and saved-element labels, and other rendered study copy. Compact missing trend values use "n/a" or "Not established". Comments and the progress-export `app` field were left unchanged.
+
 ## November 11, 2026: Automatic checked website releases
 
 Michael explicitly requested continuing Gemini Carbon improvements and automatic publication after fixes. This bounded work owns release scripts/CI only, preserving the root reference, auth-free study deployment and separate tutor. Fresh main was01a295c; other worktrees were preserved. Existing CI is routed to hosted Ubuntu by a repository variable, so adding existing private-mesh SSH to the hosted runner would require new credentials. Chosen path: checked static artifact from main CI, existing-auth Studio LaunchAgent polls every3minutes, existing ctdsu SSH publishes it atomically after checksum/source checks. No new account, deployment key, host, service cost or inbound port.

@@ -355,7 +355,7 @@ describe("Home periodic table drawer journey: filter -> subshells -> in-drawer t
       assert.ok(workedExample);
       assert.match(
         textOf(workedExample),
-        /Oxygen in Period 2: 1313\.9 kJ\/mol — 88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/
+        /Oxygen in Period 2: 1313\.9 kJ\/mol, 88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/
       );
       assert.match(textOf(workedExample), /OpenStax Chemistry 2e/);
       assert.equal(

@@ -129,7 +129,7 @@ export default function TrendExplorerCard({
                 }`}
               >
                 <span className={`text-[10px] font-mono mb-1 ${isCurrent ? "text-white font-bold" : "text-[#aeb8c4]"}`}>
-                  {hasVal ? val : "—"}
+                  {hasVal ? val : "n/a"}
                 </span>
                 <div
                   className={`w-full h-24 bg-[#141a24] rounded-t flex items-end justify-center p-0.5 border ${

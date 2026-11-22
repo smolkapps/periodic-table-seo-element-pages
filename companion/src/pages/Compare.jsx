@@ -203,7 +203,7 @@ export default function Compare() {
                 {idx >= 2 && <option value="">None</option>}
                 {ELEMENTS.map((el) => (
                   <option key={el.slug} value={el.slug}>
-                    {el.number} · {el.symbol} — {el.name}
+                    {el.number} · {el.symbol}: {el.name}
                   </option>
                 ))}
               </select>

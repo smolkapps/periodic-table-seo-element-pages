@@ -116,7 +116,7 @@ export default function DailyElementSpotlight({ onInspectElement, savedSlugs = [
                 {isCorrect && <CheckCircle2 className="w-3.5 h-3.5 text-[#69db7c] shrink-0" />}
                 <span>
                   {isCorrect
-                    ? `Spot on — ${target.name} (${target.symbol}, Z = ${target.number})!`
+                    ? `Spot on: ${target.name} (${target.symbol}, Z = ${target.number})!`
                     : pickedElement
                     ? `Close neighbor! It’s ${target.name} (${target.symbol}, Z = ${target.number}) rather than ${pickedElement.name} (${pickedElement.symbol}, Z = ${pickedElement.number}).`
                     : `${target.name} (${target.symbol}, Z = ${target.number})`}
@@ -158,7 +158,7 @@ export default function DailyElementSpotlight({ onInspectElement, savedSlugs = [
               <button
                 type="button"
                 onClick={handleNextMystery}
-                aria-label="Next Clue — try another element"
+                aria-label="Next clue: try another element"
                 className="min-h-[44px] px-2.5 py-1.5 rounded-lg bg-[#161c26] border border-[#242c38] hover:border-white text-xs font-medium text-[#aeb8c4] hover:text-white inline-flex items-center gap-1"
               >
                 <Shuffle className="w-3.5 h-3.5 shrink-0" />

@@ -459,15 +459,15 @@ export default function Home() {
               const isSelected = drawerSlug === element.slug;
               const trendValue =
                 trendMode === "electronegativity"
-                  ? element.electronegativity ?? "—"
+                  ? element.electronegativity ?? "n/a"
                   : trendMode === "ionizationEnergy"
                   ? element.ionizationEnergy
                     ? Math.round(element.ionizationEnergy)
-                    : "—"
+                    : "n/a"
                   : trendMode === "atomicRadius"
                   ? element.atomicRadius
                     ? `${element.atomicRadius}pm`
-                    : "—"
+                    : "n/a"
                   : null;
 
               return (
@@ -631,7 +631,7 @@ export default function Home() {
                   aria-pressed={savedSlugs.includes(drawerElement.slug)}
                   aria-label={
                     savedSlugs.includes(drawerElement.slug)
-                      ? `Saved — remove ${drawerElement.name} from Study Deck`
+                      ? `Saved: remove ${drawerElement.name} from Study Deck`
                       : `Save ${drawerElement.name} to Study Deck`
                   }
                   onClick={() => toggleSaveElement(drawerElement.slug)}

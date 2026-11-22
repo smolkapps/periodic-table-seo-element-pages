@@ -12,7 +12,7 @@ function describeOption(opt, fallbackSlug) {
   const el = getElementBySlug(opt?.slug || fallbackSlug);
   const rawLabel = opt?.label || el?.name || fallbackSlug;
   if (el && !rawLabel.toLowerCase().includes(el.name.toLowerCase())) {
-    return `${rawLabel} — ${el.name}`;
+    return `${rawLabel}: ${el.name}`;
   }
   return rawLabel;
 }
@@ -152,7 +152,7 @@ export default function QuizRoundReview({ items = [] }) {
         ) : (
           <div className="rounded-xl bg-[#0e121a] border border-[#69db7c]/30 p-3.5 space-y-2">
             <p className="text-xs font-semibold text-[#69db7c]">
-              Clean sweep — every element in this set answered accurately:
+              Clean sweep: every element in this set answered accurately:
             </p>
             <div className="flex flex-wrap gap-2">
               {correctItems.map((item) => (

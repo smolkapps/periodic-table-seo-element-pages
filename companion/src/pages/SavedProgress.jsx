@@ -111,7 +111,7 @@ export default function SavedProgress() {
               Bookmark elements, write personal study notes, and track your quiz mastery across all 118 elements.
             </p>
             <p className="text-[11px] text-[#7a8694] mt-1">
-              Stored only in this browser on this device — no account, nothing uploaded.{" "}
+              Stored only in this browser on this device. No account, nothing uploaded.{" "}
               <Link to="/privacy" className="text-[#7bb6ff] hover:underline">
                 What's stored
               </Link>
@@ -188,7 +188,7 @@ export default function SavedProgress() {
           >
             {ELEMENTS.map((el) => (
               <option key={el.slug} value={el.slug}>
-                #{el.number} {el.symbol} — {el.name}
+                #{el.number} {el.symbol}: {el.name}
               </option>
             ))}
           </select>

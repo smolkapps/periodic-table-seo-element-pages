@@ -1450,7 +1450,7 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     const flashcardsBox = findNodes(tree, (n) => n.props?.["data-testid"] === "study-deck-flashcards")[0];
     assert.ok(flashcardsBox);
     assert.match(textOf(flashcardsBox), /Card 1 of 2/);
-    assert.match(textOf(flashcardsBox), /Personal study note saved — revealed with answer/);
+    assert.match(textOf(flashcardsBox), /Personal study note saved: revealed with answer/);
     assert.doesNotMatch(textOf(flashcardsBox), /\[He\] 2s2 2p2/, "Unrevealed card must not spoil configuration");
     assert.doesNotMatch(textOf(flashcardsBox), /Forms 4 covalent bonds/, "Unrevealed card must not spoil personal note");
 
@@ -1465,7 +1465,7 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     const answerPanel = findNodes(tree, (n) => n.props?.["data-testid"] === "flashcard-answer")[0];
     assert.ok(answerPanel);
     assert.match(textOf(answerPanel), /\[He\] 2s2 2p2/);
-    assert.match(textOf(answerPanel), /2s² 2p² — 4 valence electrons in outermost shell n=2/);
+    assert.match(textOf(answerPanel), /2s² 2p²: 4 valence electrons in outermost shell n=2/);
     const revealedCarbonNoteInput = findNodes(answerPanel, (n) => n.type === "input")[0];
     assert.equal(revealedCarbonNoteInput.props.value, "Forms 4 covalent bonds; graphite & diamond");
 
@@ -1627,7 +1627,7 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
 
     const workedBox = findNodes(tree, (n) => n.props?.["data-testid"] === "trend-worked-example")[0];
     assert.ok(workedBox);
-    assert.match(textOf(workedBox), /Oxygen in Period 2: 1313\.9 kJ\/mol — 88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/);
+    assert.match(textOf(workedBox), /Oxygen in Period 2: 1313\.9 kJ\/mol, 88\.4 kJ\/mol lower than Nitrogen \(1402\.3 kJ\/mol\)/);
     assert.match(textOf(workedBox), /2p³.*2p⁴/);
     assert.equal(
       findNodes(workedBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=nitrogen,oxygen,fluorine").length,
@@ -1657,7 +1657,7 @@ describe("End-to-end learner journey: search → atom/orbitals → compare → q
     assert.match(currentBars[0].props["aria-label"], /Inspect Nitrogen \(N\)/);
 
     const nWorkedBox = findNodes(tree, (n) => n.props?.["data-testid"] === "trend-worked-example")[0];
-    assert.match(textOf(nWorkedBox), /Nitrogen in Period 2: 1402\.3 kJ\/mol — 88\.4 kJ\/mol higher than Oxygen/);
+    assert.match(textOf(nWorkedBox), /Nitrogen in Period 2: 1402\.3 kJ\/mol, 88\.4 kJ\/mol higher than Oxygen/);
     assert.equal(
       findNodes(nWorkedBox, (n) => n.type === "Link" && n.props?.to === "/compare?ids=carbon,nitrogen,oxygen").length,
       1
