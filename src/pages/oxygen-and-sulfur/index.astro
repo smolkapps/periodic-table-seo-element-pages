@@ -1,10 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { absUrl } from "../../config";
+import { getElementBySlug } from "../../lib/elements";
+import { trendFacts } from "../../lib/article";
+import { breadcrumbList } from "../../lib/breadcrumbs";
 
 const title = "Why do oxygen and sulfur have similar properties?";
 const answer = "Oxygen and sulfur have similar chemical properties because both are in group 16 and have six electrons in their outermost occupied shell.";
 const url = absUrl("oxygen-and-sulfur/");
+const oxygen = getElementBySlug("oxygen")!;
+const sulfur = getElementBySlug("sulfur")!;
+const oxygenTrends = trendFacts(oxygen);
+const sulfurTrends = trendFacts(sulfur);
 const faq = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -14,11 +22,15 @@ const faq = {
     acceptedAnswer: { "@type": "Answer", text: answer },
   }],
 };
+const breadcrumbs = breadcrumbList([
+  { name: "Home", url: absUrl() },
+  { name: "Oxygen and sulfur", url },
+]);
 ---
 
-<BaseLayout title={title} description={answer} jsonLd={faq}>
+<BaseLayout title={title} description={answer} jsonLd={[faq, breadcrumbs]}>
   <article class="container explainer">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › Oxygen and sulfur</nav>
+    <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Oxygen and sulfur" }]} />
     <h1>{title}</h1>
     <p class="summary"><strong>Short answer.</strong> {answer}</p>
     <p>
@@ -46,8 +58,14 @@ const faq = {
         <tr><th scope="row">Period</th><td>2</td><td>3</td></tr>
         <tr><th scope="row">Electron configuration</th><td>[He] 2s² 2p⁴</td><td>[Ne] 3s² 3p⁴</td></tr>
         <tr><th scope="row">Electrons by shell</th><td>2, 6</td><td>2, 8, 6</td></tr>
+        <tr><th scope="row">Pauling electronegativity</th><td>{oxygenTrends.electronegativity}</td><td>{sulfurTrends.electronegativity}</td></tr>
+        <tr><th scope="row">First ionization energy</th><td>{oxygenTrends.ionizationEnergy} kJ/mol</td><td>{sulfurTrends.ionizationEnergy} kJ/mol</td></tr>
+        <tr><th scope="row">Covalent radius</th><td>{oxygenTrends.covalentRadius} pm</td><td>{sulfurTrends.covalentRadius} pm</td></tr>
       </tbody>
     </table>
+    <p>
+      Down group 16, the recorded Pauling electronegativity falls from {oxygenTrends.electronegativity} for oxygen to {sulfurTrends.electronegativity} for sulfur, and the first ionization energy falls from {oxygenTrends.ionizationEnergy} kJ/mol to {sulfurTrends.ionizationEnergy} kJ/mol. The covalent radius rises from {oxygenTrends.covalentRadius} pm to {sulfurTrends.covalentRadius} pm. Those are the same study-tool figures used on the element pages (Pauling electronegativity, NIST first ionization energy, Cordero et al. covalent radius). The shared count of six outer-shell electrons explains the similar bonding pattern. The different shells explain why the trend values are not the same.
+    </p>
     <p>
       The bracketed symbols stand for filled inner shells: [He] accounts for two
       electrons and [Ne] for ten. Adding the remaining six gives the full electron

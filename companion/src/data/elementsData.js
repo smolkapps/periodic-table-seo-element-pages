@@ -263,7 +263,7 @@ export const HIGHLIGHTS = {
 };
 
 // Standard Pauling electronegativity (CRC / IUPAC reference; null where not experimentally established)
-const ELECTRONEGATIVITY_BY_Z = {
+export const ELECTRONEGATIVITY_BY_Z = {
   1: 2.20, 3: 0.98, 4: 1.57, 5: 2.04, 6: 2.55, 7: 3.04, 8: 3.44, 9: 3.98,
   11: 0.93, 12: 1.31, 13: 1.61, 14: 1.90, 15: 2.19, 16: 2.58, 17: 3.16,
   19: 0.82, 20: 1.00, 21: 1.36, 22: 1.54, 23: 1.63, 24: 1.66, 25: 1.55, 26: 1.83, 27: 1.88, 28: 1.91, 29: 1.90, 30: 1.65, 31: 1.81, 32: 2.01, 33: 2.18, 34: 2.55, 35: 2.96, 36: 3.00,
@@ -274,7 +274,7 @@ const ELECTRONEGATIVITY_BY_Z = {
 };
 
 // First Ionization Energy in kJ/mol (NIST Atomic Spectra Database reference)
-const IONIZATION_ENERGY_BY_Z = {
+export const IONIZATION_ENERGY_BY_Z = {
   1: 1312.0, 2: 2372.3, 3: 520.2, 4: 899.5, 5: 800.6, 6: 1086.5, 7: 1402.3, 8: 1313.9, 9: 1681.0, 10: 2080.7,
   11: 495.8, 12: 737.7, 13: 577.5, 14: 786.5, 15: 1011.8, 16: 999.6, 17: 1251.2, 18: 1520.6,
   19: 418.8, 20: 589.8, 21: 633.1, 22: 658.8, 23: 650.9, 24: 652.9, 25: 717.3, 26: 762.5, 27: 760.4, 28: 737.1, 29: 745.5, 30: 906.4, 31: 578.8, 32: 762.0, 33: 947.0, 34: 941.0, 35: 1139.9, 36: 1350.8,
@@ -285,7 +285,7 @@ const IONIZATION_ENERGY_BY_Z = {
 };
 
 // Covalent atomic radius in pm (Cordero et al. / Cambridge Structural Database reference)
-const ATOMIC_RADIUS_BY_Z = {
+export const ATOMIC_RADIUS_BY_Z = {
   1: 31, 2: 28, 3: 128, 4: 96, 5: 84, 6: 76, 7: 71, 8: 66, 9: 57, 10: 58,
   11: 166, 12: 141, 13: 121, 14: 111, 15: 107, 16: 105, 17: 102, 18: 106,
   19: 203, 20: 176, 21: 170, 22: 160, 23: 153, 24: 139, 25: 139, 26: 132, 27: 126, 28: 124, 29: 132, 30: 122, 31: 122, 32: 120, 33: 119, 34: 120, 35: 120, 36: 116,
@@ -511,8 +511,8 @@ export function getElementBySlug(slug) {
 }
 
 export function buildElementPageTitle(element) {
-  if (!element) return "Element not found — Elementa";
-  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz — Elementa`;
+  if (!element) return "Element not found | ElementaLearn";
+  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz | ElementaLearn`;
 }
 
 export function getElementBySymbol(symbol) {
@@ -659,7 +659,7 @@ export function buildArticle(element) {
   const citations = [
     {
       source: "PubChem (NCBI / NIH)",
-      title: `${element.name} — Atomic & Physical Properties`,
+      title: `${element.name}: atomic and physical properties`,
       url: `https://pubchem.ncbi.nlm.nih.gov/element/${element.number}`,
     },
     {
@@ -726,14 +726,14 @@ export function buildComparison(elements) {
     { label: "Symbol", value: (e) => e.symbol, numeric: null },
     { label: "Atomic weight / isotope mass number", value: (e) => formatMass(e), numeric: null },
     { label: "Category", value: (e) => categoryLabel(e.category), numeric: null },
-    { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "— (f-block)"), numeric: null },
+    { label: "Group", value: (e) => (e.group !== null ? String(e.group) : "f-block"), numeric: null },
     { label: "Period & Block", value: (e) => `Period ${e.period} (${e.block}-block)`, numeric: null },
     { label: "Phase at STP", value: (e) => e.phase.charAt(0).toUpperCase() + e.phase.slice(1), numeric: null },
     { label: "Electron configuration", value: (e) => e.electronConfig, numeric: null },
     { label: "Shell occupancy (K..Q)", value: (e) => e.shells.join(" · "), numeric: null },
-    { label: "Electronegativity (Pauling)", value: (e) => (e.electronegativity !== null ? String(e.electronegativity) : "—"), numeric: (e) => (e.electronegativity !== null ? e.electronegativity : -Infinity) },
-    { label: "1st Ionization energy", value: (e) => (e.ionizationEnergy !== null ? `${e.ionizationEnergy} kJ/mol` : "—"), numeric: (e) => (e.ionizationEnergy !== null ? e.ionizationEnergy : -Infinity) },
-    { label: "Covalent radius", value: (e) => (e.atomicRadius !== null ? `${e.atomicRadius} pm` : "—"), numeric: (e) => (e.atomicRadius !== null ? e.atomicRadius : -Infinity) },
+    { label: "Electronegativity (Pauling)", value: (e) => (e.electronegativity !== null ? String(e.electronegativity) : "Not established"), numeric: (e) => (e.electronegativity !== null ? e.electronegativity : -Infinity) },
+    { label: "1st Ionization energy", value: (e) => (e.ionizationEnergy !== null ? `${e.ionizationEnergy} kJ/mol` : "Not established"), numeric: (e) => (e.ionizationEnergy !== null ? e.ionizationEnergy : -Infinity) },
+    { label: "Covalent radius", value: (e) => (e.atomicRadius !== null ? `${e.atomicRadius} pm` : "Not established"), numeric: (e) => (e.atomicRadius !== null ? e.atomicRadius : -Infinity) },
     { label: "Discovered", value: (e) => (e.discoveredYear !== null ? String(e.discoveredYear) : "Antiquity"), numeric: null },
     { label: "Key applications & notability", value: (e) => e.highlight.charAt(0).toUpperCase() + e.highlight.slice(1) + ".", numeric: null },
   ];
@@ -950,35 +950,35 @@ export function describeValenceSummary(element) {
   const activeLabels = chosen.map((sub) => `${sub.label}${toSuperscript(sub.count)}`).join(" ");
 
   if (element.symbol === "Pd") {
-    return `${activeLabels} — closed n=4 d-subshell with 0 electrons in n=5`;
+    return `${activeLabels}: closed n=4 d-subshell with 0 electrons in n=5`;
   }
   if (element.category === "noble gas") {
     if (element.number === 2) {
-      return `${activeLabels} — closed n=1 valence shell (2 e⁻)`;
+      return `${activeLabels}: closed n=1 valence shell (2 e⁻)`;
     }
     if (element.number >= 104) {
-      return `${activeLabels} — nominal closed n=${element.period} shell (${element.outerShellElectrons} outer-shell e⁻; relativistic Period 7 behavior predicted)`;
+      return `${activeLabels}: nominal closed n=${element.period} shell (${element.outerShellElectrons} outer-shell e⁻; relativistic Period 7 behavior predicted)`;
     }
-    return `${activeLabels} — closed n=${element.period} valence octet (${element.outerShellElectrons} outer-shell e⁻)`;
+    return `${activeLabels}: closed n=${element.period} valence octet (${element.outerShellElectrons} outer-shell e⁻)`;
   }
   if (element.block === "s" || element.block === "p") {
-    return `${activeLabels} — ${element.outerShellElectrons} valence electron${
+    return `${activeLabels}: ${element.outerShellElectrons} valence electron${
       element.outerShellElectrons === 1 ? "" : "s"
     } in outermost shell n=${element.shells.length}`;
   }
   if (element.block === "d") {
     const innerD = element.subshells.find((s) => s.n === element.period - 1 && s.l === "d");
     if (innerD && innerD.count < 10) {
-      return `${activeLabels} — ${element.outerShellElectrons} outer-shell e⁻ in n=${
+      return `${activeLabels}: ${element.outerShellElectrons} outer-shell e⁻ in n=${
         element.shells.length
       } plus partially filled inner ${innerD.label}${toSuperscript(innerD.count)} subshell`;
     }
     const filledLabel = innerD ? `${innerD.label}${toSuperscript(innerD.count)}` : `n=${element.period - 1} d-subshell`;
-    return `${activeLabels} with filled inner ${filledLabel} — ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length}`;
+    return `${activeLabels} with filled inner ${filledLabel}: ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length}`;
   }
   const innerF = element.subshells.find((s) => s.n === element.period - 2 && s.l === "f");
   const filledFClause = innerF && innerF.count === 14 ? ` over filled ${innerF.label}¹⁴` : "";
-  return `${activeLabels}${filledFClause} — ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length} (${element.category} f-block series)`;
+  return `${activeLabels}${filledFClause}: ${element.outerShellElectrons} outer-shell e⁻ in n=${element.shells.length} (${element.category} f-block series)`;
 }
 
 export const FLASHCARD_MODES = Object.freeze({
@@ -1061,7 +1061,7 @@ export function buildDeckFlashcard(element, mode = "structure", personalNote = "
         element.shells.length === 1 ? "shell" : "shells"
       }`,
       frontTitle: "Identify This Saved Element",
-      frontPrompt: `Notable as ${sanitizedHighlight} — a ${catMeta.label.toLowerCase()} with ${outerBrief} (${trendBrief}). Which element in your Study Deck is this?`,
+      frontPrompt: `Notable as ${sanitizedHighlight}: a ${catMeta.label.toLowerCase()} with ${outerBrief} (${trendBrief}). Which element in your Study Deck is this?`,
       hasPersonalNote: trimmedNote.length > 0,
       answerHeadline: `#${element.number} ${element.name} (${element.symbol})`,
       answerSubline: `${catMeta.label} · ${element.electronConfig} · Shells ${element.shells.join(" · ")}`,
@@ -1125,7 +1125,7 @@ export function buildDailySpotlight(dateKey = "2025-11-01", offset = 0) {
 
   const sanitizedHighlight = redactElementClueText(target);
 
-  const clue = `Known as ${sanitizedHighlight} — a ${categoryLabel(target.category).toLowerCase()} with ${
+  const clue = `Known as ${sanitizedHighlight}: a ${categoryLabel(target.category).toLowerCase()} with ${
     target.outerShellElectrons
   } outer-shell e⁻ (${target.block}-block, ${trendBit}). Can you identify this element?`;
 
@@ -1209,7 +1209,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
 
       const options = [target, ...trendDistractors].map((el) => ({
         slug: el.slug,
-        label: `${el.name} (${el.symbol}) — ${categoryLabel(el.category)}, Z = ${el.number}`,
+        label: `${el.name} (${el.symbol}): ${categoryLabel(el.category)}, Z = ${el.number}`,
       }));
 
       const prompt =
@@ -1236,7 +1236,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
     } else if (qType === 2) {
       const options = [target, ...distractors].map((el) => ({
         slug: el.slug,
-        label: `${el.symbol} — ${el.name} (Z = ${el.number})`,
+        label: `${el.symbol}: ${el.name} (Z = ${el.number})`,
       }));
       questions.push({
         id: qId,
@@ -1323,7 +1323,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
       const nearDistractors = getNeighborDistractors(target, seed + 1, null, false);
       const options = [target, ...nearDistractors].map((el) => ({
         slug: el.slug,
-        label: `${el.name} (${el.symbol}) — ${el.group !== null ? `Group ${el.group}` : "f-block"}`,
+        label: `${el.name} (${el.symbol}): ${el.group !== null ? `Group ${el.group}` : "f-block"}`,
       }));
       const topSubs = target.subshells
         .slice(-2)
@@ -1353,7 +1353,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
           .join(" ");
         return {
           slug: el.slug,
-          label: `${subSummary} — ${el.outerShellElectrons} outer-shell e⁻ in n = ${el.shells.length} (${el.shells.join("·")})`,
+          label: `${subSummary}: ${el.outerShellElectrons} outer-shell e⁻ in n = ${el.shells.length} (${el.shells.join("·")})`,
         };
       });
       const aufbauNote = AUFBAU_NOTES[target.symbol] ? ` ${AUFBAU_NOTES[target.symbol]}` : "";
@@ -1370,7 +1370,7 @@ export function buildDeterministicQuiz(pool, count = 5, mode = "all", difficulty
     } else {
       const options = [target, ...distractors].map((el) => ({
         slug: el.slug,
-        label: `${el.name} (${el.symbol}) — ${categoryLabel(el.category)}, ${el.outerShellElectrons} outer-shell e⁻ (${el.block}-block)`,
+        label: `${el.name} (${el.symbol}): ${categoryLabel(el.category)}, ${el.outerShellElectrons} outer-shell e⁻ (${el.block}-block)`,
       }));
       const valenceDetail =
         target.block === "d" || target.block === "f"

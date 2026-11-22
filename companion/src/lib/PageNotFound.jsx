@@ -22,7 +22,7 @@ export default function PageNotFound() {
                 <div className="w-16 h-16 rounded-2xl bg-[#161b22] border border-[#ff6b6b] flex items-center justify-center mx-auto text-2xl font-mono font-bold text-[#ff6b6b]">
                     404
                 </div>
-                <h1 className="text-3xl font-extrabold text-white">404 — Off the table</h1>
+                <h1 className="text-3xl font-extrabold text-white">404: Off the table</h1>
                 <p className="text-sm text-[#aeb8c4]">
                     The page <code className="font-mono text-white">&quot;{pageName}&quot;</code> could not be found.
                     Maybe it hasn&apos;t been synthesized yet.

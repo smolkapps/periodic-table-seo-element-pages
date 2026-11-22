@@ -1,6 +1,18 @@
 # Worklog
 
-## November 11, 2026 — Automatic checked website releases
+## November 22, 2026: element page indexing content
+
+Goal: make all 118 `/element/<slug>/` pages more specific and useful so Google has distinct titles, descriptions, and source-backed facts, and so breadcrumb items have names.
+
+Changed the shared article builder. Each page now has one use sentence, a place/neighbor paragraph, the ground-state configuration (with the existing Aufbau exception note where the study data has one), Pauling electronegativity, NIST first ionization energy, and Cordero covalent radius from the study dataset, plus CIAAW weight wording. Thorium, protactinium, and uranium keep their standard weights instead of a bracketed mass number. The old repeated highlight sentence is gone. Titles use `Name (Symbol): Electron Configuration, Properties & Quiz | ElementaLearn`. Breadcrumbs are a named list in both HTML and JSON-LD. Each page links the other elements in its group, or the rest of its f-block series. Public site text uses ElementaLearn and no em dash in the reference pages.
+
+Verified: `astro check` clean; root tests 152 passed; `verify-build` 127 HTML pages and 4016 internal links; study tests 48 passed, typecheck and lint clean. Sitemap has 126 URLs, including all 118 element pages and `/oxygen-and-sulfur/`. Desktop and narrow screenshots of iron and chlorine showed the new title block, breadcrumb, and article. A live check of `http://elementalearn.com` returned 308 to HTTPS from Cloudflare, not 500. The repo Caddy snippet has no HTTP listener.
+
+Next: merge to main is what publishes the site. This branch does not deploy by itself.
+
+Follow-up: replaced remaining em dashes in study-lab quiz strings, trend headlines, compare and saved-element labels, and other rendered study copy. Compact missing trend values use "n/a" or "Not established". Comments and the progress-export `app` field were left unchanged.
+
+## November 11, 2026: Automatic checked website releases
 
 Michael explicitly requested continuing Gemini Carbon improvements and automatic publication after fixes. This bounded work owns release scripts/CI only, preserving the root reference, auth-free study deployment and separate tutor. Fresh main was01a295c; other worktrees were preserved. Existing CI is routed to hosted Ubuntu by a repository variable, so adding existing private-mesh SSH to the hosted runner would require new credentials. Chosen path: checked static artifact from main CI, existing-auth Studio LaunchAgent polls every3minutes, existing ctdsu SSH publishes it atomically after checksum/source checks. No new account, deployment key, host, service cost or inbound port.
 

@@ -40,4 +40,20 @@ const article = buildArticle(element);
       </table>
     )
   }
+
+  <section class="sources">
+    <h3>Sources</h3>
+    <p>{article.sourceNote}</p>
+    <ul>
+      {
+        article.citations.map((citation) => (
+          <li>
+            <a href={citation.url}>
+              {citation.source}: {citation.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </div>

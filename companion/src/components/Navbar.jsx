@@ -25,7 +25,7 @@ export default function Navbar() {
             </div>
             <div>
               <span className="font-bold text-base sm:text-lg tracking-tight text-white flex items-center gap-2">
-                Elementa
+                ElementaLearn
                 <span className="hidden md:inline-block text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#4f9dff]/15 text-[#7bb6ff] border border-[#4f9dff]/30">
                   {masteredCount}/118 Mastered
                 </span>

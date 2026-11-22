@@ -145,7 +145,7 @@ export default function ComparisonVisualLens({ elements = [] }) {
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between gap-2 px-1">
             <span className="text-xs font-mono text-[#7bb6ff]">
-              Inspecting {inspectedElement.name} ({inspectedElement.symbol}) — toggle Bohr shells or Hund&apos;s rule
+              Inspecting {inspectedElement.name} ({inspectedElement.symbol}): toggle Bohr shells or Hund&apos;s rule
               orbital boxes below:
             </span>
             <button

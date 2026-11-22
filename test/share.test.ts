@@ -7,7 +7,7 @@ import {
 } from "../src/lib/share";
 
 const payload: SharePayload = {
-  title: "Iron (Fe) — Periodic Table",
+  title: "Iron (Fe): Electron Configuration, Properties & Quiz | ElementaLearn",
   text: "Iron: element 26 on the periodic table.",
   url: "https://elements.example.com/element/iron/",
 };

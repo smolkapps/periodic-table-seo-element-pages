@@ -89,7 +89,7 @@ describe("Elementa 118-element dataset", () => {
     assert.equal(getElementBySlug("unobtanium"), undefined);
     assert.equal(
       buildElementPageTitle(getElementBySlug("iron")),
-      "Iron (Fe): Electron Configuration, Properties & Quiz — Elementa"
+      "Iron (Fe): Electron Configuration, Properties & Quiz | ElementaLearn"
     );
   });
 
@@ -271,12 +271,12 @@ describe("Elementa 118-element dataset", () => {
       assert.doesNotMatch(clueFront, new RegExp(`#${el.number}\\b|Z\\s*=\\s*${el.number}\\b`));
     }
 
-    assert.equal(describeValenceSummary(getElementBySlug("carbon")), "2s² 2p² — 4 valence electrons in outermost shell n=2");
-    assert.equal(describeValenceSummary(getElementBySlug("helium")), "1s² — closed n=1 valence shell (2 e⁻)");
-    assert.match(describeValenceSummary(getElementBySlug("neon")), /2s² 2p⁶ — closed n=2 valence octet/);
+    assert.equal(describeValenceSummary(getElementBySlug("carbon")), "2s² 2p²: 4 valence electrons in outermost shell n=2");
+    assert.equal(describeValenceSummary(getElementBySlug("helium")), "1s²: closed n=1 valence shell (2 e⁻)");
+    assert.match(describeValenceSummary(getElementBySlug("neon")), /2s² 2p⁶: closed n=2 valence octet/);
     assert.match(describeValenceSummary(getElementBySlug("chromium")), /3d⁵ 4s¹.*partially filled inner 3d⁵/);
     assert.match(describeValenceSummary(getElementBySlug("copper")), /4s¹ with filled inner 3d¹⁰/);
-    assert.equal(describeValenceSummary(getElementBySlug("palladium")), "4d¹⁰ — closed n=4 d-subshell with 0 electrons in n=5");
+    assert.equal(describeValenceSummary(getElementBySlug("palladium")), "4d¹⁰: closed n=4 d-subshell with 0 electrons in n=5");
     assert.match(describeValenceSummary(getElementBySlug("ytterbium")), /6s² over filled 4f¹⁴/);
     assert.match(describeValenceSummary(getElementBySlug("lawrencium")), /7s² 7p¹ over filled 5f¹⁴/);
 

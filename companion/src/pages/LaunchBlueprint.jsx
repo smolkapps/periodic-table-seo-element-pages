@@ -116,7 +116,7 @@ const PATCH_SNIPPETS = [
       '  url: "https://elementa.smolkin.org",',
       '  name: "Elementa",',
       '  shortName: "Elementa",',
-      '  title: "Elementa — Interactive Periodic Table, Atomic Trends & Chemistry Reference",',
+      '  title: "Elementa: Interactive Periodic Table, Atomic Trends & Chemistry Reference",',
       "  description:",
       '    "Explore all 118 chemical elements with verified IUPAC/NIST data, non-repetitive chemical profiles, Bohr shell diagrams, side-by-side comparison, and active-recall mastery.",',
       '  author: "Michael Smolkin",',
@@ -149,7 +149,7 @@ export default function LaunchBlueprint() {
         <section className="rounded-2xl bg-gradient-to-br from-[#161e2e] via-[#121824] to-[#0d1118] border border-[#2c374b] p-6 space-y-3">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase text-[#ffd43b]">
             <Rocket className="w-4 h-4" />
-            <span>Owner Documentation — Strategy, SEO Launch &amp; Astro Reintegration</span>
+            <span>Owner Documentation: Strategy, SEO Launch &amp; Astro Reintegration</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
             Elementa Owner Documentation: Diagnosis, Launch Plan &amp; Astro 5 Patches
@@ -242,7 +242,7 @@ export default function LaunchBlueprint() {
                 </li>
                 <li>
                   <strong>Cut / Avoid:</strong> Do NOT generate 6,903 thin programmatic pair pages ({" "}
-                  <code className="text-white">118 × 117 / 2</code>) — search engines penalize near-duplicate thin
+                  <code className="text-white">118 × 117 / 2</code>). Search engines penalize near-duplicate thin
                   combinatorial pages. Keep <code className="text-white">/compare/?ids=</code> dynamic and index only
                   118 rich element pages + 10 curated category/comparison hubs.
                 </li>

@@ -12,9 +12,15 @@
 import {
   type Element,
   categoryLabel,
-  getElementBySymbol,
   getElementByNumber,
 } from "./elements";
+import {
+  AUFBAU_NOTES,
+  ATOMIC_RADIUS_BY_Z,
+  ELECTRONEGATIVITY_BY_Z,
+  IONIZATION_ENERGY_BY_Z,
+  parseShellsAndSubshells,
+} from "../../companion/src/data/elementsData.js";
 
 /** Curated one-line highlight per element (uses/notability). Keyed by symbol. */
 const HIGHLIGHTS: Record<string, string> = {
@@ -138,9 +144,57 @@ const HIGHLIGHTS: Record<string, string> = {
   Og: "the heaviest known element, a synthetic noble gas named after Yuri Oganessian",
 };
 
-/** Format the atomic mass, bracketing it for synthetic/unstable elements. */
+/** Stable elements whose standard weight comes from one naturally occurring nuclide. */
+const MONONUCLIDIC_STABLE = new Set([
+  4, 9, 11, 13, 15, 21, 25, 27, 33, 39, 41, 45, 53, 55, 59, 65, 67, 69, 79,
+]);
+
+export interface TrendFacts {
+  electronegativity: number | null;
+  ionizationEnergy: number | null;
+  covalentRadius: number | null;
+}
+
+function recordedTrend(table: Readonly<Record<number, number>>, z: number): number | null {
+  return Object.prototype.hasOwnProperty.call(table, z) ? table[z]! : null;
+}
+
+/** Pauling electronegativity, NIST first ionization energy, and covalent radius. */
+export function trendFacts(element: Element): TrendFacts {
+  return {
+    electronegativity: recordedTrend(ELECTRONEGATIVITY_BY_Z, element.number),
+    ionizationEnergy: recordedTrend(IONIZATION_ENERGY_BY_Z, element.number),
+    covalentRadius: recordedTrend(ATOMIC_RADIUS_BY_Z, element.number),
+  };
+}
+
+/** Format the atomic mass, bracketing it when there is no CIAAW standard weight. */
 export function formatMass(element: Element): string {
   return element.synthetic ? `[${Math.round(element.atomicMass)}]` : String(element.atomicMass);
+}
+
+/** Descriptive document title, without the site name (the layout appends it). */
+export function elementPageTitle(element: Element): string {
+  return `${element.name} (${element.symbol}): Electron Configuration, Properties & Quiz`;
+}
+
+/** Search snippet. A finished sentence, kept within the usual ~160 character limit. */
+export function metaDescriptionFor(element: Element): string {
+  const trends = trendFacts(element);
+  const parts = [
+    `${element.name} (${element.symbol}): ground-state configuration ${element.electronConfig}`,
+  ];
+  if (trends.electronegativity !== null) {
+    parts.push(`Pauling electronegativity ${trends.electronegativity}`);
+  }
+  if (trends.ionizationEnergy !== null) {
+    parts.push(`first ionization energy ${trends.ionizationEnergy} kJ/mol`);
+  }
+  let text = `${parts.join(", ")}.`;
+  if (text.length > 160) {
+    text = `${element.name} (${element.symbol}): configuration ${element.electronConfig}.`;
+  }
+  return text;
 }
 
 /** Human phrase for discovery, e.g. "discovered in 1869 by Mendeleev" or "known since antiquity". */
@@ -156,14 +210,27 @@ export interface ArticleSection {
   body: string;
 }
 
+export interface Citation {
+  source: string;
+  title: string;
+  url: string;
+}
+
 export interface Article {
-  /** Short summary used for meta description + card text + panel intro. */
+  /** Visible lead. The curated use or fact, stated once. */
   summary: string;
+  /** Search snippet. Distinct from the visible lead. */
+  metaDescription: string;
   /** Ordered prose sections rendered on the page and in the panel. */
   sections: ArticleSection[];
   /** Key/value facts rendered as a table. */
   facts: { label: string; value: string }[];
+  citations: Citation[];
+  sourceNote: string;
 }
+
+export const SOURCE_NOTE =
+  "Trend figures are the Pauling electronegativities, NIST first ionization energies, and Cordero et al. covalent radii compiled for the study tools. Standard atomic weights follow IUPAC CIAAW. Where a value is missing from that dataset, the table says it is not established.";
 
 /** The highlight clause for an element (curated, or a safe generic fallback). */
 export function highlightFor(element: Element): string {
@@ -174,44 +241,69 @@ export function highlightFor(element: Element): string {
 }
 
 /**
- * Build the full article for an element. Deterministic: same input → same
+ * Build the full article for an element. Deterministic: same input, same
  * output, so the page and the panel always agree, and tests can assert exact
- * content.
+ * content. The curated highlight is used only in the summary. Trend numbers
+ * come from the study dataset.
  */
 export function buildArticle(element: Element): Article {
   const mass = formatMass(element);
   const cat = categoryLabel(element.category).toLowerCase();
   const highlight = highlightFor(element);
-  const groupText =
+  const trends = trendFacts(element);
+  const outer = parseShellsAndSubshells(element.electronConfig).outerShellElectrons;
+  const summary = `${element.name} is ${highlight}.`;
+
+  const place =
     element.group !== null
-      ? `group ${element.group}`
-      : element.category === "lanthanide"
-        ? "the lanthanide series (f-block)"
-        : "the actinide series (f-block)";
+      ? `${element.name} is a ${cat} in group ${element.group}, period ${element.period}. ${phaseSentence(element)} ${neighbourSentence(element)}`
+      : `${element.name} is a ${cat} in period ${element.period}. It belongs to the f-block, which has no group number in the 18-column table. ${phaseSentence(element)} ${neighbourSentence(element)}`;
 
-  const summary = `${element.name} (symbol ${element.symbol}, atomic number ${element.number}) is ${highlight}. It is classified as a ${cat} and sits in ${groupText}, period ${element.period} of the periodic table.`;
+  const aufbau = (AUFBAU_NOTES as Readonly<Record<string, string>>)[element.symbol];
+  const structure = [
+    `A neutral ${element.name} atom has ${countNoun(element.number, "proton")} and ${countNoun(element.number, "electron")}. Its ground-state electron configuration is ${element.electronConfig}, and the highest occupied shell holds ${countNoun(outer, "electron")}.`,
+    aufbau,
+    trendSentence(trends),
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const overview = `${element.name} is the chemical element with atomic number ${element.number} and the symbol ${element.symbol}. With a standard atomic weight of ${mass}, it is a ${cat}. In the periodic table it occupies ${groupText} and period ${element.period}, and under standard conditions it is normally a ${element.phase}. ${capitalize(element.name)} ${highlight.startsWith("the") || highlight.startsWith("a ") || highlight.startsWith("an ") || highlight.startsWith("one") ? "is " + highlight : highlight}.`;
-
-  const structure = `An atom of ${element.name} has ${element.number} proton${element.number === 1 ? "" : "s"} in its nucleus and, when neutral, ${element.number} electron${element.number === 1 ? "" : "s"} arranged in the configuration ${element.electronConfig}. ${element.synthetic ? `${capitalize(element.name)} has no stable isotope; the value ${mass} refers to the mass number of its most stable or most commonly produced isotope.` : `Its standard atomic weight of ${mass} reflects the natural mix of its stable isotopes.`}`;
-
-  const discovery = `${capitalize(element.name)} ${discoveryPhrase(element)}. ${neighbourSentence(element)}`;
+  const discovery = `${capitalize(element.name)} ${discoveryPhrase(element)}. ${isotopeSentence(element, mass)}`;
 
   const sections: ArticleSection[] = [
-    { heading: "Overview", body: overview },
-    { heading: "Atomic structure", body: structure },
-    { heading: "Discovery and place in the table", body: discovery },
+    { heading: "Place in the periodic table", body: place },
+    { heading: "Electron configuration and trends", body: structure },
+    { heading: "Discovery and isotopes", body: discovery },
   ];
 
   const facts: { label: string; value: string }[] = [
     { label: "Atomic number", value: String(element.number) },
     { label: "Symbol", value: element.symbol },
-    { label: "Atomic mass", value: mass },
+    {
+      label: "Standard atomic weight",
+      value: element.synthetic ? `${mass} (reference mass number, no CIAAW weight)` : mass,
+    },
     { label: "Category", value: categoryLabel(element.category) },
-    { label: "Group", value: element.group !== null ? String(element.group) : "—" },
+    { label: "Group", value: element.group !== null ? String(element.group) : "f-block" },
     { label: "Period", value: String(element.period) },
     { label: "Electron configuration", value: element.electronConfig },
-    { label: "Phase at STP", value: capitalize(element.phase) },
+    { label: "Highest occupied shell", value: countNoun(outer, "electron") },
+    {
+      label: "Phase at STP",
+      value: element.number >= 104 ? `${capitalize(element.phase)} (predicted)` : capitalize(element.phase),
+    },
+    {
+      label: "Pauling electronegativity",
+      value: trends.electronegativity !== null ? String(trends.electronegativity) : "Not established",
+    },
+    {
+      label: "First ionization energy",
+      value: trends.ionizationEnergy !== null ? `${trends.ionizationEnergy} kJ/mol` : "Not established",
+    },
+    {
+      label: "Covalent radius",
+      value: trends.covalentRadius !== null ? `${trends.covalentRadius} pm` : "Not established",
+    },
     {
       label: "Discovered",
       value:
@@ -221,17 +313,102 @@ export function buildArticle(element: Element): Article {
     },
   ];
 
-  return { summary, sections, facts };
+  const citations: Citation[] = [
+    {
+      source: "PubChem (NCBI / NIH)",
+      title: `${element.name}: atomic and physical properties`,
+      url: `https://pubchem.ncbi.nlm.nih.gov/element/${element.number}`,
+    },
+    {
+      source: "Royal Society of Chemistry",
+      title: `${element.name} (${element.symbol}) visual elements reference`,
+      url: `https://periodic-table.rsc.org/element/${element.number}`,
+    },
+    {
+      source: "NIST Physical Measurement Laboratory",
+      title: "Ground levels and ionization energies for the neutral atoms",
+      url: "https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html",
+    },
+    {
+      source: "IUPAC CIAAW",
+      title: "Standard atomic weights of the elements",
+      url: "https://ciaaw.org/atomic-weights.htm",
+    },
+  ];
+
+  return {
+    summary,
+    metaDescription: metaDescriptionFor(element),
+    sections,
+    facts,
+    citations,
+    sourceNote: SOURCE_NOTE,
+  };
 }
 
 function capitalize(s: string): string {
   return s.length === 0 ? s : s[0]!.toUpperCase() + s.slice(1);
 }
 
+function countNoun(n: number, noun: string): string {
+  return `${n} ${noun}${n === 1 ? "" : "s"}`;
+}
+
+function phaseSentence(element: Element): string {
+  if (element.number >= 104) {
+    return `The table lists its phase as ${element.phase}. For atomic number 104 and above, that phase is a prediction from periodic placement: these elements are produced a few atoms at a time, so a bulk sample is not measured.`;
+  }
+  return `At standard temperature and pressure it is a ${element.phase}.`;
+}
+
+function trendSentence(trends: TrendFacts): string {
+  const parts = [
+    trends.electronegativity !== null
+      ? `Pauling electronegativity ${trends.electronegativity}`
+      : "no established Pauling electronegativity",
+    trends.ionizationEnergy !== null
+      ? `first ionization energy ${trends.ionizationEnergy} kJ/mol`
+      : "no measured first ionization energy",
+    trends.covalentRadius !== null
+      ? `covalent radius ${trends.covalentRadius} pm`
+      : "no established covalent radius",
+  ];
+  return `Recorded trend values: ${parts.join("; ")}.`;
+}
+
+/**
+ * Isotope wording follows the study dataset's distinctions: bracketed mass
+ * numbers, CIAAW weights for Bi/Th/Pa/U, and mononuclidic stable elements.
+ */
+function isotopeSentence(element: Element, mass: string): string {
+  if (element.number === 83) {
+    return `Although ${element.name} has no stable isotopes, primordial 209Bi (alpha decay half-life about 2.01 x 10^19 years) occurs naturally in Earth's crust, and IUPAC CIAAW assigns a standard atomic weight of ${mass}.`;
+  }
+  if (element.number === 90) {
+    return `Although ${element.name} has no stable isotopes, primordial 232Th (half-life about 1.40 x 10^10 years) occurs naturally in Earth's crust, and IUPAC CIAAW assigns a standard atomic weight of ${mass}.`;
+  }
+  if (element.number === 91) {
+    return `Although ${element.name} has no stable isotopes, and primordial protactinium has long decayed away, natural 231Pa in 235U decay chains occurs in Earth's crust, and IUPAC CIAAW assigns a standard atomic weight of ${mass}.`;
+  }
+  if (element.number === 92) {
+    return `Although ${element.name} has no stable isotopes, primordial 238U and 235U (along with radiogenic 234U maintained through 238U decay) occur naturally in Earth's crust, and IUPAC CIAAW assigns a standard atomic weight of ${mass}.`;
+  }
+  if (element.synthetic && element.number >= 95) {
+    return `${element.name} is a synthetic element with no stable isotopes. CIAAW assigns no standard atomic weight, and ${mass} is a reference mass number.`;
+  }
+  if (element.synthetic) {
+    return `Every isotope of ${element.name} is radioactive. CIAAW assigns no standard atomic weight, and ${mass} is a reference mass number.`;
+  }
+  if (MONONUCLIDIC_STABLE.has(element.number)) {
+    return `Its standard atomic weight of ${mass} comes from its one naturally occurring stable isotope, ${element.symbol}-${Math.round(element.atomicMass)}.`;
+  }
+  return `Its standard atomic weight of ${mass} reflects the terrestrial mix of its naturally occurring isotopes.`;
+}
+
 /** Sentence relating the element to its periodic-table neighbours by symbol. */
 function neighbourSentence(element: Element): string {
-  const prev = getElementBySymbol(prevSymbol(element));
-  const next = getElementBySymbol(nextSymbol(element));
+  const prev = getElementByNumber(element.number - 1);
+  const next = getElementByNumber(element.number + 1);
   if (prev && next) {
     return `It follows ${prev.name} (${prev.symbol}) and precedes ${next.name} (${next.symbol}) in order of atomic number.`;
   }
@@ -242,19 +419,4 @@ function neighbourSentence(element: Element): string {
     return `It follows ${prev.name} (${prev.symbol}) and is, so far, the heaviest element ever produced.`;
   }
   return "";
-}
-
-// These two helpers avoid importing the whole list again; they reconstruct the
-// neighbour symbol via atomic number through the public lookup.
-function prevSymbol(element: Element): string {
-  const p = getNumberSymbol(element.number - 1);
-  return p ?? "";
-}
-function nextSymbol(element: Element): string {
-  const n = getNumberSymbol(element.number + 1);
-  return n ?? "";
-}
-
-function getNumberSymbol(n: number): string | undefined {
-  return getElementByNumber(n)?.symbol;
 }

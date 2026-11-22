@@ -6,7 +6,7 @@ export const TREND_EXPLORER_METRICS = Object.freeze([
     label: "Pauling Electronegativity",
     unit: "",
     principle:
-      "Pauling electronegativity (dimensionless scale) estimates an atom's relative attraction for shared electrons inside a covalent bond—distinct from isolated-atom ionization energy.",
+      "Pauling electronegativity (dimensionless scale) estimates an atom's relative attraction for shared electrons inside a covalent bond, distinct from isolated-atom ionization energy.",
   },
   {
     key: "ionizationEnergy",
@@ -180,7 +180,7 @@ export function buildTrendExplorerAnalysis(element, metricKey = "electronegativi
   const explanation = pair ? getIonizationExceptionExplanation(comparePeers.filter((p) => pair.includes(p.slug))) : "";
   const valText = formatTrendMetricValue(currentVal, metric.key);
   return { ...result,
-    headline: `${element.name} in ${shortScope}: ${valText}${relation ? ` — ${relation}` : ""}`,
+    headline: `${element.name} in ${shortScope}: ${valText}${relation ? `, ${relation}` : ""}`,
     summary: `${element.name}'s ${metric.label.toLowerCase()} is ${valText}${relation ? `, ${relation}` : ""}. ${scopeNote}${missingNote}${explanation ? ` ${explanation}` : ""}`,
     sourceUrl: explanation ? "https://openstax.org/books/chemistry-2e/pages/6-5-periodic-variations-in-element-properties" : null };
 }

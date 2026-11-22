@@ -32,10 +32,10 @@ export const STORAGE_UNAVAILABLE_MESSAGE =
   "Progress can't be saved in this browser: local storage is unavailable (private or restricted browsing). Changes you make now will disappear when you reload.";
 
 export const STORAGE_FULL_MESSAGE =
-  "This browser's storage for Elementa is full, so your latest change was not saved. Export your progress, then remove some study notes to free space.";
+  "This browser's storage for ElementaLearn is full, so your latest change was not saved. Export your progress, then remove some study notes to free space.";
 
 export const STORAGE_BLOCKED_MESSAGE =
-  "Your browser blocked saving progress for this site. Allow site data for Elementa (or leave private browsing) so your study deck survives a reload.";
+  "Your browser blocked saving progress for this site. Allow site data for ElementaLearn (or leave private browsing) so your study deck survives a reload.";
 
 function getDefaultStorage() {
   try {
@@ -231,7 +231,7 @@ export function buildExportPayload(progress) {
  */
 export function validateImport(raw) {
   if (!isPlainObject(raw)) {
-    return { ok: false, error: "That file isn't a JSON object, so it can't be an Elementa progress export." };
+    return { ok: false, error: "That file isn't a JSON object, so it can't be an ElementaLearn progress export." };
   }
 
   const fields = ["savedSlugs", "masteryMap", "notesMap", "quizHistory"];
@@ -272,7 +272,7 @@ export function validateImport(raw) {
     progress.quizHistory.length === 0 &&
     (raw.savedSlugs?.length || Object.keys(raw.notesMap || {}).length || Object.keys(raw.masteryMap || {}).length)
   ) {
-    return { ok: false, error: "None of the elements in this file match Elementa's 118-element table." };
+    return { ok: false, error: "None of the elements in this file match ElementaLearn's 118-element table." };
   }
 
   const droppedSlugs = Array.isArray(raw.savedSlugs) ? raw.savedSlugs.length - progress.savedSlugs.length : 0;

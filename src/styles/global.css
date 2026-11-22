@@ -487,14 +487,45 @@ p {
   max-width: 48%;
 }
 
-/* Breadcrumbs */
+/* Breadcrumbs. Separators are CSS so they are not extra unnamed items. */
 .crumbs {
   font-size: var(--step--1);
   color: var(--ink-faint);
   margin-top: var(--space-m);
 }
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.crumbs li:not(:last-child)::after {
+  content: "›";
+  margin-left: 0.35rem;
+}
 .crumbs a {
   color: var(--ink-soft);
+}
+
+.related-elements {
+  margin-top: var(--space-l);
+}
+.related-elements ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+.article .sources ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+.article .sources li {
+  margin: 0.2rem 0;
 }
 
 /* Toast for copy fallback */

@@ -11,7 +11,8 @@ import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ELEMENTS, getElementByNumber } from "../src/lib/elements";
-import { buildArticle } from "../src/lib/article";
+import { buildArticle, elementPageTitle } from "../src/lib/article";
+import { sameGroupElements } from "../src/lib/elements";
 
 const DIST = join(process.cwd(), "dist");
 const hasBuild = existsSync(DIST);
@@ -31,15 +32,18 @@ d("static build output", () => {
     }
   });
 
-  it("each element page embeds its full article summary in the static HTML", () => {
+  it("each element page embeds its article, configuration, and descriptive title in static HTML", () => {
     for (const el of ELEMENTS) {
       const html = readFileSync(pagePath(el.slug), "utf8");
-      const { summary } = buildArticle(el);
-      // The opening clause of the summary (name + symbol + number) must be in
-      // the prerendered HTML — i.e. crawlers see the content with no JS.
-      const probe = `${el.name} (symbol ${el.symbol}, atomic number ${el.number})`;
-      expect(html.includes(probe), `summary missing in ${el.slug}`).toBe(true);
-      expect(summary.startsWith(probe)).toBe(true);
+      // Astro escapes apostrophes in text, so compare the decoded page.
+      const text = html.replaceAll("&amp;", "&").replaceAll("&#39;", "'");
+      const article = buildArticle(el);
+      // Crawlers see the prose with no JavaScript.
+      expect(text.includes(article.summary), `summary missing in ${el.slug}`).toBe(true);
+      expect(text).toContain(el.electronConfig);
+      expect(text).toContain(`<title>${elementPageTitle(el)} | ElementaLearn</title>`);
+      expect(text).toContain(`name="description" content="${article.metaDescription}"`);
+      expect(html).not.toContain("\u2014");
     }
   });
 
@@ -57,11 +61,33 @@ d("static build output", () => {
     );
   });
 
-  it("each element page emits ChemicalSubstance + BreadcrumbList JSON-LD", () => {
+  it("each element page emits ChemicalSubstance + named BreadcrumbList items", () => {
     const html = readFileSync(pagePath("oxygen"), "utf8");
     expect(html).toContain('"@type":"ChemicalSubstance"');
     expect(html).toContain('"@type":"BreadcrumbList"');
-    expect(html).toContain('application/ld+json');
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
+      (match) => JSON.parse(match[1]!) as { "@type"?: string; itemListElement?: { name?: string }[] },
+    );
+    const crumbs = blocks.find((block) => block["@type"] === "BreadcrumbList");
+    expect(crumbs?.itemListElement?.map((item) => item.name)).toEqual([
+      "Home",
+      "Elements",
+      "Oxygen",
+    ]);
+    // The visible trail names the current page in its own item, not a bare text node.
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain(">Oxygen</span>");
+  });
+
+  it("links every element to the other members of its group from crawlable HTML", () => {
+    for (const el of ELEMENTS) {
+      const html = readFileSync(pagePath(el.slug), "utf8");
+      for (const mate of sameGroupElements(el)) {
+        expect(html, `${el.slug} missing link to ${mate.slug}`).toContain(
+          `href="/element/${mate.slug}/"`,
+        );
+      }
+    }
   });
 
   it("element pages carry full Open Graph + Twitter card meta", () => {
@@ -98,7 +124,7 @@ d("static build output", () => {
   it("home page uses the full marketing title and WebSite JSON-LD", () => {
     const home = readFileSync(join(DIST, "index.html"), "utf8");
     expect(home).toContain(
-      "<title>Elementa — Periodic Table &amp; Chemistry Practice</title>",
+      "<title>ElementaLearn: Periodic Table and Chemistry Practice</title>",
     );
     expect(home).toContain('"@type":"WebSite"');
   });
@@ -148,7 +174,7 @@ d("static build output", () => {
       expect(html).toContain(`<link rel="canonical" href="https://elementalearn.com/${slug}/"`);
       expect(html).toMatch(/<h1\b[^>]*>/);
       expect(html).toContain('href="/apple-touch-icon.png"');
-      expect(html).not.toContain("404 — Off the table");
+      expect(html).not.toContain("404: Off the table");
     }
   });
 
@@ -171,9 +197,19 @@ d("static build output", () => {
     expect(h).toContain("/compare/?ids=hydrogen,helium");
   });
 
-  it("emits sitemap and robots.txt", () => {
+  it("emits sitemap and robots.txt, including every element page", () => {
     expect(existsSync(join(DIST, "sitemap-index.xml"))).toBe(true);
     expect(existsSync(join(DIST, "robots.txt"))).toBe(true);
+    const sitemapFiles = ["sitemap-index.xml", "sitemap-0.xml"].filter((name) =>
+      existsSync(join(DIST, name)),
+    );
+    const xml = sitemapFiles.map((name) => readFileSync(join(DIST, name), "utf8")).join("\n");
+    for (const el of ELEMENTS) {
+      expect(xml, `sitemap missing ${el.slug}`).toContain(
+        `https://elementalearn.com/element/${el.slug}/`,
+      );
+    }
+    expect(xml).toContain("https://elementalearn.com/oxygen-and-sulfur/");
   });
 
   it("emits the RSS feed with element entries", () => {

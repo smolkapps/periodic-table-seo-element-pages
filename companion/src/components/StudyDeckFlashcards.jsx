@@ -196,7 +196,7 @@ export default function StudyDeckFlashcards({ elements = [], notesMap = {}, mast
             <p className="text-xs sm:text-sm text-[#aeb8c4]">
               {flaggedElements.length > 0
                 ? `Flagged for another look: ${flaggedElements.map((e) => `${e.name} (${e.symbol})`).join(", ")}.`
-                : "Every card in this pass was recalled cleanly — lock in mastery with a multiple-choice quiz or try the next recall lens."}
+                : "Every card in this pass was recalled cleanly. Lock in mastery with a multiple-choice quiz or try the next recall lens."}
             </p>
           </div>
 
@@ -286,7 +286,7 @@ export default function StudyDeckFlashcards({ elements = [], notesMap = {}, mast
             {!isRevealed && card.hasPersonalNote && (
               <p className="text-xs font-mono text-[#7bb6ff] flex items-center gap-1.5 pt-0.5">
                 <FileText className="w-3.5 h-3.5 shrink-0" />
-                <span>Personal study note saved — revealed with answer</span>
+                <span>Personal study note saved: revealed with answer</span>
               </p>
             )}
           </div>

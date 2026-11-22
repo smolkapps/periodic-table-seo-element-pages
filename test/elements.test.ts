@@ -224,7 +224,9 @@ describe("buildShareData", () => {
   it("produces a title, descriptive text, and the canonical URL", () => {
     const fe = getElementByNumber(26)!;
     const share = buildShareData(fe, "https://elements.example.com");
-    expect(share.title).toBe("Iron (Fe) — Periodic Table");
+    expect(share.title).toBe(
+      "Iron (Fe): Electron Configuration, Properties & Quiz | ElementaLearn",
+    );
     expect(share.url).toBe("https://elements.example.com/element/iron/");
     expect(share.text).toContain("element 26");
     expect(share.text).toContain("transition metal");

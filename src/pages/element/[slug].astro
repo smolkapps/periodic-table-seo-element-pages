@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleBody from "../../components/ArticleBody.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ShareButton from "../../components/ShareButton.astro";
 import { absUrl } from "../../config";
 import {
@@ -8,9 +9,12 @@ import {
   CATEGORY_META,
   categoryLabel,
   adjacentElements,
+  sameGroupElements,
+  sameGroupLabel,
   type Element,
 } from "../../lib/elements";
-import { buildArticle, formatMass } from "../../lib/article";
+import { buildArticle, elementPageTitle, formatMass } from "../../lib/article";
+import { breadcrumbList } from "../../lib/breadcrumbs";
 
 export function getStaticPaths() {
   return ELEMENTS.map((element) => ({
@@ -30,6 +34,8 @@ const article = buildArticle(element);
 const canonical = absUrl(`element/${element.slug}/`);
 const accent = CATEGORY_META[element.category].cssVar;
 const { prev, next } = adjacentElements(element.number);
+const groupMates = sameGroupElements(element);
+const groupLabel = sameGroupLabel(element);
 
 // JSON-LD: a ChemicalSubstance for the element itself + a BreadcrumbList.
 const chemical = {
@@ -38,34 +44,18 @@ const chemical = {
   name: element.name,
   alternateName: element.symbol,
   identifier: String(element.number),
-  description: article.summary,
+  description: article.metaDescription,
   url: canonical,
   ...(element.discoveredBy && element.discoveredBy !== "Ancient"
     ? { discoverer: { "@type": "Person", name: element.discoveredBy } }
     : {}),
 };
 
-const breadcrumbs = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: absUrl() },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Elements",
-      item: absUrl("elements/"),
-    },
-    {
-      "@type": "ListItem",
-      position: 3,
-      name: element.name,
-      item: canonical,
-    },
-  ],
-};
-
-const metaDescription = article.summary.slice(0, 300);
+const breadcrumbs = breadcrumbList([
+  { name: "Home", url: absUrl() },
+  { name: "Elements", url: absUrl("elements/") },
+  { name: element.name, url: canonical },
+]);
 
 // Deep link into /compare/ preloaded with this element and its neighbours,
 // so "how does it stack up?" is one click from every article.
@@ -76,16 +66,20 @@ const compareIds = [prev, element, next]
 ---
 
 <BaseLayout
-  title={`${element.name} (${element.symbol})`}
-  description={metaDescription}
+  title={elementPageTitle(element)}
+  description={article.metaDescription}
   jsonLd={[chemical, breadcrumbs]}
   ogImagePath={`/og/${element.slug}.png`}
-  ogImageAlt={`${element.name} (${element.symbol}), element ${element.number} — periodic table tile with key facts`}
+  ogImageAlt={`${element.name} (${element.symbol}), element ${element.number}: periodic table tile with key facts`}
 >
   <div class="container">
-    <nav class="crumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a> › <a href="/elements/">Elements</a> › {element.name}
-    </nav>
+    <Breadcrumbs
+      items={[
+        { name: "Home", href: "/" },
+        { name: "Elements", href: "/elements/" },
+        { name: element.name },
+      ]}
+    />
 
     <div class="element-hero">
       <div class="element-tile" style={`--tile-accent:var(${accent});`}>
@@ -97,7 +91,7 @@ const compareIds = [prev, element, next]
         <h1>{element.name}</h1>
         <p class="cat">
           {categoryLabel(element.category)} · Group {
-            element.group ?? "—"
+            element.group ?? "f-block"
           } · Period {element.period}
         </p>
       </div>
@@ -114,9 +108,29 @@ const compareIds = [prev, element, next]
       <a class="icon-btn" href="/" style="margin-left:auto;">← Back to table</a>
     </div>
 
-    <ArticleBody element={element} />{ ["oxygen", "sulfur"].includes(element.slug) && (
-      <p><a href="/oxygen-and-sulfur/">Why do oxygen and sulfur have similar properties?</a></p>
-    ) }
+    <ArticleBody element={element} />
+    {
+      ["oxygen", "sulfur"].includes(element.slug) && (
+        <p>
+          <a href="/oxygen-and-sulfur/">Why do oxygen and sulfur have similar properties?</a>
+        </p>
+      )
+    }
+
+    <nav class="related-elements" aria-label={groupLabel}>
+      <h2>{groupLabel}</h2>
+      <ul>
+        {
+          groupMates.map((mate) => (
+            <li>
+              <a href={`/element/${mate.slug}/`}>
+                {mate.name} ({mate.symbol})
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
 
     <nav class="prevnext" aria-label="Element navigation">
       {

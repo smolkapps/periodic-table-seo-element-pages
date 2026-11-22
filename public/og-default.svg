@@ -16,7 +16,7 @@
     <rect x="340" y="190" width="110" height="110" rx="10" fill="#1c232d" stroke="#da77f2" stroke-width="4"/>
     <text x="395" y="262" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#e9edf2" text-anchor="middle">Xe</text>
   </g>
-  <text x="80" y="400" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#e9edf2">Elementa</text>
+  <text x="80" y="400" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#e9edf2">ElementaLearn</text>
   <text x="80" y="460" font-family="Arial, sans-serif" font-size="34" fill="#aeb8c4">Explore and compare all 118 chemical elements</text>
   <text x="80" y="556" font-family="Arial, sans-serif" font-size="26" fill="#4f9dff">elementalearn.com</text>
 </svg>

@@ -41,10 +41,10 @@ const canonical = canonicalPath
 // Social crawlers (Facebook, X, Slack, iMessage) don't render SVG og:images,
 // so cards are always prerendered 1200×630 PNGs. ogImagePath is base-less.
 const ogImage = absUrl(ogImagePath);
-const ogAlt = ogImageAlt ?? `${SITE.name} — ${title}`;
+const ogAlt = ogImageAlt ?? `${SITE.name}: ${title}`;
 // Pages titled with the site name itself (the home page) get the full
-// marketing title; everything else gets a "Page — Site" pattern.
-const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`;
+// marketing title; everything else gets a "Page | Site" pattern.
+const fullTitle = title === SITE.name ? SITE.title : `${title} | ${SITE.name}`;
 ---
 
 <!doctype html>
@@ -135,7 +135,7 @@ const fullTitle = title === SITE.name ? SITE.title : `${title} — ${SITE.name}`
           <a href="https://github.com/smolkapps/periodic-table-seo-element-pages">Source code</a>
           under the MIT license.
         </p>
-        <nav aria-label="About Elementa">
+        <nav aria-label="About ElementaLearn">
           <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a>
         </nav>
       </div>
