@@ -34,6 +34,7 @@ const required = [
   "icon-192.png",
   "icon-512.png",
   "robots.txt",
+  "llms.txt",
   "sitemap-index.xml",
   "rss.xml",
   "404.html",

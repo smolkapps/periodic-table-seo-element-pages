@@ -10,7 +10,7 @@ export const REQUIRED = ['index.html', 'element/oxygen/index.html', 'element/sul
   'favicon.svg', 'og-default.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png',
   'study/icons/apple-touch-icon-180.png', 'study/icons/icon-192.png', 'study/icons/icon-512.png',
   'study/icons/icon-512-maskable.png',
-  'robots.txt', 'sitemap-index.xml', '404.html'];
+  'robots.txt', 'llms.txt', 'sitemap-index.xml', '404.html'];
 
 export function releaseIdentity(revision, runId) {
   if (!/^[a-f0-9]{40}$/.test(revision)) throw new Error('Release needs a full Git revision');

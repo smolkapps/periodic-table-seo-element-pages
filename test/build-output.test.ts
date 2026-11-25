@@ -197,9 +197,14 @@ d("static build output", () => {
     expect(h).toContain("/compare/?ids=hydrogen,helium");
   });
 
-  it("emits sitemap and robots.txt, including every element page", () => {
+  it("emits sitemap, robots.txt, and llms.txt, including every element page", () => {
     expect(existsSync(join(DIST, "sitemap-index.xml"))).toBe(true);
     expect(existsSync(join(DIST, "robots.txt"))).toBe(true);
+    expect(existsSync(join(DIST, "llms.txt"))).toBe(true);
+    const llms = readFileSync(join(DIST, "llms.txt"), "utf8");
+    expect(llms).toContain("# ElementaLearn: Periodic Table and Chemistry Practice");
+    expect(llms).toContain("https://elementalearn.com/element/hydrogen/");
+    expect(llms).toContain("https://elementalearn.com/element/oganesson/");
     const sitemapFiles = ["sitemap-index.xml", "sitemap-0.xml"].filter((name) =>
       existsSync(join(DIST, name)),
     );
