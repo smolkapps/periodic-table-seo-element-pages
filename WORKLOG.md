@@ -1,5 +1,13 @@
 # Worklog
 
+## November 25, 2026: Persistent `/llms.txt` endpoint and AI crawler rules
+
+Goal: ship a persistent `/llms.txt` index for answer engines and agentic browsers on `elementalearn.com`, explicitly allow AI search/training crawlers in `robots.txt`, and wire `llms.txt` into the post-build verification and atomic release manifest gates so future CI or `auto-release-elementa` promotions never delete it.
+
+Changed `src/pages/llms.txt.ts` (generates `/llms.txt` at build time covering all 118 elements by category, interactive tools, study lab, and trend questions), updated `src/pages/robots.txt.ts` (`OAI-SearchBot`, `ChatGPT-User`, `GPTBot`, `Claude-SearchBot`, `Claude-User`, `ClaudeBot`, `PerplexityBot`, `Perplexity-User`, `Google-Extended`, `Applebot-Extended`, plus `# LLMs: https://elementalearn.com/llms.txt`), added `'llms.txt'` to `REQUIRED` in `scripts/verify-build.mjs`, `scripts/release-manifest.mjs`, and `~/.local/share/elementa-auto-release/release-manifest.mjs`, and added build-output assertion in `test/build-output.test.ts`.
+
+Verified: `astro check` 0 errors/warnings/hints; root Vitest 100% pass; `verify-build.mjs` OK (127 HTML pages, 4016 internal links, all finishing assets including `llms.txt`); `companion` 48/48 pass + lint/typecheck clean; `promote-elementa.test.py` 7/7 pass. Deployed via atomic `publish-elementa.mjs` release swap (`d6331798740978a9077515c9939fc6e45245f15f`) and verified `https://elementalearn.com/llms.txt` and `https://elementalearn.com/robots.txt` return `HTTP 200`.
+
 ## November 22, 2026: element page indexing content
 
 Goal: make all 118 `/element/<slug>/` pages more specific and useful so Google has distinct titles, descriptions, and source-backed facts, and so breadcrumb items have names.
